@@ -1,13 +1,14 @@
 import React from "react";
+
+import "./vmachines.css";
 import SideBar from "../../components/Sidebar";
-import "./vouchers.css";
-const Vouchers = () => {
+const Vmachines = () => {
   return (
     <div>
-      Vouchers PAGE:
+      Vmachines PAGE:
       <SideBar />
     </div>
   );
 };
 
-export default Vouchers;
+export default Vmachines;

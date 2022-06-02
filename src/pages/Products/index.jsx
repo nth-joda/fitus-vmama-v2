@@ -1,13 +1,14 @@
 import React from "react";
+
+import "./products.css";
 import SideBar from "../../components/Sidebar";
-import "./vouchers.css";
-const Vouchers = () => {
+const Products = () => {
   return (
     <div>
-      Vouchers PAGE:
+      Products PAGE:
       <SideBar />
     </div>
   );
 };
 
-export default Vouchers;
+export default Products;
