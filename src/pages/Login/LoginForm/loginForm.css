@@ -1,0 +1,74 @@
+.loginForm {
+  text-align: center;
+}
+
+.loginFromInput {
+  border: 2px solid var(--blue-text-color);
+  border-radius: 0.5rem;
+  width: 100%;
+}
+
+.loginFormInput__header {
+  color: var(--blue-text-color);
+  font-size: 1.7rem;
+  font-weight: 600;
+  line-height: 2;
+  letter-spacing: 0.1rem;
+  text-align: center;
+  border-bottom: 2px solid var(--blue-text-color);
+}
+
+.field {
+  line-height: 2.2rem;
+  margin: 2rem auto;
+}
+
+.field__icon {
+  text-align: center;
+  border: 2px solid var(--blue-text-color);
+  background-color: var(--blue-text-color);
+  color: var(--white-color);
+  border-radius: 0.3rem 0 0 0.3rem;
+}
+.field__input {
+  border: 2px solid var(--blue-text-color);
+  border-radius: 0 0.3rem 0.3rem 0;
+  border-left: transparent;
+}
+
+.field__input input {
+  line-height: 2.2rem;
+  font-size: 1.3rem;
+  padding: 0 0.7rem;
+  text-decoration: italic;
+  font-style: italic;
+  border: none;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: transparent !important;
+}
+
+.field__input input:focus {
+  border: none;
+}
+
+.field__icon {
+  display: inline-block;
+}
+
+.field__password {
+  display: inline-block;
+}
+
+.field__password-eye {
+  cursor: pointer;
+  color: var(--blue-text-color);
+}
+
+.cta {
+  margin-top: 0.7rem;
+}
+
+.submitBtn {
+  margin-top: 1.2rem;
+}
