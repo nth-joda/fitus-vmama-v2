@@ -5,6 +5,16 @@ body {
   padding: 0;
   box-sizing: border-box;
   font-family: "Open Sans", sans-serif;
+
+  --blue-bg-color: #3084d7;
+  --blue-text-color: #005593;
+  --green-color: #2e7d32;
+  --red-color: #a00000;
+  --white-color: #fff;
+  --gray-bg-color: #ededed;
+  --gray-text: #898989;
+  --transition: all ease 0.3ms;
+  --gray-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 h1,
@@ -18,4 +28,43 @@ ul,
 li {
   margin: 0;
   padding: 0;
+}
+
+.btn {
+  background-color: transparent;
+  font-weight: 500;
+  font-size: 1.4rem;
+  color: var(--white-color);
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 0.4rem;
+  opacity: 0.9;
+  transition: var(--transition);
+  cursor: pointer;
+  box-shadow: var(--gray-shadow);
+}
+
+.btn-primary {
+  background-color: var(--blue-bg-color);
+  text-transform: uppercase;
+}
+
+.btn-safe {
+  background-color: var(--green-color);
+  text-transform: uppercase;
+}
+
+.btn-danger {
+  background-color: var(--red-color);
+  text-transform: uppercase;
+}
+
+.btn:disabled {
+  background-color: var(--gray-bg-color);
+  color: var(--gray-text);
+  cursor: default;
+}
+
+.btn:hover {
+  opacity: 1;
 }
