@@ -1,23 +1,32 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Card from "./Card";
 import "./sideBar.css";
 
-const SideBar = () => {
+import DiscountIcon from "@mui/icons-material/Discount";
+import CategoryIcon from "@mui/icons-material/Category";
+
+const SideBar = (props) => {
   const navigate = useNavigate();
   const goTo = (location) => {
-    navigate(location);
+    navigate("/" + location);
   };
   return (
-    <div>
-      <div onClick={() => goTo("/vouchers")} className="sideBar__location">
+    <div className="sideBar">
+      <Card
+        isActive={props.location === "/vouchers" ? true : false}
+        icon={<DiscountIcon />}
+        onNavigate={(where) => goTo(where)}
+      >
         Vouchers
-      </div>
-      <div onClick={() => goTo("/products")} className="sideBar__location">
+      </Card>
+      <Card
+        isActive={props.location === "/products" ? true : false}
+        icon={<CategoryIcon />}
+        onNavigate={(where) => goTo(where)}
+      >
         Products
-      </div>
-      <div onClick={() => goTo("/vmachines")} className="sideBar__location">
-        Vmachines
-      </div>
+      </Card>
     </div>
   );
 };

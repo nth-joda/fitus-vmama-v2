@@ -2,8 +2,8 @@ import React from "react";
 
 import "./mainContent.css";
 
-const MainContent = () => {
-  return <div>MainContent</div>;
+const MainContent = (props) => {
+  return <div className="mainContent">{props.children}</div>;
 };
 
 export default MainContent;

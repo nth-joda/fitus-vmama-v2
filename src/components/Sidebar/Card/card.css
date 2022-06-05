@@ -1,0 +1,30 @@
+.card {
+  background-color: var(--gray-bg-color);
+  color: var(--gray-text);
+  border-radius: 0.4rem;
+  letter-spacing: 0.1rem;
+  cursor: pointer;
+  opacity: 0.9;
+  transition: var(--transition);
+  margin: 1rem 0 1.4rem 0.8rem;
+  box-shadow: var(--gray-shadow);
+}
+
+.card__name {
+  margin: 0;
+  padding: 0.8rem 0.2rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.card.card_active {
+  background-color: var(--card-bg-color);
+  color: var(--white-color);
+  cursor: pointer;
+  transition: var(--transition);
+  cursor: default;
+}
+
+.card:hover {
+  opacity: 1;
+}

@@ -1,0 +1,8 @@
+.mainContent {
+  background-color: var(--bg-main-color);
+  padding: 0.8rem;
+  margin: 1rem;
+  border-radius: 0.2rem;
+  box-shadow: var(--gray-shadow);
+  min-height: 83vh;
+}

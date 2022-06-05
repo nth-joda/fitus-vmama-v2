@@ -7,11 +7,13 @@ body {
   font-family: "Open Sans", sans-serif;
 
   --blue-bg-color: #3084d7;
-  --blue-text-color: #005593;
+  --bg-main-color: #70a0c2;
+  --card-bg-color: #005593;
+  --blue-text-color: rgba(0, 85, 147, 0.78);
   --green-color: #2e7d32;
   --red-color: #a00000;
   --white-color: #fff;
-  --gray-bg-color: #ededed;
+  --gray-bg-color: #dededefa;
   --gray-text: #898989;
   --transition: all ease 0.3ms;
   --gray-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
