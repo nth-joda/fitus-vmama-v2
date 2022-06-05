@@ -1,5 +1,5 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
@@ -13,19 +13,41 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 });
 
 const Login = (props) => {
-  const navigate = useNavigate();
+  let navigate = useNavigate();
   const [open, setOpen] = React.useState(true);
   const [error, setError] = React.useState(null);
   const handleClose = () => {
     setOpen(false);
   };
 
+  // useEffect(() => {
+  //   if (localStorage.length > 0) {
+  //     if (
+  //       localStorage.getItem("name") !== null &&
+  //       localStorage.getItem("name") !== "" &&
+  //       localStorage.getItem("token") !== null &&
+  //       localStorage.getItem("token") !== ""
+  //     ) {
+  //       if (props.from) {
+  //         console.log("navigate to:", props.from);
+  //         navigate(props.from);
+  //       } else {
+  //         console.log("navigate back");
+  //         navigate(-1);
+  //       }
+  //     }
+  //   }
+  // }, []);
+
   const onHandleError = (err) => {
     setOpen(true);
     setError(err);
     if (err.status === 200) {
-      if (props.from) navigate(props.from);
-      else navigate("vouchers");
+      console.log(err.data.name);
+      localStorage.setItem("name", err.data.name);
+      localStorage.setItem("token", err.data.token);
+      console.log(localStorage);
+      props.handleAuth(true);
     }
   };
 
