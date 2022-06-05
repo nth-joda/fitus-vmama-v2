@@ -1,15 +1,13 @@
 import "./App.css";
 import AppRouter from "./AppRouter";
-
-import Header from "./components/Header";
-import MainContent from "./components/MainContent";
-import SideBar from "./components/Sidebar";
-import Login from "./pages/Login";
+import { BrowserRouter as Router } from "react-router-dom";
 
 function App() {
   return (
     <div className="App">
-      <AppRouter />
+      <Router>
+        <AppRouter />
+      </Router>
     </div>
   );
 }

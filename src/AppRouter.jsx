@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 import Vouchers from "./pages/Vouchers/index";
 import Products from "./pages/Products/index";
@@ -15,17 +15,28 @@ import {
 import Login from "./pages/Login";
 
 const AppRouter = () => {
+  let navigate = useNavigate();
+  const handleNavigate = (m) => {
+    if (m === true) {
+      navigate("/vouchers");
+    }
+  };
+
   return (
-    <Router>
+    <div>
       <Routes>
-        <Route path="/" element={<Login from="vouchers" />}></Route>
+        <Route path="/" element={<Navigate to="/vouchers" />}></Route>
+        <Route
+          path="/login"
+          element={<Login handleAuth={(auth) => handleNavigate(auth)} />}
+        ></Route>
         <Route
           path="/vouchers"
           element={
             localStorage.getItem("token") ? (
               <Vouchers />
             ) : (
-              <Login from="vouchers" />
+              <Navigate to="/login" />
             )
           }
         ></Route>
@@ -35,7 +46,9 @@ const AppRouter = () => {
             localStorage.getItem("token") ? (
               <Products />
             ) : (
-              <Login from="products" />
+              <Navigate
+                to={{ pathname: "/login", state: { from: "/products" } }}
+              />
             )
           }
         ></Route>
@@ -45,12 +58,15 @@ const AppRouter = () => {
             localStorage.getItem("token") ? (
               <Vmachines />
             ) : (
-              <Login from="vmachines" />
+              <Navigate
+                to={{ pathname: "/login", state: { from: "/vmachines" } }}
+              />
             )
           }
         ></Route>
+        {/* <default element={<NotFound />}></default> */}
       </Routes>
-    </Router>
+    </div>
   );
 };
 

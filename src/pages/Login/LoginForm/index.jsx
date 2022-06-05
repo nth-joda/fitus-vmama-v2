@@ -9,6 +9,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Zoom from "@mui/material/Zoom";
 import Link from "@mui/material/Link";
 import Checkbox from "@mui/material/Checkbox";
+import { makeStyles } from "@mui/styles";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { useFormik } from "formik";
 import axios from "axios";
@@ -16,6 +17,7 @@ import axios from "axios";
 import "./loginForm.css";
 import SERVER_API from "../../../objects/ServerApi";
 import ServerResponse from "../../../objects/ServerResponse";
+
 const LoginForm = (props) => {
   const [canSubmit, setCanSubmit] = useState(false);
 
@@ -54,6 +56,14 @@ const LoginForm = (props) => {
     },
   });
 
+  window.onbeforeunload = function () {
+    if (!formik.values.rememberMe) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      console("xoa cookie");
+    }
+  };
+
   const checkCanSubmit = () => {
     if (formik.values.userName !== "" && formik.values.passWord !== "") {
       setCanSubmit(true);
@@ -87,6 +97,7 @@ const LoginForm = (props) => {
                     onBlur={formik.handleBlur}
                     value={formik.values.userName}
                     placeholder="Tên đăng nhập/ địa chỉ email"
+                    name="userName"
                   />
                 </Grid>
               </Grid>
@@ -109,6 +120,7 @@ const LoginForm = (props) => {
                           );
                         }}
                         onBlur={formik.handleBlur}
+                        name="passWord"
                         value={formik.values.passWord}
                       />
                     </Grid>

@@ -1,9 +1,2 @@
-.sideBar__location {
-  cursor: pointer;
-  margin: 2rem;
-}
-
-.sideBar__location:hover {
-  color: blue;
-  text-decoration: underline;
+.sideBar {
 }

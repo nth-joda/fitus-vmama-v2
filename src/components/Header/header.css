@@ -1,0 +1,19 @@
+.header {
+  background-color: var(--blue-text-color);
+}
+
+.header__logo {
+  width: 70%;
+  margin: 1rem auto;
+}
+.header__menu {
+  cursor: pointer;
+}
+
+.header__menu-profile {
+  color: var(--white-color);
+}
+
+.profile-name {
+  margin-left: 0.7rem;
+}
