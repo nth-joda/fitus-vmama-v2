@@ -1,6 +1,5 @@
 import React from "react";
 import Grid from "@mui/material/Grid";
-import DiscountIcon from "@mui/icons-material/Discount";
 import "./card.css";
 const Card = (props) => {
   return (
@@ -10,20 +9,20 @@ const Card = (props) => {
     >
       <Grid
         container
-        columnSpacing={1}
+        columnSpacing={0}
         justify="center"
         justifyContent="center"
       >
         <Grid
           item
-          xs={2}
-          sm={2}
+          xs={3}
+          sm={3}
           md={2}
           container
           justify="center"
           justifyContent="center"
         >
-          <p className="card__name">{props.icon}</p>
+          <p className="card__name icon">{props.icon}</p>
         </Grid>
         <Grid item xs={9} sm={9} md={9} container justifyContent="center">
           <p className="card__name">{props.children}</p>

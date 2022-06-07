@@ -10,11 +10,11 @@ const Products = () => {
     <div>
       <Header />
       <Grid container>
-        <Grid item xs={1.5} sm={1.5} md={2}>
+        <Grid item xs={12} sm={2} md={2}>
           <SideBar location="/products" />
         </Grid>
-        <Grid item xs={10} sm={10} md={10}>
-          <MainContent>Main Content Products</MainContent>
+        <Grid item xs={12} sm={10} md={10}>
+          <MainContent of="products">Main Content Products</MainContent>
         </Grid>
       </Grid>
     </div>
