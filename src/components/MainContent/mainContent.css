@@ -1,31 +1,39 @@
 .mainContent {
+  /* position: relative; */
   background-color: var(--bg-main-color);
   padding: 0.8rem;
-  margin: 1rem;
+  margin: 0 1rem;
   border-radius: 0.2rem;
   box-shadow: var(--gray-shadow);
-  min-height: max-content;
+  height: 90vh;
 }
 
 .mainContent__footer {
-  position: absolute;
-  bottom: 2rem;
-  right: 2rem;
+  /* position: absolute;
+    bottom: 1rem;
+    right: 1rem; */
+  width: max-content;
+  margin-top: 0.5rem;
+  margin-left: auto;
+  margin-right: 0;
   background-color: var(--white-color);
   padding: 0.5rem;
   border-radius: 0.5rem;
+  box-shadow: var(--gray-shadow);
 }
 
 /* For tablet */
 @media only screen and (min-width: 600px) {
   .mainContent {
-    min-height: 90vh;
+    height: 90vh;
+    margin: 0 1rem;
   }
 }
 
 /* For desktop */
 @media only screen and (min-width: 1200px) {
   .mainContent {
-    min-height: 83vh;
+    height: 84vh;
+    margin: 1rem;
   }
 }

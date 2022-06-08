@@ -16,7 +16,7 @@ const Card = (props) => {
         <Grid
           item
           xs={3}
-          sm={3}
+          sm={4}
           md={2}
           container
           justify="center"
@@ -24,7 +24,7 @@ const Card = (props) => {
         >
           <p className="card__name icon">{props.icon}</p>
         </Grid>
-        <Grid item xs={9} sm={9} md={9} container justifyContent="center">
+        <Grid item xs={9} sm={6} md={9} container justifyContent="center">
           <p className="card__name">{props.children}</p>
         </Grid>
       </Grid>

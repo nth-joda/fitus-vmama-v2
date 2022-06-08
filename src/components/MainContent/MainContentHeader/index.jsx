@@ -4,38 +4,35 @@ import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import SearchIcon from "@mui/icons-material/Search";
-import { createStyles, makeStyles } from "@mui/styles";
-import { styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import "./mainContentHeader.css";
-const Span = styled("span")(({ theme }) => ({
-  ...theme.typography.button,
-  padding: theme.spacing(1),
-  fontSize: "2rem",
-  color: "#005593",
-}));
+// const Span = styled("span")(({ theme }) => ({
+//   ...theme.typography.button,
+//   padding: theme.spacing(1),
+//   fontSize: "2rem",
+//   color: "#005593",
+// }));
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    overflow: "hidden",
-    width: "30rem",
-    borderRadius: "0.6rem",
-    color: "#000",
-    backgroundColor: "#fff",
-    "&:hover": {
-      backgroundColor: "#fff",
-    },
-    "&$focused": {
-      backgroundColor: "#fff",
-    },
-  },
-  focused: {},
-}));
+// const useStyles = makeStyles((theme) => ({
+//   root: {
+//     overflow: "hidden",
+//     width: "100%",
+//     borderRadius: "0.6rem",
+//     color: "#000",
+//     backgroundColor: "#fff",
+//     "&:hover": {
+//       backgroundColor: "#fff",
+//     },
+//     "&$focused": {
+//       backgroundColor: "#fff",
+//     },
+//   },
+//   focused: {},
+// }));
 
 const MainContentHeader = (props) => {
-  const classes = useStyles();
   return (
     <Grid
       container
@@ -43,19 +40,18 @@ const MainContentHeader = (props) => {
       spacing={1}
       alignItems="center"
     >
-      <Grid item xs={12} sm={6} md={7}>
+      <Grid item xs={12} sm={4.5} md={5}>
         <TextField
           id="outlined-adornment-password"
           variant="outlined"
           type="text"
-          className={classes.textField}
           label={props.of ? "Nhập tên " + props.of + " ..." : "Nhập từ khóa"}
           size="small"
+          sx={{ width: "100%" }}
           InputProps={{
-            classes,
             endAdornment: (
               <InputAdornment position="end">
-                <Span fontSize={2}>I</Span>
+                <span fontSize={2}>I</span>
                 <IconButton
                   color="primary"
                   // onClick={this.handleClickShowPassword}
@@ -67,10 +63,11 @@ const MainContentHeader = (props) => {
           }}
         />
       </Grid>
+      <Grid item xs={0} sm={0.5} md={2}></Grid>
       <Grid
         item
         xs={12}
-        sm={6}
+        sm={7}
         md={5}
         container
         spacing={3}
