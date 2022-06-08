@@ -5,6 +5,7 @@ import "./sideBar.css";
 
 import DiscountIcon from "@mui/icons-material/Discount";
 import CategoryIcon from "@mui/icons-material/Category";
+import Grid from "@mui/material/Grid";
 
 const SideBar = (props) => {
   const navigate = useNavigate();
@@ -12,22 +13,26 @@ const SideBar = (props) => {
     navigate("/" + location);
   };
   return (
-    <div className="sideBar">
-      <Card
-        isActive={props.location === "/vouchers" ? true : false}
-        icon={<DiscountIcon />}
-        onNavigate={(where) => goTo(where)}
-      >
-        Vouchers
-      </Card>
-      <Card
-        isActive={props.location === "/products" ? true : false}
-        icon={<CategoryIcon />}
-        onNavigate={(where) => goTo(where)}
-      >
-        Products
-      </Card>
-    </div>
+    <Grid container className="sideBar">
+      <Grid item xs={6} sm={12} md={12}>
+        <Card
+          isActive={props.location === "/vouchers" ? true : false}
+          icon={<DiscountIcon />}
+          onNavigate={(where) => goTo(where)}
+        >
+          Vouchers
+        </Card>
+      </Grid>
+      <Grid item xs={6} sm={12} md={12}>
+        <Card
+          isActive={props.location === "/products" ? true : false}
+          icon={<CategoryIcon />}
+          onNavigate={(where) => goTo(where)}
+        >
+          Products
+        </Card>
+      </Grid>
+    </Grid>
   );
 };
 

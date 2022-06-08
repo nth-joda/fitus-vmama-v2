@@ -2,19 +2,19 @@
   background-color: var(--gray-bg-color);
   color: var(--gray-text);
   border-radius: 0.4rem;
-  letter-spacing: 0.1rem;
+  letter-spacing: 0.05rem;
   cursor: pointer;
   opacity: 0.9;
   transition: var(--transition);
-  margin: 1rem 0 1.4rem 0.8rem;
+  margin: 0.8rem;
   box-shadow: var(--gray-shadow);
 }
 
 .card__name {
   margin: 0;
   padding: 0.8rem 0.2rem;
-  font-size: 1.8rem;
-  font-weight: 700;
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
 .card.card_active {
@@ -27,4 +27,28 @@
 
 .card:hover {
   opacity: 1;
+}
+
+/* For tablet */
+@media only screen and (min-width: 600px) {
+  .card {
+    margin: 1rem 0 1.4rem 0.8rem;
+  }
+  .card__name {
+    padding: 0.8rem 0.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}
+
+/* For desktop */
+@media only screen and (min-width: 1200px) {
+  .card {
+    margin: 1rem 0 1.4rem 0.8rem;
+  }
+  .card__name {
+    padding: 0.8rem 0.2rem;
+    font-size: 1.8rem;
+    font-weight: 700;
+  }
 }

@@ -4,5 +4,28 @@
   margin: 1rem;
   border-radius: 0.2rem;
   box-shadow: var(--gray-shadow);
-  min-height: 83vh;
+  min-height: max-content;
+}
+
+.mainContent__footer {
+  position: absolute;
+  bottom: 2rem;
+  right: 2rem;
+  background-color: var(--white-color);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+/* For tablet */
+@media only screen and (min-width: 600px) {
+  .mainContent {
+    min-height: 90vh;
+  }
+}
+
+/* For desktop */
+@media only screen and (min-width: 1200px) {
+  .mainContent {
+    min-height: 83vh;
+  }
 }
