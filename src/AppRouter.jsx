@@ -64,7 +64,7 @@ const AppRouter = () => {
             )
           }
         ></Route>
-        {/* <default element={<NotFound />}></default> */}
+        <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </div>
   );

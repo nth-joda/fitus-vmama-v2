@@ -13,8 +13,13 @@ const SideBar = (props) => {
     navigate("/" + location);
   };
   return (
-    <Grid container className="sideBar">
-      <Grid item xs={6} sm={12} md={12}>
+    <Grid
+      container
+      className="sideBar"
+      justify="center"
+      justifyContent="center"
+    >
+      <Grid item xs={6} sm={2.5} md={12}>
         <Card
           isActive={props.location === "/vouchers" ? true : false}
           icon={<DiscountIcon />}
@@ -23,7 +28,7 @@ const SideBar = (props) => {
           Vouchers
         </Card>
       </Grid>
-      <Grid item xs={6} sm={12} md={12}>
+      <Grid item xs={6} sm={2.5} md={12}>
         <Card
           isActive={props.location === "/products" ? true : false}
           icon={<CategoryIcon />}

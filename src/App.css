@@ -35,11 +35,11 @@ li {
 .btn {
   background-color: transparent;
   font-weight: 500;
-  font-size: 1rem;
+  font-size: 0.7rem;
   color: var(--white-color);
   border: none;
-  padding: 0.7rem 1.2rem;
-  border-radius: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.3rem;
   opacity: 0.9;
   transition: var(--transition);
   cursor: pointer;
@@ -81,4 +81,25 @@ li {
 
 .btn:hover {
   opacity: 1;
+}
+
+@media only screen and (min-width: 600px) {
+  .btn {
+    font-size: 1rem;
+    padding: 0.7rem 1.1rem;
+    border-radius: 0.4rem;
+  }
+}
+
+/* For desktop */
+@media only screen and (min-width: 1200px) {
+  /* .mainContent {
+    min-height: 83vh;
+    margin: 1rem;
+  } */
+  .btn {
+    font-size: 1rem;
+    padding: 0.7rem 1.2rem;
+    border-radius: 0.4rem;
+  }
 }

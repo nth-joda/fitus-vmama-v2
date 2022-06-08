@@ -9,10 +9,10 @@ const Vouchers = () => {
     <div>
       <Header />
       <Grid container>
-        <Grid item xs={12} sm={2} md={2}>
+        <Grid item xs={12} sm={12} md={2}>
           <SideBar location="/vouchers" />
         </Grid>
-        <Grid item xs={12} sm={10} md={10}>
+        <Grid item xs={12} sm={12} md={10}>
           <MainContent of="vouchers">content vouchers</MainContent>
         </Grid>
       </Grid>
