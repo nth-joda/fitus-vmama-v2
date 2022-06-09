@@ -40,7 +40,7 @@ const MainContentHeader = (props) => {
       spacing={1}
       alignItems="center"
     >
-      <Grid item xs={12} sm={4.5} md={5}>
+      <Grid item xs={12} sm={4} md={5}>
         <TextField
           id="outlined-adornment-password"
           variant="outlined"
@@ -60,20 +60,20 @@ const MainContentHeader = (props) => {
           }}
         />
       </Grid>
-      <Grid item xs={0} sm={0.5} md={2}></Grid>
+      <Grid item xs={0} sm={0} md={2}></Grid>
       <Grid
         item
         xs={12}
-        sm={7}
+        sm={7.5}
         md={5}
         container
-        spacing={3}
+        spacing={2}
         justify="center"
         justifyContent="center"
       >
-        <Grid item>
+        <Grid item xs={4} sm={4} md={4}>
           <button
-            className={"btn btn-primary custom"}
+            className={"btn btn-primary fullWidth"}
             disabled={props.isRefreshDisabled}
             onClick={() => props.handleRefreshClicked()}
           >
@@ -84,9 +84,9 @@ const MainContentHeader = (props) => {
           </button>
         </Grid>
 
-        <Grid item>
+        <Grid item xs={4} sm={4} md={4}>
           <button
-            className="btn btn-safe custom"
+            className="btn btn-safe fullWidth"
             disabled={props.isAddDisabled}
             onClick={() => props.handleAddClicked()}
           >
@@ -95,9 +95,9 @@ const MainContentHeader = (props) => {
           </button>
         </Grid>
 
-        <Grid item>
+        <Grid item xs={4} sm={4} md={4}>
           <button
-            className="btn btn-danger custom"
+            className="btn btn-danger fullWidth"
             disabled={props.isDeleteDisabled}
             onClick={() => props.handleDeleteClicked()}
           >

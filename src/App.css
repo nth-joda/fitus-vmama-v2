@@ -35,10 +35,10 @@ li {
 .btn {
   background-color: transparent;
   font-weight: 500;
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   color: var(--white-color);
   border: none;
-  padding: 0.5rem 0.5rem;
+  padding: 0.8rem 0.8rem;
   border-radius: 0.3rem;
   opacity: 0.9;
   transition: var(--transition);
@@ -85,7 +85,7 @@ li {
 /* For tablet */
 @media only screen and (min-width: 600px) {
   .btn {
-    font-size: 1rem;
+    font-size: 0.9rem;
     padding: 0.7rem 1.1rem;
     border-radius: 0.4rem;
   }
@@ -101,7 +101,7 @@ li {
     margin: 1rem;
   } */
   .btn {
-    font-size: 1rem;
+    font-size: 1.1rem;
     padding: 0.7rem 1.2rem;
     border-radius: 0.4rem;
   }

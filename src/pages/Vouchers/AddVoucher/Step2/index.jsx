@@ -185,11 +185,11 @@ const Step2 = (props) => {
   return (
     <form onSubmit={formik.handleSubmit}>
       <Grid container rowSpacing={5}>
-        <Grid item md={12} container>
-          <Grid item md={2}>
+        <Grid item xs={12} sm={12} md={12} container>
+          <Grid item xs={12} sm={2} md={2}>
             <p className="label"> Mặt hàng: </p>
           </Grid>
-          <Grid item md={10}>
+          <Grid item xs={12} sm={10} md={10}>
             <div className="productList">
               {
                 <Wrapper>
@@ -197,6 +197,8 @@ const Step2 = (props) => {
                     <Grid container columnSpacing={2} key={mItem.value}>
                       <Grid
                         item={true}
+                        xs={1}
+                        sm={1}
                         md={1}
                         container
                         justifyContent="center"
@@ -204,7 +206,7 @@ const Step2 = (props) => {
                       >
                         <span style={{ margin: "auto" }}>{index + 1}</span>
                       </Grid>
-                      <Grid item={true} md={10}>
+                      <Grid item={true} xs={10} sm={10} md={10}>
                         <Autocomplete
                           disablePortal
                           id="combo-box-demo"
@@ -234,6 +236,8 @@ const Step2 = (props) => {
                       </Grid>
                       <Grid
                         item={true}
+                        xs={1}
+                        sm={1}
                         md={1}
                         container
                         justifyContent="center"
@@ -254,7 +258,13 @@ const Step2 = (props) => {
                   ))}
                 </Wrapper>
               }
-              <Grid item={true} md={1} sx={{ textAlign: "center" }}>
+              <Grid
+                item={true}
+                xs={12}
+                sm={1}
+                md={1}
+                sx={{ textAlign: "center" }}
+              >
                 <IconButton size="large" onClick={handleOnAddClicked}>
                   <AddCircleIcon />
                 </IconButton>
@@ -262,11 +272,11 @@ const Step2 = (props) => {
             </div>
           </Grid>
         </Grid>
-        <Grid item={true} md={12} container>
-          <Grid item={true} md={2}>
+        <Grid item={true} xs={12} sm={12} md={12} container>
+          <Grid item={true} xs={12} sm={2} md={2}>
             <p className="label">Quà tặng:</p>
           </Grid>
-          <Grid item={true} md={10}>
+          <Grid item={true} xs={12} sm={10} md={10}>
             <TextField
               fullWidth
               label="Bắt buộc*"
@@ -284,12 +294,15 @@ const Step2 = (props) => {
 
         <Grid
           item
+          xs={12}
           md={12}
+          sm={12}
           container
           columnSpacing={3}
+          rowSpacing={2}
           justifyContent="flex-end"
         >
-          <Grid item md={2}>
+          <Grid item xs={6} sm={3} md={2}>
             <button
               className="btn btn-primary fullWidth"
               type="button"
@@ -298,7 +311,7 @@ const Step2 = (props) => {
               Quay lại
             </button>
           </Grid>
-          <Grid item md={2}>
+          <Grid item xs={6} sm={3} md={2}>
             <button
               className="btn btn-safe fullWidth"
               type="submit"
@@ -313,7 +326,7 @@ const Step2 = (props) => {
               Lưu
             </button>
           </Grid>
-          <Grid item md={2.5}>
+          <Grid item xs={12} sm={4} md={2.5}>
             <button
               className="btn btn-safe fullWidth"
               type="submit"
