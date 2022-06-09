@@ -108,11 +108,11 @@ const AddProduct = (props) => {
         className="addProduct__formContainer"
       >
         <Grid container rowSpacing={5}>
-          <Grid item md={12} container>
-            <Grid item md={2}>
+          <Grid item xs={12} sm={12} md={12} container>
+            <Grid item xs={12} sm={4} md={2}>
               <p className="label">Tên product:</p>
             </Grid>
-            <Grid item md={10}>
+            <Grid item xs={12} sm={8} md={10}>
               <TextField
                 fullWidth
                 id="productName"
@@ -129,11 +129,13 @@ const AddProduct = (props) => {
           <Grid
             item
             md={12}
+            sm={12}
+            xs={12}
             container
             columnSpacing={2}
             justifyContent="flex-end"
           >
-            <Grid item md={1.5}>
+            <Grid item xs={6} sm={2.5} md={1.5}>
               <button
                 className="btn btn-primary fullWidth"
                 type="button"
@@ -142,7 +144,7 @@ const AddProduct = (props) => {
                 Hủy
               </button>
             </Grid>
-            <Grid item md={1.5}>
+            <Grid item xs={6} sm={2.5} md={1.5}>
               <button
                 className="btn btn-safe fullWidth"
                 type="submit"

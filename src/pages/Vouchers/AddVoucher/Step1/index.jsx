@@ -21,11 +21,11 @@ const Step1 = (props) => {
   return (
     <form onSubmit={formik.handleSubmit}>
       <Grid container rowSpacing={4}>
-        <Grid item md={12} container>
-          <Grid item md={2}>
+        <Grid item xs={12} sm={12} md={12} container rowSpacing={0}>
+          <Grid item xs={12} sm={4} md={2}>
             <p className="label">Tên voucher: </p>
           </Grid>
-          <Grid item md={10}>
+          <Grid item xs={12} sm={8} md={10}>
             <TextField
               fullWidth
               id="tenVoucher"
@@ -40,11 +40,11 @@ const Step1 = (props) => {
           </Grid>
         </Grid>
 
-        <Grid item md={12} container>
-          <Grid item md={2}>
+        <Grid item xs={12} sm={12} md={12} container>
+          <Grid item xs={12} sm={4} md={2}>
             <p className="label">Ghi chú: </p>
           </Grid>
-          <Grid item md={10}>
+          <Grid item xs={12} sm={8} md={10}>
             <TextField
               fullWidth
               label="Bắt buộc*"
@@ -61,12 +61,20 @@ const Step1 = (props) => {
           </Grid>
         </Grid>
 
-        <Grid item md={12} container>
-          <Grid item md={2}>
+        <Grid item xs={12} sm={12} md={12} container>
+          <Grid item xs={12} sm={4} md={2}>
             <p className="label">Tổng tiền: </p>
           </Grid>
-          <Grid item md={10} container columnSpacing={5}>
-            <Grid item md={4}>
+          <Grid
+            item
+            xs={12}
+            sm={8}
+            md={10}
+            container
+            columnSpacing={5}
+            rowSpacing={1}
+          >
+            <Grid item xs={12} sm={5} md={4}>
               <TextField
                 fullWidth
                 label="Tối thiểu"
@@ -85,7 +93,7 @@ const Step1 = (props) => {
                 type="number"
               />
             </Grid>
-            <Grid item md={4}>
+            <Grid item xs={8.5} sm={5} md={4}>
               <TextField
                 fullWidth
                 label="Tối đa"
@@ -104,18 +112,18 @@ const Step1 = (props) => {
                 variant="filled"
               />
             </Grid>
-            <Grid item md={2}>
+            <Grid item xs={1.5} sm={2} md={2}>
               <p className="label">VND</p>
             </Grid>
           </Grid>
         </Grid>
 
-        <Grid item md={12} container>
-          <Grid item md={2}>
+        <Grid item xs={12} sm={12} md={12} container>
+          <Grid item xs={12} sm={4} md={2}>
             <p className="label">Số lượng voucher: </p>
           </Grid>
-          <Grid item md={10} container columnSpacing={5}>
-            <Grid item md={4}>
+          <Grid item xs={12} sm={8} md={10} container columnSpacing={5}>
+            <Grid item xs={12} sm={5} md={4}>
               <TextField
                 fullWidth
                 label="Số lượng"
@@ -129,7 +137,7 @@ const Step1 = (props) => {
                 type="number"
               />
             </Grid>
-            <Grid item md={6}>
+            <Grid item sm={7} md={6}>
               <p className="label">
                 Publish:{" "}
                 <Checkbox
@@ -148,11 +156,13 @@ const Step1 = (props) => {
         <Grid
           item
           md={12}
+          sm={12}
+          xs={12}
           container
           columnSpacing={3}
           justifyContent="flex-end"
         >
-          <Grid item md={2}>
+          <Grid item xs={6} sm={3} md={2}>
             <button
               type="button"
               className="btn btn-primary fullWidth"
@@ -161,7 +171,7 @@ const Step1 = (props) => {
               Hủy
             </button>
           </Grid>
-          <Grid item md={2}>
+          <Grid item xs={6} sm={3} md={2}>
             <button
               type="submit"
               className="btn btn-safe fullWidth"

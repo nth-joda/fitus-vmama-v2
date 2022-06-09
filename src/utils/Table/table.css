@@ -36,7 +36,7 @@
 }
 
 .table__tr {
-  background-color: rgba(208, 208, 208, 0.345);
+  background-color: rgb(208, 208, 208);
 }
 
 .table__tr-selected {
@@ -116,6 +116,9 @@
   .table__tbody {
     /* height: 70vh; */
   }
+  .table__td:last-child {
+    margin-bottom: 1.2rem;
+  }
 
   .table,
   .table__thead,
@@ -133,7 +136,7 @@
   }
 
   .table__mobile-title {
-    margin-top: 1rem;
+    /* margin-top: 1rem; */
     background-color: var(--tableTitleBgColor);
     color: var(--tableTitleTextColor);
   }
@@ -163,6 +166,9 @@
     display: block;
     overflow-y: auto;
     border-radius: 0.4rem;
+  }
+  .table {
+    background-color: transparent;
   }
 }
 

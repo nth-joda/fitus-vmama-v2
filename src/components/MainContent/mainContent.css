@@ -1,5 +1,4 @@
 .mainContent {
-  /* position: relative; */
   background-color: var(--bg-main-color);
   padding: 0.8rem;
   margin: 0 1rem;
@@ -8,9 +7,6 @@
 }
 
 .mainContent__footer {
-  /* position: absolute;
-    bottom: 1rem;
-    right: 1rem; */
   width: max-content;
   margin-top: 0.5rem;
   margin-left: auto;
