@@ -5,13 +5,7 @@ import Products from "./pages/Products/index";
 import Vmachines from "./pages/Vmachines/index";
 import NotFound from "./pages/NotFound";
 
-import {
-  BrowserRouter as Router,
-  Navigate,
-  useNavigate,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { Navigate, useNavigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 
 const AppRouter = () => {

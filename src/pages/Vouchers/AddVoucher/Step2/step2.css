@@ -5,3 +5,15 @@
   grid-template-columns: 1fr;
   gap: 0.5rem;
 }
+
+.msg__error {
+  color: var(--red-color);
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.msg__safe {
+  color: var(--green-color);
+  font-size: 1.4rem;
+  font-weight: 600;
+}

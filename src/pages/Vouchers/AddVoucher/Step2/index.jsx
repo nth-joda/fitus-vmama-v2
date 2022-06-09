@@ -9,16 +9,20 @@ import { useFormik } from "formik";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
 import CircularProgress from "@mui/material/CircularProgress";
 import Wrapper from "../../../../utils/Wrapper";
 import SERVER_API from "../../../../objects/ServerApi";
+import ServerResPonse from "../../../../objects/ServerResponse";
 import "./step2.css";
-
+import { useNavigate } from "react-router-dom";
 const DEAD_TEXT = " <<Product đã bị xóa>>";
 
 const Step2 = (props) => {
+  let navigate = useNavigate();
   const [productOptions, setProductOptions] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [serverStatus, setServerStatus] = useState(null);
   const formik = useFormik({
     initialValues: {
       productList: [{ value: -1, label: "" }],
@@ -26,6 +30,7 @@ const Step2 = (props) => {
     },
     onSubmit: (values) => {
       setIsSaving(true);
+      console.log(values);
       const endPoint =
         props.item !== null
           ? SERVER_API.CREATE_VOUCHER + "/" + props.item.ID
@@ -42,6 +47,8 @@ const Step2 = (props) => {
         products: values.productList.map((item) => item.value),
         gift: values.gift,
       };
+
+      console.log(body_params);
       const config = {
         headers: {
           Authorization: "Bearer " + local_token,
@@ -53,26 +60,31 @@ const Step2 = (props) => {
           .post(SERVER_API.BASE_URL + endPoint, body_params, config)
           .then((res) => {
             console.log(res);
-            setIsSaving(false);
           })
           .catch((err) => {
-            console.log(err);
+            catchError(err);
           });
       } else {
         axios
           .put(SERVER_API.BASE_URL + endPoint, body_params, config)
           .then((res) => {
             console.log(res);
-            setIsSaving(false);
           })
           .catch((err) => {
-            console.log(err);
+            catchError(err);
           });
       }
     },
   });
 
   const catchData = (res) => {
+    res = ServerResPonse(res);
+    setServerStatus({
+      code: res.status,
+      msg: "Voucher đã được cập nhật thành công",
+      hint: "",
+    });
+    console.log(res);
     const prods = res.data.products;
     if (prods != null) {
       const listProductName = prods.map((item) => {
@@ -84,7 +96,7 @@ const Step2 = (props) => {
           "productList",
           props.item.Products.map((item) => {
             return {
-              value: item,
+              value: item.ID,
               label: listProductName.find((x) => x.value === item.ID)
                 ? listProductName.find((x) => x.value === item.ID).label
                 : item.ProductName + DEAD_TEXT,
@@ -93,6 +105,22 @@ const Step2 = (props) => {
         );
       }
     }
+  };
+  const catchError = (err) => {
+    console.log("err:", err);
+    err = ServerResPonse(err);
+    if (err.status === 401)
+      setServerStatus({
+        code: err.status,
+        msg: err.message,
+        hint: "Đăng nhập lại ?",
+      });
+    else
+      setServerStatus({
+        code: err.status,
+        msg: err.message,
+        hint: "",
+      });
   };
 
   useEffect(() => {
@@ -106,11 +134,10 @@ const Step2 = (props) => {
     axios
       .get(SERVER_API.BASE_URL + SERVER_API.GETALLPRODUCTS, config)
       .then((res) => {
-        console.log(res);
-        catchData(res.data);
+        catchData(res);
       })
       .catch((err) => {
-        console.log(err);
+        catchError(err);
       });
   }, []);
   const handleUserLostFocus = (item, index) => {
@@ -145,6 +172,15 @@ const Step2 = (props) => {
         { label: "", value: -1 },
       ]);
     }
+  };
+  const handleAgree = () => {
+    setIsSaving(false);
+    if (serverStatus.code === 200) props.handleDone();
+    if (serverStatus.code === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      navigate("/login");
+    } else setIsSaving(false);
   };
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -301,11 +337,36 @@ const Step2 = (props) => {
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">
-            {"Voucher đang được lưu vào hệ thống..."}
+            {serverStatus === null ? (
+              <span>"Voucher đang được lưu vào hệ thống..."</span>
+            ) : (
+              <p
+                className={
+                  serverStatus.code !== 200 ? "msg__error" : "msg__safe"
+                }
+              >
+                {serverStatus.msg}
+              </p>
+            )}
           </DialogTitle>
           <DialogContent sx={{ textAlign: "center" }}>
-            <CircularProgress sx={{ margin: "0.5rem" }} />
+            {serverStatus === null ? (
+              <CircularProgress sx={{ margin: "0.5rem" }} />
+            ) : (
+              <p>{serverStatus.hint}</p>
+            )}
           </DialogContent>
+          {serverStatus && (
+            <DialogActions>
+              <button
+                className="btn btn-primary"
+                type="button"
+                onClick={() => handleAgree()}
+              >
+                Đồng ý
+              </button>
+            </DialogActions>
+          )}
         </Dialog>
       </div>
     </form>
