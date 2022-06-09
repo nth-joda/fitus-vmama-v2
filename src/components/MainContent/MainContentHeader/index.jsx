@@ -52,10 +52,7 @@ const MainContentHeader = (props) => {
             endAdornment: (
               <InputAdornment position="end">
                 <span fontSize={2}>I</span>
-                <IconButton
-                  color="primary"
-                  // onClick={this.handleClickShowPassword}
-                >
+                <IconButton color="primary">
                   <SearchIcon />
                 </IconButton>
               </InputAdornment>
@@ -71,10 +68,15 @@ const MainContentHeader = (props) => {
         md={5}
         container
         spacing={3}
-        alignItems="center"
+        justify="center"
+        justifyContent="center"
       >
         <Grid item>
-          <button className="btn btn-primary custom">
+          <button
+            className={"btn btn-primary custom"}
+            disabled={props.isRefreshDisabled}
+            onClick={() => props.handleRefreshClicked()}
+          >
             <RefreshIcon
               sx={{ verticalAlign: "middle", marginRight: "0.5rem" }}
             />
@@ -83,14 +85,22 @@ const MainContentHeader = (props) => {
         </Grid>
 
         <Grid item>
-          <button className="btn btn-safe custom">
+          <button
+            className="btn btn-safe custom"
+            disabled={props.isAddDisabled}
+            onClick={() => props.handleAddClicked()}
+          >
             <AddIcon sx={{ verticalAlign: "middle", marginRight: "0.5rem" }} />
             Thêm
           </button>
         </Grid>
 
         <Grid item>
-          <button className="btn btn-danger custom">
+          <button
+            className="btn btn-danger custom"
+            disabled={props.isDeleteDisabled}
+            onClick={() => props.handleDeleteClicked()}
+          >
             <DeleteForeverIcon
               sx={{ verticalAlign: "middle", marginRight: "0.5rem" }}
             />

@@ -1,0 +1,9 @@
+.fullWidth {
+  width: 100%;
+  display: block;
+}
+
+.label {
+  font-size: 1.1rem;
+  font-weight: 600;
+}

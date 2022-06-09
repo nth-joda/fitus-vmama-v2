@@ -5,7 +5,6 @@
   margin: 0 1rem;
   border-radius: 0.2rem;
   box-shadow: var(--gray-shadow);
-  height: 90vh;
 }
 
 .mainContent__footer {
@@ -25,7 +24,6 @@
 /* For tablet */
 @media only screen and (min-width: 600px) {
   .mainContent {
-    height: 90vh;
     margin: 0 1rem;
   }
 }

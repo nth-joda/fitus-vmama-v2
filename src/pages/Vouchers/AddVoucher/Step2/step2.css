@@ -1,0 +1,7 @@
+.productList {
+  max-height: 15rem;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+}
