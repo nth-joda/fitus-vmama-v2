@@ -3,6 +3,7 @@
   box-shadow: var(--gray-shadow);
   border-radius: 0.2rem;
   margin-top: 0.5rem;
+  padding: 2rem;
 }
 
 .addProduct__address {

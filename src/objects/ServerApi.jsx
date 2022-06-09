@@ -8,6 +8,7 @@ const ServerApi = {
   GETALLPRODUCTS: "/api/v1/products/getAll",
   CREATE_VOUCHER: "/api/v1/vouchers",
   GET_VOUCHER_BY_ID: "/api/v1/vouchers/",
+  CREATE_PRODUCT: "/api/v1/products",
 };
 
 export default ServerApi;

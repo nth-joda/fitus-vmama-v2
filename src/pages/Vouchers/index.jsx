@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Pagination from "@mui/material/Pagination";
@@ -8,6 +8,10 @@ import IconButton from "@mui/material/IconButton";
 import Checkbox from "@mui/material/Checkbox";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditIcon from "@mui/icons-material/Edit";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import axios from "axios";
 
 import Header from "../../components/Header";
@@ -17,10 +21,12 @@ import Table from "../../utils/Table";
 import Wrapper from "../../utils/Wrapper";
 import AddVoucher from "./AddVoucher";
 import SERVER_API from "../../objects/ServerApi";
+import ServerResponse from "../../objects/ServerResponse";
 
 import "./vouchers.css";
 import MainContentHeader from "../../components/MainContent/MainContentHeader";
 const Vouchers = () => {
+  let navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,6 +34,8 @@ const Vouchers = () => {
   const [selectedList, setSelectedList] = useState([]);
   const [addOrEditMode, setAddOrEditMode] = useState(false);
   const [editItem, setEditItem] = useState(-1);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [serverStatus, setServerStatus] = useState(null);
 
   const onHandleCheck = (id, isCheck) => {
     if (selectedList.includes(id) && isCheck === false) {
@@ -146,6 +154,19 @@ const Vouchers = () => {
     if (meta != null) setTotalPages(meta.total_pages);
     if (vouchs != null) setVouchers(vouchs);
   };
+
+  const catchError = (err) => {
+    err = ServerResponse(err);
+    if (err.status === 401)
+      setServerStatus({
+        code: err.status,
+        msg: err.message,
+        hint: "Đăng nhập lại",
+      });
+    else setServerStatus({ code: err.status, msg: err.message, hint: "" });
+    setOpenDialog(true);
+  };
+
   const loadData = () => {
     const local_token = localStorage.getItem("token");
     setIsLoading(true);
@@ -168,7 +189,7 @@ const Vouchers = () => {
         })
         .catch((err) => {
           setIsLoading(false);
-          console.log(err);
+          catchError(err);
         });
     } else {
       localStorage.removeItem("name");
@@ -195,6 +216,18 @@ const Vouchers = () => {
   };
   const onHandleAddClicked = () => {
     setAddOrEditMode(true);
+  };
+
+  const onHandleAfterAddOrEditingMode = () => {
+    setAddOrEditMode(false);
+    loadData();
+  };
+  const handleAgree = () => {
+    if (serverStatus.code === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      navigate("/login");
+    } else setOpenDialog(false);
   };
 
   return (
@@ -245,11 +278,36 @@ const Vouchers = () => {
                 )}
               </Box>
             ) : (
-              <AddVoucher editItem={editItem} handleCancel={onHandleCancel} />
+              <AddVoucher
+                editItem={editItem}
+                handleCancel={onHandleCancel}
+                afterAddOrEditingMode={onHandleAfterAddOrEditingMode}
+              />
             )}
           </MainContent>
         </Grid>
       </Grid>
+      {serverStatus && (
+        <Dialog
+          open={openDialog}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle>{serverStatus.msg}</DialogTitle>
+          <DialogContent>
+            <p>{serverStatus.hint}</p>
+          </DialogContent>
+          <DialogActions>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={handleAgree}
+            >
+              Đồng ý
+            </button>
+          </DialogActions>
+        </Dialog>
+      )}
     </div>
   );
 };
