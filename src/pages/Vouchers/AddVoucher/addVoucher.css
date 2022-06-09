@@ -1,0 +1,19 @@
+.addVoucher__formContainer {
+  background-color: var(--white-color);
+  box-shadow: var(--gray-shadow);
+  border-radius: 0.2rem;
+  margin-top: 0.5rem;
+  padding: 2rem;
+}
+
+.addVoucher__address {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--white-color);
+}
+
+.addVoucher__address-icon {
+  margin-right: 0.5rem;
+  font-size: 1.3rem;
+  font-weight: 400;
+}

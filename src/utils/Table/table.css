@@ -1,5 +1,3 @@
-/* core styles for table */
-
 .table {
   width: 100%;
   height: 70%;
@@ -13,19 +11,18 @@
   background-color: var(--tableTitleBgColor);
   color: var(--tableTitleTextColor);
 }
-.scrollBody {
+.content {
   margin-top: 0.5rem;
-  height: 31rem;
-  width: 100%;
+}
+.table__tbody {
+  /* height: 27rem; */
   display: block;
+  position: relative;
+  width: 100%;
   overflow-y: scroll;
+  overflow-y: auto;
   border-radius: 0.4rem;
 }
-
-/* thead,
-tbody {
-  display: block;
-} */
 
 .table__mobile-caption {
   display: none;
@@ -35,26 +32,91 @@ tbody {
 .table__th {
   padding: var(--tableCellPadding, 20px);
   box-sizing: border-box;
+  margin: auto;
 }
 
+.table__tr {
+  background-color: rgba(208, 208, 208, 0.345);
+}
+
+.table__tr-selected {
+  background-color: var(--tableRowSelected);
+}
+.table__mobile-name {
+  margin: auto;
+}
 @media screen and (min-width: 769px) {
   .table__tr:hover {
     background-color: var(--tableRowBgColorHover);
   }
 
+  .table {
+    width: 100%;
+    border-spacing: 0;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.12), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+    background-color: var(--tableBgColor, #fff);
+    /*width:100%; */
+    display: block;
+    empty-cells: show;
+  }
+  .table__thead {
+    background-color: var(--tableTitleBgColor);
+    color: var(--tableTitleTextColor);
+    position: relative;
+    display: block;
+    width: 100%;
+    overflow-y: scroll;
+  }
+
+  .table__tbody {
+    height: 26rem;
+    display: block;
+    position: relative;
+    width: 100%;
+    overflow-y: scroll;
+    border-radius: 0.4rem;
+  }
+
+  .table tr {
+    width: 100%;
+    display: flex;
+  }
+
   .table__td:first-child,
   .table__th:first-child {
-    width: 30%;
-    text-align: left;
+    flex-basis: 35%;
+    flex-grow: 1;
+  }
+
+  .table__td:last-child,
+  .table__th:last-child {
+    flex-basis: 40%;
+    flex-grow: 1;
+    text-align: center;
+  }
+  .table td,
+  .table th {
+    flex-basis: 100%;
+    flex-grow: 2;
+    display: block;
+    padding: 1rem;
+    text-align: center;
   }
 
   .table__td,
   .table__th {
     text-align: center;
   }
+  .table__mobile-name {
+    display: none;
+  }
 }
 
 @media screen and (max-width: 768px) {
+  .table__tbody {
+    /* height: 70vh; */
+  }
+
   .table,
   .table__thead,
   .table__tbody,
@@ -71,6 +133,7 @@ tbody {
   }
 
   .table__mobile-title {
+    margin-top: 1rem;
     background-color: var(--tableTitleBgColor);
     color: var(--tableTitleTextColor);
   }
@@ -93,47 +156,26 @@ tbody {
   .table__mobile-caption {
     padding-right: 2%;
   }
+
+  .scrollBody {
+    height: max-content;
+    width: 100%;
+    display: block;
+    overflow-y: auto;
+    border-radius: 0.4rem;
+  }
 }
 
 .table {
-  --tableCellPadding: 0.8rem;
+  --tableCellPadding: 0.4rem;
   --tableTitleBgColor: #005593;
   --tableTitleTextColor: #fff;
-  --tableRowBgColorHover: #f0f0f0;
+  --tableRowBgColorHover: #c4c4c4;
   --tableSeparatorColor: #eee;
+  --tableRowSelected: #5d8ff963;
 }
 
-a {
-  text-decoration: none;
-  color: #5668ca;
-}
-
-a:hover,
-a:focus {
-  text-decoration: underline;
-}
-
-.page {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-}
-
-.page__demo {
-  flex-grow: 1;
-}
-
-.main-container {
-  padding-left: 1rem;
-  padding-right: 1rem;
-  max-width: 1000px;
-
-  margin-right: auto;
-  margin-left: auto;
-}
-
-.page__container {
+/* .page__container {
   margin-top: 4rem;
   margin-bottom: 4rem;
 }
@@ -143,7 +185,7 @@ a:focus {
   padding-bottom: 1rem;
   text-align: center;
   font-size: 1.4rem;
-}
+} */
 
 @media screen and (min-width: 641px) {
   .footer__container {

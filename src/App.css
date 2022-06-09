@@ -38,7 +38,7 @@ li {
   font-size: 0.7rem;
   color: var(--white-color);
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.5rem;
   border-radius: 0.3rem;
   opacity: 0.9;
   transition: var(--transition);
@@ -46,7 +46,7 @@ li {
   box-shadow: var(--gray-shadow);
 }
 
-.btn:active {
+.btn:active:enabled {
   transform: scale(0.98);
   /* Scaling button to 0.98 to its original size */
   box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
@@ -79,16 +79,19 @@ li {
   cursor: default;
 }
 
-.btn:hover {
+.btn:hover:enabled {
   opacity: 1;
 }
-
+/* For tablet */
 @media only screen and (min-width: 600px) {
   .btn {
     font-size: 1rem;
     padding: 0.7rem 1.1rem;
     border-radius: 0.4rem;
   }
+  /* body {
+    overflow-y: hidden;
+  } */
 }
 
 /* For desktop */
@@ -101,5 +104,8 @@ li {
     font-size: 1rem;
     padding: 0.7rem 1.2rem;
     border-radius: 0.4rem;
+  }
+  body {
+    overflow-y: hidden;
   }
 }
