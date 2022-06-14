@@ -183,7 +183,6 @@ const Vouchers = () => {
           config
         )
         .then((res) => {
-          console.log(res);
           catchData(res.data);
           setIsLoading(false);
         })

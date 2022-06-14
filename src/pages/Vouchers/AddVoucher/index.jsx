@@ -58,7 +58,6 @@ const AddVoucher = (props) => {
           config
         )
         .then((res) => {
-          console.log(res);
           catchData(res);
           setIsLoading(false);
         })

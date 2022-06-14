@@ -59,7 +59,6 @@ const LoginForm = (props) => {
     if (!formik.values.rememberMe) {
       localStorage.removeItem("token");
       localStorage.removeItem("name");
-      console("xoa cookie");
     }
   };
 
