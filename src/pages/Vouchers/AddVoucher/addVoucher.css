@@ -1,5 +1,6 @@
 .addVoucher__formContainer {
   background-color: var(--white-color);
+  -webkit-appearance: none;
   box-shadow: var(--gray-shadow);
   border-radius: 0.2rem;
   margin-top: 0.5rem;

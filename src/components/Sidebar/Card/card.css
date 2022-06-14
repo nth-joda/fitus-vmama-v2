@@ -7,6 +7,7 @@
   opacity: 0.9;
   transition: var(--transition);
   margin: 0.8rem;
+  -webkit-appearance: none;
   box-shadow: var(--gray-shadow);
 }
 

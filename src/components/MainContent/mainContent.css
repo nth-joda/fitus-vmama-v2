@@ -3,6 +3,7 @@
   padding: 0.8rem;
   margin: 0 1rem;
   border-radius: 0.2rem;
+  -webkit-appearance: none;
   box-shadow: var(--gray-shadow);
 }
 
@@ -14,6 +15,7 @@
   background-color: var(--white-color);
   padding: 0.5rem;
   border-radius: 0.5rem;
+  -webkit-appearance: none;
   box-shadow: var(--gray-shadow);
 }
 

@@ -43,12 +43,14 @@ li {
   opacity: 0.9;
   transition: var(--transition);
   cursor: pointer;
+  -webkit-appearance: none;
   box-shadow: var(--gray-shadow);
 }
 
 .btn:active:enabled {
   transform: scale(0.98);
   /* Scaling button to 0.98 to its original size */
+  -webkit-appearance: none;
   box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
   /* Lowering the shadow */
 }
