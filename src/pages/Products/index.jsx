@@ -87,9 +87,9 @@ const Products = () => {
               <span className="table__mobile-value">
                 <Checkbox
                   sx={{
-                    color: "black",
+                    color: { xs: "white", sm: "black", md: "black" },
                     "&.Mui-checked": {
-                      color: "black",
+                      color: { xs: "white", sm: "black", md: "black" },
                     },
                   }}
                   checked={selectedList.includes(item.ID)}

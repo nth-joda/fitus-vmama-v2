@@ -140,9 +140,10 @@ const Step2 = (props) => {
         catchError(err);
       });
   }, []);
-  const handleUserLostFocus = (item, index) => {
+  const handleUserLostFocus = (e, item, index) => {
+    console.log(e);
     const newList = formik.values.productList.map((it, id) =>
-      id !== index ? it : item
+      id !== index ? it : ""
     );
     formik.setFieldValue("productList", newList);
     setProductOptions([
@@ -212,13 +213,15 @@ const Step2 = (props) => {
                           id="combo-box-demo"
                           options={productOptions}
                           // sx={{ width: 300 }}
-                          defaultValue={mItem}
-                          onChange={(e, v) => handleUserLostFocus(v, index)}
+                          defaultValue={mItem.label}
+                          onChange={(e, v) => {
+                            handleUserLostFocus(e, v, index);
+                          }}
                           renderInput={(params) => (
                             <TextField
                               fullWidth
                               error={
-                                formik.values.productList[index].value === -1 ||
+                                formik.values.productList[index].value === -1 ??
                                 formik.values.productList[index].label.includes(
                                   DEAD_TEXT
                                 )
@@ -317,7 +320,7 @@ const Step2 = (props) => {
               type="submit"
               disabled={
                 formik.values.productList.find(
-                  (x) => x.label === "" || x.label.includes(DEAD_TEXT)
+                  (x) => x.label === "" ?? x.label.includes(DEAD_TEXT)
                 ) || formik.values.gift === ""
                   ? true
                   : false
@@ -332,7 +335,7 @@ const Step2 = (props) => {
               type="submit"
               disabled={
                 formik.values.productList.find(
-                  (x) => x.label === "" || x.label.includes(DEAD_TEXT)
+                  (x) => x.label === "" ?? x.label.includes(DEAD_TEXT)
                 ) || formik.values.gift === ""
                   ? true
                   : false
