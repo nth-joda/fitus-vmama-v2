@@ -36,7 +36,7 @@
 }
 
 .table__tr {
-  background-color: rgb(208, 208, 208);
+  background-color: #fff;
 }
 
 .table__tr-selected {
@@ -103,6 +103,10 @@
     text-align: center;
   }
 
+  .table th {
+    padding: 0.5rem;
+  }
+
   .table__td,
   .table__th {
     text-align: center;
@@ -139,6 +143,7 @@
     /* margin-top: 1rem; */
     background-color: var(--tableTitleBgColor);
     color: var(--tableTitleTextColor);
+    font-weight: 600;
   }
 
   .table__td {
@@ -158,6 +163,7 @@
 
   .table__mobile-caption {
     padding-right: 2%;
+    font-weight: 600;
   }
 
   .scrollBody {
@@ -178,7 +184,7 @@
   --tableTitleTextColor: #fff;
   --tableRowBgColorHover: #c4c4c4;
   --tableSeparatorColor: #eee;
-  --tableRowSelected: #5d8ff963;
+  --tableRowSelected: rgba(255, 110, 77, 0.3);
 }
 
 /* .page__container {
