@@ -38,7 +38,7 @@
 
 .field__input input {
   line-height: 2.2rem;
-  font-size: 1.3rem;
+  font-size: 1rem;
   padding: 0 0.7rem;
   text-decoration: italic;
   font-style: italic;
@@ -71,4 +71,18 @@
 
 .submitBtn {
   margin-top: 1.2rem;
+}
+
+/* For tablet */
+@media only screen and (min-width: 600px) {
+  .field__input input {
+    font-size: 1.3rem;
+  }
+}
+
+/* For desktop */
+@media only screen and (min-width: 1200px) {
+  .field__input input {
+    font-size: 1.3rem;
+  }
 }
