@@ -11,8 +11,6 @@ const HeaderDropdown = () => {
   const onLogOut = () => {
     localStorage.removeItem("name");
     localStorage.removeItem("token");
-    console.log("local: ", localStorage);
-    console.log("logut, navigate: login");
     navigate("/login");
   };
   return (

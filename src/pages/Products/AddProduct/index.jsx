@@ -73,7 +73,6 @@ const AddProduct = (props) => {
   const catchData = (res) => {
     res = ServerResponse(res);
     setServerStatus({ code: res.status, msg: res.message, hint: "" });
-    console.log("result", res);
   };
 
   const catchError = (err) => {

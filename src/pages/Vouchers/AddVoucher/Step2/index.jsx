@@ -30,7 +30,6 @@ const Step2 = (props) => {
     },
     onSubmit: (values) => {
       setIsSaving(true);
-      console.log(values);
       const endPoint =
         props.item !== null
           ? SERVER_API.CREATE_VOUCHER + "/" + props.item.ID
@@ -90,7 +89,7 @@ const Step2 = (props) => {
       const listProductName = prods.map((item) => {
         return { label: item.ProductName, value: item.ID };
       });
-      setProductOptions([...listProductName, ""]);
+      setProductOptions([...listProductName, { value: -1, label: "" }]);
       if (props.item !== null && props.item.Products.length > 0) {
         formik.setFieldValue(
           "productList",
@@ -140,11 +139,10 @@ const Step2 = (props) => {
         catchError(err);
       });
   }, []);
-  const handleUserLostFocus = (e, item, index) => {
-    console.log(e);
-    const newList = formik.values.productList.map((it, id) =>
-      id !== index ? it : ""
-    );
+  const handleUserLostFocus = (item, index) => {
+    const newList = formik.values.productList.map((it, id) => {
+      return index !== id ? it : item;
+    });
     formik.setFieldValue("productList", newList);
     setProductOptions([
       ...productOptions.filter((it, id) => {
@@ -154,7 +152,6 @@ const Step2 = (props) => {
   };
 
   const handleDeleteProduct = (index) => {
-    console.log(formik.values.productList[index]);
     if (formik.values.productList.length > 1) {
       const newList = formik.values.productList.filter((it, id) => {
         return id !== index;
@@ -167,7 +164,10 @@ const Step2 = (props) => {
   //   };
 
   const handleOnAddClicked = () => {
-    if (!formik.values.productList.includes({ label: "", value: -1 })) {
+    if (
+      !formik.values.productList.map((item) => item.label).includes("") ||
+      formik.values.productList.map((item) => item.label).includes(DEAD_TEXT)
+    ) {
       formik.setFieldValue("productList", [
         ...formik.values.productList,
         { label: "", value: -1 },
@@ -212,19 +212,18 @@ const Step2 = (props) => {
                           disablePortal
                           id="combo-box-demo"
                           options={productOptions}
+                          // getOptionLabel={(option) => option.label || ""}
                           // sx={{ width: 300 }}
-                          defaultValue={mItem.label}
-                          onChange={(e, v) => {
-                            handleUserLostFocus(e, v, index);
-                          }}
+                          isOptionEqualToValue={(option, value) =>
+                            option.value === value.value
+                          }
+                          defaultValue={mItem}
+                          onChange={(e, v) => handleUserLostFocus(v, index)}
                           renderInput={(params) => (
                             <TextField
                               fullWidth
                               error={
-                                formik.values.productList[index].value === -1 ??
-                                formik.values.productList[index].label.includes(
-                                  DEAD_TEXT
-                                )
+                                formik.values.productList[index].label === ""
                                   ? true
                                   : false
                               }
@@ -320,7 +319,7 @@ const Step2 = (props) => {
               type="submit"
               disabled={
                 formik.values.productList.find(
-                  (x) => x.label === "" ?? x.label.includes(DEAD_TEXT)
+                  (x) => x.label === "" || x.label.includes(DEAD_TEXT)
                 ) || formik.values.gift === ""
                   ? true
                   : false
@@ -335,7 +334,7 @@ const Step2 = (props) => {
               type="submit"
               disabled={
                 formik.values.productList.find(
-                  (x) => x.label === "" ?? x.label.includes(DEAD_TEXT)
+                  (x) => x.label === "" || x.label.includes(DEAD_TEXT)
                 ) || formik.values.gift === ""
                   ? true
                   : false
