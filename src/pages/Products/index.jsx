@@ -13,6 +13,8 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import DialogContentText from "@mui/material/DialogContentText";
+import Button from "@mui/material/Button";
 import "./products.css";
 import MainContent from "../../components/MainContent";
 import Header from "../../components/Header";
@@ -29,19 +31,21 @@ const Products = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const [products, setProducts] = useState([]);
+  const [productsOnCurrentPage, setProductsOnCurrentPage] = useState([]);
   const [selectedList, setSelectedList] = useState([]);
   const [addOrEditMode, setAddOrEditMode] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [serverStatus, setServerStatus] = useState(null);
+  const [openConfirmDel, setOpenConfirmDel] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
-  const onHandleCheck = (id, isCheck) => {
-    if (selectedList.includes(id) && isCheck === false) {
-      const newList = selectedList.filter((item) => item !== id);
+  const onHandleCheck = (item, isCheck) => {
+    if (selectedList.includes(item.ID) && isCheck === false) {
+      const newList = selectedList.filter((it) => it.ID !== item.ID);
       setSelectedList(newList);
-    } else if (!selectedList.includes(id) && isCheck === true) {
-      setSelectedList([...selectedList, id]);
+    } else if (!selectedList.includes(item.ID) && isCheck === true) {
+      setSelectedList([...selectedList, item]);
     }
   };
 
@@ -59,7 +63,9 @@ const Products = () => {
             checked={selectedList.length > 0}
             onChange={(e) => {
               if (e.target.checked) {
-                setSelectedList(products.map((item) => item.ID));
+                setSelectedList([
+                  ...selectedList.concat(productsOnCurrentPage),
+                ]);
               } else setSelectedList([]);
             }}
           />
@@ -78,7 +84,7 @@ const Products = () => {
         {prods.map((item) => (
           <tr
             className={
-              selectedList.includes(item.ID)
+              selectedList.filter((it, id) => it.ID === item.ID).length > 0
                 ? "table__tr table__tr-selected"
                 : "table__tr"
             }
@@ -92,8 +98,13 @@ const Products = () => {
                       color: { xs: "white", sm: "black", md: "black" },
                     },
                   }}
-                  checked={selectedList.includes(item.ID)}
-                  onChange={(e) => onHandleCheck(item.ID, e.target.checked)}
+                  checked={
+                    selectedList.filter((it, id) => it.ID === item.ID).length >
+                    0
+                      ? true
+                      : false
+                  }
+                  onChange={(e) => onHandleCheck(item, e.target.checked)}
                 />
               </span>
               <span className="table__mobile-name">{item.ProductName}</span>
@@ -150,7 +161,7 @@ const Products = () => {
     const meta = res.data.metadata;
     const prods = res.data.products;
     if (meta != null) setTotalPages(meta.total_pages);
-    if (prods != null) setProducts(prods);
+    if (prods != null) setProductsOnCurrentPage(prods);
   };
 
   const catchError = (err) => {
@@ -165,7 +176,7 @@ const Products = () => {
     setOpenDialog(true);
   };
 
-  const loadData = () => {
+  const loadData = (pageNum) => {
     const local_token = localStorage.getItem("token");
     setIsLoading(true);
     if (local_token !== null || local_token !== "") {
@@ -177,7 +188,7 @@ const Products = () => {
       };
       axios
         .get(
-          SERVER_API.BASE_URL + SERVER_API.GETPRODUCTS_ENDPOINT + currentPage,
+          SERVER_API.BASE_URL + SERVER_API.GETPRODUCTS_ENDPOINT + pageNum,
           config
         )
         .then((res) => {
@@ -187,7 +198,14 @@ const Products = () => {
         })
         .catch((err) => {
           setIsLoading(false);
-          catchError(err);
+          console.log(err);
+          if (err.response.data.status === 404 && currentPage > 1) {
+            const prevPage = currentPage - 1;
+            setCurrentPage(prevPage);
+            loadData(prevPage);
+          } else {
+            catchError(err);
+          }
         });
     } else {
       localStorage.removeItem("name");
@@ -196,17 +214,17 @@ const Products = () => {
   };
 
   useEffect(() => {
-    loadData();
+    loadData(currentPage);
   }, [currentPage]);
 
   const onHandleRefreshClicked = () => {
     setIsLoading(true);
     setSelectedList([]);
-    loadData();
+    loadData(currentPage);
   };
 
   const onHandleDeleteClicked = () => {
-    alert("Xoa nha?");
+    setOpenConfirmDel(true);
   };
   const onHandleAddClicked = () => {
     setAddOrEditMode(true);
@@ -226,7 +244,42 @@ const Products = () => {
 
   const onHandleAddOrEditDone = () => {
     setAddOrEditMode(false);
-    loadData();
+    loadData(currentPage);
+  };
+
+  const confirmedDelete = () => {
+    setDeleting(true);
+    const local_token = localStorage.getItem("token");
+    if (local_token !== null || local_token !== "") {
+      const config = {
+        headers: {
+          Authorization: "Bearer " + local_token,
+          "Content-Type": "application/json",
+        },
+      };
+      const body_params = { ids: selectedList.map((item) => item.ID) };
+      axios
+        .post(
+          SERVER_API.BASE_URL + SERVER_API.DELETE_PRODUCTS,
+          body_params,
+          config
+        )
+        .then((res) => {
+          res = catchData(res);
+          setDeleting(false);
+          setOpenConfirmDel(false);
+          setSelectedList([]);
+          loadData(currentPage);
+        })
+        .catch((err) => {
+          catchError(err);
+          setDeleting(false);
+          setOpenConfirmDel(false);
+        });
+    } else {
+      localStorage.removeItem("name");
+      localStorage.removeItem("token");
+    }
   };
   return (
     <div>
@@ -255,7 +308,7 @@ const Products = () => {
                   <div className="content_body">
                     <Table
                       headers={renderHeaders()}
-                      body={renderBody(products)}
+                      body={renderBody(productsOnCurrentPage)}
                     />
                     <div className="mainContent__footer">
                       <Stack spacing={2}>
@@ -306,6 +359,70 @@ const Products = () => {
           </DialogActions>
         </Dialog>
       )}
+      <Dialog
+        open={openConfirmDel}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        fullWidth={true}
+        maxWidth="sm"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Xóa {selectedList.length} sản phẩm sau khỏi hệ thống?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <Grid container sx={{ background: "#3084d7", padding: "0.5rem" }}>
+              <Grid item xs={3} sm={3} md={3}>
+                <span className="table__title">No </span>
+              </Grid>
+              <Grid item xs={3} sm={3} md={3}>
+                <span className="table__title">Id </span>
+              </Grid>
+              <Grid item xs={6} sm={6} md={6}>
+                <span className="table__title">Tên sản phẩm</span>
+              </Grid>
+            </Grid>
+            {selectedList.map((item, index) => {
+              console.log(item);
+              return (
+                <Grid container sx={{ padding: "0.5rem" }}>
+                  <Grid item xs={3} sm={3} md={3}>
+                    <span>{index + 1} </span>
+                  </Grid>
+                  <Grid item xs={3} sm={3} md={3}>
+                    <span>{item.ID} </span>
+                  </Grid>
+                  <Grid item xs={3} sm={3} md={3}>
+                    <span>{item.ProductName}</span>
+                  </Grid>
+                </Grid>
+              );
+            })}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          {deleting ? (
+            <Grid
+              container
+              sx={{
+                justifyContent: "center",
+                alignItems: "center",
+                textAlign: "center",
+                padding: "0.5rem",
+              }}
+            >
+              <CircularProgress />
+            </Grid>
+          ) : (
+            <Wrapper>
+              <Button onClick={() => setOpenConfirmDel(false)}>Hủy bỏ</Button>
+              <Button color="error" onClick={confirmedDelete}>
+                Xác nhận xóa
+              </Button>
+            </Wrapper>
+          )}
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
