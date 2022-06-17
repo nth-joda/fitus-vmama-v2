@@ -203,6 +203,7 @@ const Products = () => {
             const prevPage = currentPage - 1;
             setCurrentPage(prevPage);
             loadData(prevPage);
+            setSelectedList([]);
           } else {
             catchError(err);
           }
