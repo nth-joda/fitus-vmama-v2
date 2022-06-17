@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
@@ -33,6 +33,7 @@ import "./mainContentHeader.css";
 // }));
 
 const MainContentHeader = (props) => {
+  // const [inputSearchTerm, setInputSearchTerm] = useState("");
   return (
     <Grid
       container
@@ -48,15 +49,17 @@ const MainContentHeader = (props) => {
           label={props.of ? "Nhập tên " + props.of + " ..." : "Nhập từ khóa"}
           size="small"
           sx={{ width: "100%" }}
+          onChange={(e) => props.catchTerm(e.target.value)}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
                 <span fontSize={2}>I</span>
-                <IconButton color="primary">
+                <IconButton color="primary" type="submit">
                   <SearchIcon />
                 </IconButton>
               </InputAdornment>
             ),
+            className: { color: "red" },
           }}
         />
       </Grid>

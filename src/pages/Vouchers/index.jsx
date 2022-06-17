@@ -43,6 +43,7 @@ const Vouchers = () => {
   const [deleting, setDeleting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [openAfterDelete, setOpenAfterDelete] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const onHandleCheck = (item, isCheck) => {
     if (
@@ -92,75 +93,86 @@ const Vouchers = () => {
   const renderBody = (prods) => {
     return (
       <Wrapper>
-        {prods.map((item, index) => (
-          <tr
-            key={index}
-            className={
-              selectedList.filter((fitem, fid) => fitem.ID === item.ID).length >
-              0
-                ? "table__tr table__tr-selected"
-                : "table__tr"
+        {prods
+          .filter((val) => {
+            if (searchTerm === "") {
+              return val;
+            } else if (
+              val.Name.toLowerCase().includes(searchTerm.toLowerCase())
+            ) {
+              return val;
             }
-          >
-            <td className="table__td table__mobile-title">
-              <span className="table__mobile-value">
-                <Checkbox
-                  sx={{
-                    color: { xs: "white", sm: "black", md: "black" },
-                    "&.Mui-checked": {
+            return false;
+          })
+          .map((item, index) => (
+            <tr
+              key={index}
+              className={
+                selectedList.filter((fitem, fid) => fitem.ID === item.ID)
+                  .length > 0
+                  ? "table__tr table__tr-selected"
+                  : "table__tr"
+              }
+            >
+              <td className="table__td table__mobile-title">
+                <span className="table__mobile-value">
+                  <Checkbox
+                    sx={{
                       color: { xs: "white", sm: "black", md: "black" },
-                    },
-                  }}
-                  checked={
-                    selectedList.filter((fitem, fid) => fitem.ID === item.ID)
-                      .length > 0
-                  }
-                  onChange={(e) => onHandleCheck(item, e.target.checked)}
-                />
-              </span>
-              <span className="table__mobile-name">{item.Name}</span>
-            </td>
-            <td className="table__td">
-              <span className="table__mobile-caption">ID</span>
-              <span className="table__value">{item.ID}</span>
-            </td>
-            <td className="table__td">
-              <span className="table__mobile-caption">Tên voucher</span>
-              <span className="table__value">{item.Name}</span>
-            </td>
+                      "&.Mui-checked": {
+                        color: { xs: "white", sm: "black", md: "black" },
+                      },
+                    }}
+                    checked={
+                      selectedList.filter((fitem, fid) => fitem.ID === item.ID)
+                        .length > 0
+                    }
+                    onChange={(e) => onHandleCheck(item, e.target.checked)}
+                  />
+                </span>
+                <span className="table__mobile-name">{item.Name}</span>
+              </td>
+              <td className="table__td">
+                <span className="table__mobile-caption">ID</span>
+                <span className="table__value">{item.ID}</span>
+              </td>
+              <td className="table__td">
+                <span className="table__mobile-caption">Tên voucher</span>
+                <span className="table__value">{item.Name}</span>
+              </td>
 
-            <td className="table__td">
-              <span className="table__mobile-caption">Miêu tả</span>
-              <span className="table__value">{item.Description}</span>
-            </td>
+              <td className="table__td">
+                <span className="table__mobile-caption">Miêu tả</span>
+                <span className="table__value">{item.Description}</span>
+              </td>
 
-            <td className="table__td">
-              <span className="table__mobile-caption">Còn lại</span>
-              <span className="table__value">{item.Remaining}</span>
-            </td>
+              <td className="table__td">
+                <span className="table__mobile-caption">Còn lại</span>
+                <span className="table__value">{item.Remaining}</span>
+              </td>
 
-            <td className="table__td">
-              <span className="table__mobile-caption">Đã đổi</span>
-              <span className="table__value">{item.Total}</span>
-            </td>
+              <td className="table__td">
+                <span className="table__mobile-caption">Đã đổi</span>
+                <span className="table__value">{item.Total}</span>
+              </td>
 
-            <td className="table__td">
-              <span className="table__mobile-caption">Chỉnh sửa</span>
-              <span className="table__value">
-                <IconButton
-                  color="primary"
-                  aria-label="chinh sua"
-                  onClick={() => {
-                    setEditItem(item.ID);
-                    setAddOrEditMode(true);
-                  }}
-                >
-                  <EditIcon />
-                </IconButton>
-              </span>
-            </td>
-          </tr>
-        ))}
+              <td className="table__td">
+                <span className="table__mobile-caption">Chỉnh sửa</span>
+                <span className="table__value">
+                  <IconButton
+                    color="primary"
+                    aria-label="chinh sua"
+                    onClick={() => {
+                      setEditItem(item.ID);
+                      setAddOrEditMode(true);
+                    }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </span>
+              </td>
+            </tr>
+          ))}
       </Wrapper>
     );
   };
@@ -322,6 +334,7 @@ const Vouchers = () => {
               <Box>
                 <MainContentHeader
                   of="vouchers"
+                  catchTerm={(term) => setSearchTerm(term)}
                   isRefreshDisabled={isLoading}
                   isDeleteDisabled={selectedList.length > 0 ? false : true}
                   handleRefreshClicked={onHandleRefreshClicked}

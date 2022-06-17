@@ -39,6 +39,7 @@ const Products = () => {
   const [serverStatus, setServerStatus] = useState(null);
   const [openConfirmDel, setOpenConfirmDel] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const onHandleCheck = (item, isCheck) => {
     if (selectedList.includes(item.ID) && isCheck === false) {
@@ -81,60 +82,71 @@ const Products = () => {
   const renderBody = (prods) => {
     return (
       <Wrapper>
-        {prods.map((item) => (
-          <tr
-            className={
-              selectedList.filter((it, id) => it.ID === item.ID).length > 0
-                ? "table__tr table__tr-selected"
-                : "table__tr"
+        {prods
+          .filter((val) => {
+            if (searchTerm === "") {
+              return val;
+            } else if (
+              val.ProductName.toLowerCase().includes(searchTerm.toLowerCase())
+            ) {
+              return val;
             }
-          >
-            <td className="table__td table__mobile-title">
-              <span className="table__mobile-value">
-                <Checkbox
-                  sx={{
-                    color: { xs: "white", sm: "black", md: "black" },
-                    "&.Mui-checked": {
+            return false;
+          })
+          .map((item) => (
+            <tr
+              className={
+                selectedList.filter((it, id) => it.ID === item.ID).length > 0
+                  ? "table__tr table__tr-selected"
+                  : "table__tr"
+              }
+            >
+              <td className="table__td table__mobile-title">
+                <span className="table__mobile-value">
+                  <Checkbox
+                    sx={{
                       color: { xs: "white", sm: "black", md: "black" },
-                    },
-                  }}
-                  checked={
-                    selectedList.filter((it, id) => it.ID === item.ID).length >
-                    0
-                      ? true
-                      : false
-                  }
-                  onChange={(e) => onHandleCheck(item, e.target.checked)}
-                />
-              </span>
-              <span className="table__mobile-name">{item.ProductName}</span>
-            </td>
-            <td className="table__td">
-              <span className="table__mobile-caption">ID</span>
-              <span className="table__value">{item.ID}</span>
-            </td>
-            <td className="table__td">
-              <span className="table__mobile-caption">Tên sản phẩm</span>
-              <span>{item.ProductName}</span>
-            </td>
+                      "&.Mui-checked": {
+                        color: { xs: "white", sm: "black", md: "black" },
+                      },
+                    }}
+                    checked={
+                      selectedList.filter((it, id) => it.ID === item.ID)
+                        .length > 0
+                        ? true
+                        : false
+                    }
+                    onChange={(e) => onHandleCheck(item, e.target.checked)}
+                  />
+                </span>
+                <span className="table__mobile-name">{item.ProductName}</span>
+              </td>
+              <td className="table__td">
+                <span className="table__mobile-caption">ID</span>
+                <span className="table__value">{item.ID}</span>
+              </td>
+              <td className="table__td">
+                <span className="table__mobile-caption">Tên sản phẩm</span>
+                <span>{item.ProductName}</span>
+              </td>
 
-            <td className="table__td">
-              <span className="table__mobile-caption">Chỉnh sửa</span>
-              <span className="table__value">
-                <IconButton
-                  color="primary"
-                  aria-label="chinh sua"
-                  onClick={() => {
-                    setEditItem(item);
-                    setAddOrEditMode(true);
-                  }}
-                >
-                  <EditIcon />
-                </IconButton>
-              </span>
-            </td>
-          </tr>
-        ))}
+              <td className="table__td">
+                <span className="table__mobile-caption">Chỉnh sửa</span>
+                <span className="table__value">
+                  <IconButton
+                    color="primary"
+                    aria-label="chinh sua"
+                    onClick={() => {
+                      setEditItem(item);
+                      setAddOrEditMode(true);
+                    }}
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </span>
+              </td>
+            </tr>
+          ))}
 
         {/* <tr className="table__tr">
           <td className="table__td table__mobile-title">
@@ -300,6 +312,7 @@ const Products = () => {
                   handleRefreshClicked={onHandleRefreshClicked}
                   handleDeleteClicked={onHandleDeleteClicked}
                   handleAddClicked={onHandleAddClicked}
+                  catchTerm={(term) => setSearchTerm(term)}
                 />
                 {isLoading ? (
                   <Box sx={{ textAlign: "center" }}>
