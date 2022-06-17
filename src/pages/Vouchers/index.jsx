@@ -5,6 +5,7 @@ import Box from "@mui/material/Box";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
 import CircularProgress from "@mui/material/CircularProgress";
 import EditIcon from "@mui/icons-material/Edit";
@@ -12,6 +13,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import DialogContentText from "@mui/material/DialogContentText";
 import axios from "axios";
 
 import Header from "../../components/Header";
@@ -25,6 +27,7 @@ import ServerResponse from "../../objects/ServerResponse";
 
 import "./vouchers.css";
 import MainContentHeader from "../../components/MainContent/MainContentHeader";
+import ServerApi from "../../objects/ServerApi";
 const Vouchers = () => {
   let navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
@@ -36,13 +39,23 @@ const Vouchers = () => {
   const [editItem, setEditItem] = useState(-1);
   const [openDialog, setOpenDialog] = useState(false);
   const [serverStatus, setServerStatus] = useState(null);
+  const [openConfirmDel, setOpenConfirmDel] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+  const [openAfterDelete, setOpenAfterDelete] = useState(false);
 
-  const onHandleCheck = (id, isCheck) => {
-    if (selectedList.includes(id) && isCheck === false) {
-      const newList = selectedList.filter((item) => item !== id);
+  const onHandleCheck = (item, isCheck) => {
+    if (
+      selectedList.filter((fitem, fid) => fitem.ID === item.ID).length > 0 &&
+      isCheck === false
+    ) {
+      const newList = selectedList.filter((fitem) => fitem.ID !== item.ID);
       setSelectedList(newList);
-    } else if (!selectedList.includes(id) && isCheck === true) {
-      setSelectedList([...selectedList, id]);
+    } else if (
+      !selectedList.filter((fitem, fid) => fitem.ID === item.ID).length > 0 &&
+      isCheck === true
+    ) {
+      setSelectedList([...selectedList, item]);
     }
   };
 
@@ -60,7 +73,7 @@ const Vouchers = () => {
             checked={selectedList.length > 0}
             onChange={(e) => {
               if (e.target.checked) {
-                setSelectedList(vouchers.map((item) => item.ID));
+                setSelectedList(vouchers.map((item) => item));
               } else setSelectedList([]);
             }}
           />
@@ -83,7 +96,8 @@ const Vouchers = () => {
           <tr
             key={index}
             className={
-              selectedList.includes(item.ID)
+              selectedList.filter((fitem, fid) => fitem.ID === item.ID).length >
+              0
                 ? "table__tr table__tr-selected"
                 : "table__tr"
             }
@@ -97,8 +111,11 @@ const Vouchers = () => {
                       color: { xs: "white", sm: "black", md: "black" },
                     },
                   }}
-                  checked={selectedList.includes(item.ID)}
-                  onChange={(e) => onHandleCheck(item.ID, e.target.checked)}
+                  checked={
+                    selectedList.filter((fitem, fid) => fitem.ID === item.ID)
+                      .length > 0
+                  }
+                  onChange={(e) => onHandleCheck(item, e.target.checked)}
                 />
               </span>
               <span className="table__mobile-name">{item.Name}</span>
@@ -167,7 +184,7 @@ const Vouchers = () => {
     setOpenDialog(true);
   };
 
-  const loadData = () => {
+  const loadData = (pageNum) => {
     const local_token = localStorage.getItem("token");
     setIsLoading(true);
     if (local_token !== null || local_token !== "") {
@@ -179,7 +196,7 @@ const Vouchers = () => {
       };
       axios
         .get(
-          SERVER_API.BASE_URL + SERVER_API.GETVOUCHERS_ENDPOINT + currentPage,
+          SERVER_API.BASE_URL + SERVER_API.GETVOUCHERS_ENDPOINT + pageNum,
           config
         )
         .then((res) => {
@@ -188,7 +205,16 @@ const Vouchers = () => {
         })
         .catch((err) => {
           setIsLoading(false);
-          catchError(err);
+          console.log(err);
+          if (err.response.data.status === 404 && currentPage > 1) {
+            console.log("asdfasdasd", currentPage);
+            const prevPage = currentPage - 1;
+            setCurrentPage(prevPage);
+            loadData(prevPage);
+            setSelectedList([]);
+          } else {
+            catchError(err);
+          }
         });
     } else {
       localStorage.removeItem("name");
@@ -197,7 +223,7 @@ const Vouchers = () => {
   };
 
   useEffect(() => {
-    loadData();
+    loadData(currentPage);
   }, [currentPage]);
 
   const onHandleCancel = () => {
@@ -207,11 +233,16 @@ const Vouchers = () => {
   const onHandleRefreshClicked = () => {
     setIsLoading(true);
     setSelectedList([]);
-    loadData();
+    loadData(currentPage);
   };
 
   const onHandleDeleteClicked = () => {
-    alert("Xoa nha?");
+    const newList = selectedList.map((item) => ({
+      ...item,
+      status: "Chờ xử lý",
+    }));
+    setSelectedList(newList);
+    setOpenConfirmDel(true);
   };
   const onHandleAddClicked = () => {
     setAddOrEditMode(true);
@@ -219,7 +250,7 @@ const Vouchers = () => {
 
   const onHandleAfterAddOrEditingMode = () => {
     setAddOrEditMode(false);
-    loadData();
+    loadData(currentPage);
   };
   const handleAgree = () => {
     if (serverStatus.code === 401) {
@@ -227,6 +258,55 @@ const Vouchers = () => {
       localStorage.removeItem("name");
       navigate("/login");
     } else setOpenDialog(false);
+  };
+
+  const confirmedDelete = () => {
+    for (
+      let remainingItemsDel = selectedList.length;
+      remainingItemsDel > 0;
+      remainingItemsDel--
+    ) {
+      setDeleting(true);
+      const deletingID = selectedList[remainingItemsDel - 1].ID;
+      setDeletingId(deletingID);
+
+      const local_token = localStorage.getItem("token");
+      if (local_token !== null || local_token !== "") {
+        const config = {
+          headers: {
+            Authorization: "Bearer " + local_token,
+            "Content-Type": "application/json",
+          },
+        };
+        axios
+          .delete(
+            ServerApi.BASE_URL + ServerApi.DELETE_VOUCHER + deletingID,
+            config
+          )
+          .then((res) => {
+            // res = catchData(res);
+            console.log("res: ", res);
+            if (res.data.status === 200) {
+              setSelectedList([
+                ...selectedList.filter((fit, fid) => fit.ID !== deletingID),
+              ]);
+            }
+          })
+          .catch((err) => {
+            console.log("error: ", err);
+            selectedList.map((mit, mid) => {
+              if (mit.ID === deletingID) {
+                mit.status = err.response.data.message;
+              }
+              return mit;
+            });
+          })
+          .finally(() => {
+            loadData(currentPage);
+            setDeleting(false);
+          });
+      }
+    }
   };
 
   return (
@@ -307,6 +387,111 @@ const Vouchers = () => {
           </DialogActions>
         </Dialog>
       )}
+      <Dialog
+        open={openConfirmDel && selectedList.length > 0}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        fullWidth={true}
+        maxWidth="lg"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Xóa {selectedList.length} vouchers sau khỏi hệ thống?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <Grid
+              container
+              sx={{ background: "#3084d7", padding: "0.5rem" }}
+              columnSpacing={3}
+            >
+              <Grid item xs={1} sm={1} md={1}>
+                <span className="table__title">No </span>
+              </Grid>
+              <Grid item xs={1} sm={1} md={1}>
+                <span className="table__title">Id </span>
+              </Grid>
+              <Grid item xs={3} sm={3} md={3}>
+                <span className="table__title">Tên voucher</span>
+              </Grid>
+              <Grid item xs={3.5} sm={3.5} md={3.5}>
+                <span className="table__title">Miêu tả</span>
+              </Grid>
+              <Grid item xs={1.5} sm={1.5} md={1.5}>
+                <span className="table__title">Còn lại / Đã đổi</span>
+              </Grid>
+              <Grid item xs={2} sm={2} md={2}>
+                <span className="table__title">Trạng thái</span>
+              </Grid>
+            </Grid>
+            {selectedList.map((item, index) => {
+              console.log(item);
+              return (
+                <Grid container sx={{ padding: "0.5rem" }} columnSpacing={3}>
+                  <Grid item xs={1} sm={1} md={1}>
+                    <span>{index + 1}</span>
+                  </Grid>
+                  <Grid item xs={1} sm={1} md={1}>
+                    <span>{item.ID}</span>
+                  </Grid>
+                  <Grid item xs={3} sm={3} md={3}>
+                    <span>{item.Name}</span>
+                  </Grid>
+                  <Grid item xs={3.5} sm={3.5} md={3.5}>
+                    <span>{item.Description}</span>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={1.5}
+                    sm={1.5}
+                    md={1.5}
+                    sx={{ textAlign: "center" }}
+                  >
+                    <span>
+                      {item.Remaining} / {item.Total}
+                    </span>
+                  </Grid>
+                  <Grid item xs={2} sm={2} md={2}>
+                    <span style={{ textAlign: "center" }}>
+                      {deletingId === item.ID ? (
+                        <CircularProgress sx={{ verticalAlign: "center" }} />
+                      ) : (
+                        <span>{item.status}</span>
+                      )}
+                    </span>
+                  </Grid>
+                </Grid>
+              );
+            })}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          {deleting ? (
+            <Grid
+              container
+              sx={{
+                justifyContent: "center",
+                alignItems: "center",
+                textAlign: "center",
+                padding: "0.5rem",
+              }}
+            >
+              <CircularProgress />
+            </Grid>
+          ) : (
+            <Wrapper>
+              <Button onClick={() => setOpenConfirmDel(false)}>
+                {openAfterDelete ? "Xác nhận" : "Hủy bỏ"}
+              </Button>
+
+              {!openAfterDelete && (
+                <Button color="error" onClick={confirmedDelete}>
+                  Xác nhận xóa
+                </Button>
+              )}
+            </Wrapper>
+          )}
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
