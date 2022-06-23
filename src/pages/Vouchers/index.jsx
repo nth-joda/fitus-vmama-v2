@@ -83,7 +83,7 @@ const Vouchers = () => {
         <th className="table__th">Tên voucher</th>
         <th className="table__th">Miêu tả</th>
         <th className="table__th">Còn lại</th>
-        <th className="table__th">Đã đổi</th>
+        <th className="table__th">Số lượng</th>
         <th className="table__th">Chỉnh sửa</th>
       </Wrapper>
     );
@@ -151,7 +151,7 @@ const Vouchers = () => {
               </td>
 
               <td className="table__td">
-                <span className="table__mobile-caption">Đã đổi</span>
+                <span className="table__mobile-caption">Số lượng</span>
                 <span className="table__value">{item.Total}</span>
               </td>
 
@@ -450,7 +450,7 @@ const Vouchers = () => {
                   <span className="table__title">Miêu tả</span>
                 </Grid>
                 <Grid item xs={1.5} sm={1.5} md={1.5}>
-                  <span className="table__title">Còn lại / Đã đổi</span>
+                  <span className="table__title">Còn lại / Số lượng</span>
                 </Grid>
                 <Grid item xs={2} sm={2} md={2}>
                   <span className="table__title">Trạng thái</span>
