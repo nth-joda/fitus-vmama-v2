@@ -140,15 +140,17 @@ const Step2 = (props) => {
       });
   }, []);
   const handleUserLostFocus = (item, index) => {
-    const newList = formik.values.productList.map((it, id) => {
-      return index !== id ? it : item;
-    });
-    formik.setFieldValue("productList", newList);
-    setProductOptions([
-      ...productOptions.filter((it, id) => {
-        return it !== item;
-      }),
-    ]);
+    if (item !== null) {
+      const newList = formik.values.productList.map((it, id) => {
+        return index !== id ? it : item;
+      });
+      formik.setFieldValue("productList", newList);
+      setProductOptions([
+        ...productOptions.filter((it, id) => {
+          return it !== item;
+        }),
+      ]);
+    }
   };
 
   const handleDeleteProduct = (index) => {
@@ -288,6 +290,7 @@ const Step2 = (props) => {
               id="gift"
               name="gift"
               value={formik.values.gift}
+              error={formik.values.gift === ""}
               onChange={(e) => formik.setFieldValue("gift", e.target.value)}
               onBlur={(e) => formik.setFieldValue("gift", e.target.value)}
             />

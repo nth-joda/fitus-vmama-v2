@@ -42,7 +42,6 @@ const Vouchers = () => {
   const [openConfirmDel, setOpenConfirmDel] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
-  const [openAfterDelete, setOpenAfterDelete] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
   const onHandleCheck = (item, isCheck) => {
@@ -219,7 +218,6 @@ const Vouchers = () => {
           setIsLoading(false);
           console.log(err);
           if (err.response.data.status === 404 && currentPage > 1) {
-            console.log("asdfasdasd", currentPage);
             const prevPage = currentPage - 1;
             setCurrentPage(prevPage);
             loadData(prevPage);
@@ -262,6 +260,7 @@ const Vouchers = () => {
 
   const onHandleAfterAddOrEditingMode = () => {
     setAddOrEditMode(false);
+    setEditItem(-1);
     loadData(currentPage);
   };
   const handleAgree = () => {
@@ -273,13 +272,14 @@ const Vouchers = () => {
   };
 
   const confirmedDelete = () => {
+    let deletingList = selectedList;
     for (
       let remainingItemsDel = selectedList.length;
       remainingItemsDel > 0;
-      remainingItemsDel--
+      --remainingItemsDel
     ) {
       setDeleting(true);
-      const deletingID = selectedList[remainingItemsDel - 1].ID;
+      let deletingID = deletingList[remainingItemsDel - 1].ID;
       setDeletingId(deletingID);
 
       const local_token = localStorage.getItem("token");
@@ -299,8 +299,9 @@ const Vouchers = () => {
             // res = catchData(res);
             console.log("res: ", res);
             if (res.data.status === 200) {
-              setSelectedList([
-                ...selectedList.filter((fit, fid) => fit.ID !== deletingID),
+              console.log("filtering: ", deletingID);
+              setSelectedList((prevState) => [
+                ...prevState.filter((fit, fid) => fit.ID !== deletingID),
               ]);
             }
           })
@@ -401,81 +402,87 @@ const Vouchers = () => {
         </Dialog>
       )}
       <Dialog
-        open={openConfirmDel && selectedList.length > 0}
+        open={openConfirmDel}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
         fullWidth={true}
         maxWidth="lg"
       >
         <DialogTitle id="alert-dialog-title">
-          Xóa {selectedList.length} vouchers sau khỏi hệ thống?
+          {selectedList.length > 0 ? (
+            <p>Xóa {selectedList.length} vouchers sau khỏi hệ thống?</p>
+          ) : (
+            <p>"Đã xóa thành công"</p>
+          )}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            <Grid
-              container
-              sx={{ background: "#3084d7", padding: "0.5rem" }}
-              columnSpacing={3}
-            >
-              <Grid item xs={1} sm={1} md={1}>
-                <span className="table__title">No </span>
-              </Grid>
-              <Grid item xs={1} sm={1} md={1}>
-                <span className="table__title">Id </span>
-              </Grid>
-              <Grid item xs={3} sm={3} md={3}>
-                <span className="table__title">Tên voucher</span>
-              </Grid>
-              <Grid item xs={3.5} sm={3.5} md={3.5}>
-                <span className="table__title">Miêu tả</span>
-              </Grid>
-              <Grid item xs={1.5} sm={1.5} md={1.5}>
-                <span className="table__title">Còn lại / Đã đổi</span>
-              </Grid>
-              <Grid item xs={2} sm={2} md={2}>
-                <span className="table__title">Trạng thái</span>
-              </Grid>
-            </Grid>
-            {selectedList.map((item, index) => {
-              console.log(item);
-              return (
-                <Grid container sx={{ padding: "0.5rem" }} columnSpacing={3}>
-                  <Grid item xs={1} sm={1} md={1}>
-                    <span>{index + 1}</span>
-                  </Grid>
-                  <Grid item xs={1} sm={1} md={1}>
-                    <span>{item.ID}</span>
-                  </Grid>
-                  <Grid item xs={3} sm={3} md={3}>
-                    <span>{item.Name}</span>
-                  </Grid>
-                  <Grid item xs={3.5} sm={3.5} md={3.5}>
-                    <span>{item.Description}</span>
-                  </Grid>
-                  <Grid
-                    item
-                    xs={1.5}
-                    sm={1.5}
-                    md={1.5}
-                    sx={{ textAlign: "center" }}
-                  >
-                    <span>
-                      {item.Remaining} / {item.Total}
-                    </span>
-                  </Grid>
-                  <Grid item xs={2} sm={2} md={2}>
-                    <span style={{ textAlign: "center" }}>
-                      {deletingId === item.ID ? (
-                        <CircularProgress sx={{ verticalAlign: "center" }} />
-                      ) : (
-                        <span>{item.status}</span>
-                      )}
-                    </span>
-                  </Grid>
+          {selectedList.length > 0 && (
+            <DialogContentText id="alert-dialog-description">
+              <Grid
+                container
+                sx={{ background: "#3084d7", padding: "0.5rem" }}
+                columnSpacing={3}
+              >
+                <Grid item xs={1} sm={1} md={1}>
+                  <span className="table__title">No </span>
                 </Grid>
-              );
-            })}
-          </DialogContentText>
+                <Grid item xs={1} sm={1} md={1}>
+                  <span className="table__title">Id </span>
+                </Grid>
+                <Grid item xs={3} sm={3} md={3}>
+                  <span className="table__title">Tên voucher</span>
+                </Grid>
+                <Grid item xs={3.5} sm={3.5} md={3.5}>
+                  <span className="table__title">Miêu tả</span>
+                </Grid>
+                <Grid item xs={1.5} sm={1.5} md={1.5}>
+                  <span className="table__title">Còn lại / Đã đổi</span>
+                </Grid>
+                <Grid item xs={2} sm={2} md={2}>
+                  <span className="table__title">Trạng thái</span>
+                </Grid>
+              </Grid>
+              {selectedList.map((item, index) => {
+                console.log(item);
+                return (
+                  <Grid container sx={{ padding: "0.5rem" }} columnSpacing={3}>
+                    <Grid item xs={1} sm={1} md={1}>
+                      <span>{index + 1}</span>
+                    </Grid>
+                    <Grid item xs={1} sm={1} md={1}>
+                      <span>{item.ID}</span>
+                    </Grid>
+                    <Grid item xs={3} sm={3} md={3}>
+                      <span>{item.Name}</span>
+                    </Grid>
+                    <Grid item xs={3.5} sm={3.5} md={3.5}>
+                      <span>{item.Description}</span>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={1.5}
+                      sm={1.5}
+                      md={1.5}
+                      sx={{ textAlign: "center" }}
+                    >
+                      <span>
+                        {item.Remaining} / {item.Total}
+                      </span>
+                    </Grid>
+                    <Grid item xs={2} sm={2} md={2}>
+                      <span style={{ textAlign: "center" }}>
+                        {deletingId === item.ID ? (
+                          <CircularProgress sx={{ verticalAlign: "center" }} />
+                        ) : (
+                          <span>{item.status}</span>
+                        )}
+                      </span>
+                    </Grid>
+                  </Grid>
+                );
+              })}
+            </DialogContentText>
+          )}
         </DialogContent>
         <DialogActions>
           {deleting ? (
@@ -493,10 +500,10 @@ const Vouchers = () => {
           ) : (
             <Wrapper>
               <Button onClick={() => setOpenConfirmDel(false)}>
-                {openAfterDelete ? "Xác nhận" : "Hủy bỏ"}
+                {selectedList.length <= 0 ? "Xác nhận" : "Hủy bỏ"}
               </Button>
 
-              {!openAfterDelete && (
+              {selectedList.length > 0 && (
                 <Button color="error" onClick={confirmedDelete}>
                   Xác nhận xóa
                 </Button>
