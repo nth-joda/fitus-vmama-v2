@@ -256,12 +256,24 @@ const Vouchers = () => {
   };
   const onHandleAddClicked = () => {
     setAddOrEditMode(true);
+    setCurrentPage(totalPages + 1);
   };
 
-  const onHandleAfterAddOrEditingMode = () => {
-    setAddOrEditMode(false);
+  const onHandleAfterAddOrEditingMode = (isCont) => {
+    setAddOrEditMode((prevState) => {
+      if (prevState === false) {
+        return false;
+      } else return false;
+    });
     setEditItem(-1);
     loadData(currentPage);
+    if (isCont === true) {
+      setAddOrEditMode((prevState) => {
+        if (prevState === false) {
+          return true;
+        } else return true;
+      });
+    }
   };
   const handleAgree = () => {
     if (serverStatus.code === 401) {
@@ -374,7 +386,9 @@ const Vouchers = () => {
               <AddVoucher
                 editItem={editItem}
                 handleCancel={onHandleCancel}
-                afterAddOrEditingMode={onHandleAfterAddOrEditingMode}
+                afterAddOrEditingMode={(isCont) =>
+                  onHandleAfterAddOrEditingMode(isCont)
+                }
               />
             )}
           </MainContent>
