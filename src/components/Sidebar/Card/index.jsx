@@ -4,7 +4,7 @@ import "./card.css";
 const Card = (props) => {
   return (
     <div
-      onClick={() => props.onNavigate(props.children)}
+      onClick={() => props.onNavigate(props.endpoint)}
       className={props.isActive ? "card card_active" : "card"}
     >
       <Grid
@@ -22,10 +22,12 @@ const Card = (props) => {
           justify="center"
           justifyContent="center"
         >
-          <p className="card__name icon">{props.icon}</p>
+          <p className="card__name icon" style={{ margin: "auto auto" }}>
+            {props.icon}
+          </p>
         </Grid>
         <Grid item xs={9} sm={6} md={9} container justifyContent="center">
-          <p className="card__name">{props.children}</p>
+          <p className="card__name">{props.children.replace("-", " ")}</p>
         </Grid>
       </Grid>
     </div>

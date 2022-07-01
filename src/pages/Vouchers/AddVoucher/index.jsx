@@ -76,8 +76,9 @@ const AddVoucher = (props) => {
     props.handleCancel();
   };
 
-  const onHandleDone = () => {
-    props.afterAddOrEditingMode();
+  const onHandleDone = (isCont) => {
+    props.afterAddOrEditingMode(isCont);
+    setCurrentStep(1);
   };
 
   const handleAgree = () => {
@@ -113,7 +114,7 @@ const AddVoucher = (props) => {
                 item={item}
                 step1Info={step1_info}
                 handleBackFrom2={onHandleBackFrom2}
-                handleDone={onHandleDone}
+                handleDone={(isCont) => onHandleDone(isCont)}
               />
             )}
           </Wrapper>

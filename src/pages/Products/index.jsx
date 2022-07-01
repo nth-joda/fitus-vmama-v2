@@ -42,10 +42,22 @@ const Products = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const onHandleCheck = (item, isCheck) => {
-    if (selectedList.includes(item.ID) && isCheck === false) {
-      const newList = selectedList.filter((it) => it.ID !== item.ID);
+    // if (selectedList.includes(item.ID) && isCheck === false) {
+    //   const newList = selectedList.filter((it) => it.ID !== item.ID);
+    //   setSelectedList(newList);
+    // } else if (!selectedList.includes(item.ID) && isCheck === true) {
+    //   setSelectedList([...selectedList, item]);
+    // }
+    if (
+      selectedList.filter((fitem, fid) => fitem.ID === item.ID).length > 0 &&
+      isCheck === false
+    ) {
+      const newList = selectedList.filter((fitem) => fitem.ID !== item.ID);
       setSelectedList(newList);
-    } else if (!selectedList.includes(item.ID) && isCheck === true) {
+    } else if (
+      !selectedList.filter((fitem, fid) => fitem.ID === item.ID).length > 0 &&
+      isCheck === true
+    ) {
       setSelectedList([...selectedList, item]);
     }
   };

@@ -23,6 +23,7 @@ const SideBar = (props) => {
         <Card
           isActive={props.location === "/vouchers" ? true : false}
           icon={<DiscountIcon />}
+          endpoint="vouchers"
           onNavigate={(where) => goTo(where)}
         >
           Vouchers
@@ -31,10 +32,21 @@ const SideBar = (props) => {
       <Grid item xs={6} sm={2.5} md={12}>
         <Card
           isActive={props.location === "/products" ? true : false}
+          endpoint="products"
           icon={<CategoryIcon />}
           onNavigate={(where) => goTo(where)}
         >
           Products
+        </Card>
+      </Grid>
+      <Grid item xs={6} sm={2.5} md={12}>
+        <Card
+          isActive={props.location === "/user-management" ? true : false}
+          endpoint="user-management"
+          icon={<CategoryIcon />}
+          onNavigate={(where) => goTo(where)}
+        >
+          Người dùng
         </Card>
       </Grid>
     </Grid>

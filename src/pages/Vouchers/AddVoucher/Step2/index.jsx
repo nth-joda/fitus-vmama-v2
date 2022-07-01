@@ -23,6 +23,7 @@ const Step2 = (props) => {
   const [productOptions, setProductOptions] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [serverStatus, setServerStatus] = useState(null);
+  const [isCont, setIsCont] = useState(false);
   const formik = useFormik({
     initialValues: {
       productList: [{ value: -1, label: "" }],
@@ -140,15 +141,17 @@ const Step2 = (props) => {
       });
   }, []);
   const handleUserLostFocus = (item, index) => {
-    const newList = formik.values.productList.map((it, id) => {
-      return index !== id ? it : item;
-    });
-    formik.setFieldValue("productList", newList);
-    setProductOptions([
-      ...productOptions.filter((it, id) => {
-        return it !== item;
-      }),
-    ]);
+    if (item !== null) {
+      const newList = formik.values.productList.map((it, id) => {
+        return index !== id ? it : item;
+      });
+      formik.setFieldValue("productList", newList);
+      setProductOptions([
+        ...productOptions.filter((it, id) => {
+          return it !== item;
+        }),
+      ]);
+    }
   };
 
   const handleDeleteProduct = (index) => {
@@ -174,9 +177,13 @@ const Step2 = (props) => {
       ]);
     }
   };
+  const onAddAndCont = (values) => {
+    setIsCont(true);
+    formik.handleSubmit();
+  };
   const handleAgree = () => {
     setIsSaving(false);
-    if (serverStatus.code === 200) props.handleDone();
+    if (serverStatus.code === 200) props.handleDone(isCont);
     if (serverStatus.code === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("name");
@@ -288,6 +295,7 @@ const Step2 = (props) => {
               id="gift"
               name="gift"
               value={formik.values.gift}
+              error={formik.values.gift === ""}
               onChange={(e) => formik.setFieldValue("gift", e.target.value)}
               onBlur={(e) => formik.setFieldValue("gift", e.target.value)}
             />
@@ -328,21 +336,24 @@ const Step2 = (props) => {
               Lưu
             </button>
           </Grid>
-          <Grid item xs={12} sm={4} md={2.5}>
-            <button
-              className="btn btn-safe fullWidth"
-              type="submit"
-              disabled={
-                formik.values.productList.find(
-                  (x) => x.label === "" || x.label.includes(DEAD_TEXT)
-                ) || formik.values.gift === ""
-                  ? true
-                  : false
-              }
-            >
-              Lưu và thêm mới
-            </button>
-          </Grid>
+          {props.item === null && (
+            <Grid item xs={12} sm={4} md={2.5}>
+              <button
+                className="btn btn-safe fullWidth"
+                type="button"
+                onClick={() => onAddAndCont(formik.values)}
+                disabled={
+                  formik.values.productList.find(
+                    (x) => x.label === "" || x.label.includes(DEAD_TEXT)
+                  ) || formik.values.gift === ""
+                    ? true
+                    : false
+                }
+              >
+                Lưu và thêm mới
+              </button>
+            </Grid>
+          )}
         </Grid>
       </Grid>
       <div className="dialog">

@@ -7,30 +7,56 @@ import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import { styled, alpha } from "@mui/material/styles";
+import InputBase from "@mui/material/InputBase";
 import "./mainContentHeader.css";
-// const Span = styled("span")(({ theme }) => ({
-//   ...theme.typography.button,
-//   padding: theme.spacing(1),
-//   fontSize: "2rem",
-//   color: "#005593",
-// }));
 
-// const useStyles = makeStyles((theme) => ({
-//   root: {
-//     overflow: "hidden",
-//     width: "100%",
-//     borderRadius: "0.6rem",
-//     color: "#000",
-//     backgroundColor: "#fff",
-//     "&:hover": {
-//       backgroundColor: "#fff",
-//     },
-//     "&$focused": {
-//       backgroundColor: "#fff",
-//     },
-//   },
-//   focused: {},
-// }));
+const Search = styled("div")(({ theme }) => ({
+  position: "relative",
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  "&:hover": {
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  },
+  marginRight: theme.spacing(2),
+  marginLeft: 0,
+  width: "100%",
+  [theme.breakpoints.up("sm")]: {
+    marginLeft: theme.spacing(3),
+    width: "auto",
+  },
+}));
+
+const SearchIconWrapper = styled("div")(({ theme }) => ({
+  padding: theme.spacing(0, 2),
+  height: "100%",
+  position: "absolute",
+  pointerEvents: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  color: "white",
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+  color: "white",
+  "& .MuiInputBase-input": {
+    padding: theme.spacing(1, 1, 1, 0),
+    // vertical padding + font size from searchIcon
+    paddingLeft: `calc(1.5em + ${theme.spacing(4)})`,
+    transition: theme.transitions.create("width"),
+    width: "100%",
+    [theme.breakpoints.up("md")]: {
+      width: "42ch",
+    },
+    [theme.breakpoints.up("sm")]: {
+      width: "42ch",
+    },
+    [theme.breakpoints.up("xs")]: {
+      width: "42ch",
+    },
+  },
+}));
 
 const MainContentHeader = (props) => {
   // const [inputSearchTerm, setInputSearchTerm] = useState("");
@@ -42,7 +68,19 @@ const MainContentHeader = (props) => {
       alignItems="center"
     >
       <Grid item xs={12} sm={4} md={5}>
-        <TextField
+        <Search>
+          <SearchIconWrapper>
+            <SearchIcon />
+          </SearchIconWrapper>
+          <StyledInputBase
+            placeholder={
+              props.of ? "Nhập tên " + props.of + " ..." : "Nhập từ khóa"
+            }
+            inputProps={{ "aria-label": "search" }}
+            onChange={(e) => props.catchTerm(e.target.value)}
+          />
+        </Search>
+        {/* <TextField
           id="outlined-adornment-password"
           variant="outlined"
           type="text"
@@ -61,7 +99,7 @@ const MainContentHeader = (props) => {
             ),
             className: { color: "red" },
           }}
-        />
+        /> */}
       </Grid>
       <Grid item xs={0} sm={0} md={2}></Grid>
       <Grid
