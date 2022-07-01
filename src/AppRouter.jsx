@@ -7,6 +7,7 @@ import NotFound from "./pages/NotFound";
 
 import { Navigate, useNavigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
+import UserManagement from "./pages/UserManagement";
 
 const AppRouter = () => {
   let navigate = useNavigate();
@@ -42,6 +43,18 @@ const AppRouter = () => {
             ) : (
               <Navigate
                 to={{ pathname: "/login", state: { from: "/products" } }}
+              />
+            )
+          }
+        ></Route>
+        <Route
+          path="/User-Management"
+          element={
+            localStorage.getItem("token") ? (
+              <UserManagement />
+            ) : (
+              <Navigate
+                to={{ pathname: "/login", state: { from: "/User-Management" } }}
               />
             )
           }
