@@ -50,10 +50,10 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
       width: "42ch",
     },
     [theme.breakpoints.up("sm")]: {
-      width: "42ch",
+      width: "5ch",
     },
     [theme.breakpoints.up("xs")]: {
-      width: "42ch",
+      width: "13ch",
     },
   },
 }));

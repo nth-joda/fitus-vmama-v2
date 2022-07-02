@@ -84,7 +84,7 @@ const Products = () => {
           />
           {selectedList.length > 0 ? "Chọn " + selectedList.length : null}
         </th>
-        <th className="table__th">ID</th>
+        <th className="table__th small">ID</th>
         <th className="table__th">Tên Sản phẩm</th>
         <th className="table__th">Chỉnh sửa</th>
       </Wrapper>
@@ -133,7 +133,7 @@ const Products = () => {
                 </span>
                 <span className="table__mobile-name">{item.ProductName}</span>
               </td>
-              <td className="table__td">
+              <td className="table__td small">
                 <span className="table__mobile-caption">ID</span>
                 <span className="table__value">{item.ID}</span>
               </td>
