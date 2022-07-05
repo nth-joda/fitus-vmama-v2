@@ -165,7 +165,6 @@ const UserManagement = () => {
                   ? "table__tr table__tr-selected"
                   : "table__tr"
               }
-              onClick={() => setShowItem(item)}
             >
               <td className="table__td table__mobile-title">
                 <span className="table__mobile-value">
@@ -187,21 +186,21 @@ const UserManagement = () => {
                 </span>
                 <span className="table__mobile-name">{item.Full_Name}</span>
               </td>
-              <td className="table__td small">
+              <td className="table__td small" onClick={() => setShowItem(item)}>
                 <span className="table__mobile-caption">ID</span>
                 <span className="table__value">{item.ID}</span>
               </td>
-              <td className="table__td">
+              <td className="table__td" onClick={() => setShowItem(item)}>
                 <span className="table__mobile-caption">Tên người dùng</span>
                 <span>{item.Full_Name}</span>
               </td>
 
-              <td className="table__td">
+              <td className="table__td" onClick={() => setShowItem(item)}>
                 <span className="table__mobile-caption">Tên đăng nhập</span>
                 <span>{item.User_Name}</span>
               </td>
 
-              <td className="table__td small">
+              <td className="table__td small" onClick={() => setShowItem(item)}>
                 <span className="table__mobile-caption">Admin</span>
                 <span>
                   {item.Admin ? (
