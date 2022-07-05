@@ -29,3 +29,17 @@
   padding: 0.5rem;
   border-radius: 0.6rem;
 }
+
+.form-detail__cta {
+  margin: 1.5rem 0;
+  background-color: var(--white-color);
+  padding: 0.5rem;
+  border-radius: 0.6rem;
+}
+
+.dialog-title.detail {
+  background-color: var(--white-text);
+  color: var(--card-bg-color);
+  font-weight: 700;
+  font-size: 2rem;
+}

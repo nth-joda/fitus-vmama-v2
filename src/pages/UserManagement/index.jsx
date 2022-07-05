@@ -12,13 +12,10 @@ import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
+import { useFormik } from "formik";
 
 import Header from "../../components/Header";
 import SideBar from "../../components/Sidebar";
@@ -26,6 +23,7 @@ import MainContent from "../../components/MainContent";
 import MainContentHeader from "../../components/MainContent/MainContentHeader";
 import Table from "../../utils/Table";
 import Wrapper from "../../utils/Wrapper";
+import { useEffect } from "react";
 
 const usersList = [
   {
@@ -73,6 +71,7 @@ const UserManagement = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [editItem, setEditItem] = useState(null);
+  const [showItem, setShowItem] = useState(null);
 
   // Diaglog:
   const [openAddDialog, setOpenAddDialog] = React.useState(false);
@@ -87,7 +86,26 @@ const UserManagement = () => {
     setOpenAddDialog(false);
     setEditItem(null);
   };
-  // ENd dialog
+  // End dialog
+
+  // thong tin chi tiet:
+
+  const handleCloseDetailDialog = () => {
+    setShowItem(null);
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      fullName: editItem ? editItem.Full_Name : "",
+      userName: editItem ? editItem.User_Name : "",
+      password: editItem ? editItem.Password : "",
+    },
+
+    onSubmit: (values) => {
+      alert("Send Request to BE: " + JSON.stringify(values));
+      handleCloseAddEditDialog();
+    },
+  });
 
   const onHandleRefreshClicked = () => {};
 
@@ -147,6 +165,7 @@ const UserManagement = () => {
                   ? "table__tr table__tr-selected"
                   : "table__tr"
               }
+              onClick={() => setShowItem(item)}
             >
               <td className="table__td table__mobile-title">
                 <span className="table__mobile-value">
@@ -285,6 +304,10 @@ const UserManagement = () => {
                     id="fullname"
                     label="Bắt buộc *"
                     variant="filled"
+                    name="fullName"
+                    defaultValue={formik.values.fullName}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                   />
                 </Grid>
               </Grid>
@@ -295,9 +318,13 @@ const UserManagement = () => {
                 <Grid item xs={12} sm={8} md={8}>
                   <TextField
                     fullWidth
-                    id="fullname"
+                    id="userName"
                     label="Bắt buộc *"
                     variant="filled"
+                    name="userName"
+                    defaultValue={formik.values.userName}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                   />
                 </Grid>
               </Grid>
@@ -309,10 +336,13 @@ const UserManagement = () => {
                 <Grid item xs={12} sm={8} md={8}>
                   <TextField
                     fullWidth
-                    id="fullname"
+                    id="password"
                     label="Bắt buộc *"
                     variant="filled"
-                    defaultValue={editItem ? editItem.Password : ""}
+                    name="password"
+                    defaultValue={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                   />
                 </Grid>
               </Grid>
@@ -331,7 +361,7 @@ const UserManagement = () => {
               >
                 <Grid item>
                   <button
-                    onClick={handleCloseAddEditDialog}
+                    onClick={() => formik.handleSubmit(formik.values)}
                     className="btn btn-safe"
                   >
                     Xác nhận
@@ -379,10 +409,13 @@ const UserManagement = () => {
                 <Grid item xs={12} sm={8} md={8}>
                   <TextField
                     fullWidth
-                    id="fullname"
+                    id="fullName"
                     label="Bắt buộc *"
                     variant="filled"
-                    defaultValue={editItem ? editItem.Full_Name : ""}
+                    name="fullName"
+                    defaultValue={formik.values.fullName}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                   />
                 </Grid>
               </Grid>
@@ -393,10 +426,13 @@ const UserManagement = () => {
                 <Grid item xs={12} sm={8} md={8}>
                   <TextField
                     fullWidth
-                    id="fullname"
+                    id="userName"
                     label="Bắt buộc *"
                     variant="filled"
-                    defaultValue={editItem ? editItem.User_Name : ""}
+                    name="userName"
+                    defaultValue={formik.values.userName}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                   />
                 </Grid>
               </Grid>
@@ -408,10 +444,13 @@ const UserManagement = () => {
                 <Grid item xs={12} sm={8} md={8}>
                   <TextField
                     fullWidth
-                    id="fullname"
+                    id="password"
                     label="Bắt buộc *"
                     variant="filled"
-                    defaultValue={editItem ? editItem.Password : ""}
+                    name="password"
+                    defaultValue={formik.values.password}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
                   />
                 </Grid>
               </Grid>
@@ -430,7 +469,7 @@ const UserManagement = () => {
               >
                 <Grid item>
                   <button
-                    onClick={handleCloseAddEditDialog}
+                    onClick={() => formik.handleSubmit(formik.values)}
                     className="btn btn-safe"
                   >
                     Xác nhận
@@ -452,6 +491,87 @@ const UserManagement = () => {
                     className="btn btn-danger"
                   >
                     Hủy bỏ
+                  </button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Detail */}
+      <Dialog
+        open={showItem}
+        onClose={() => {
+          setShowItem(null);
+        }}
+        fullScreen={fullScreen}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <div className="dialog-content">
+          <div className="dialog-title detail">Thông tin cho tiết</div>
+          <form className="form-edit-add">
+            <Grid container rowSpacing={2}>
+              <Grid container item columnSpacing={2}>
+                <Grid item xs={12} sm={4} md={4} alignSelf="center">
+                  <label className="form-edit-add__label">Tên người dùng</label>
+                </Grid>
+                <Grid item xs={12} sm={8} md={8}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    variant="standard"
+                    defaultValue={showItem ? showItem.Full_Name : ""}
+                  />
+                </Grid>
+              </Grid>
+              <Grid container item columnSpacing={2}>
+                <Grid item xs={12} sm={4} md={4} alignSelf="center">
+                  <label className="form-edit-add__label">Tên đăng nhập</label>
+                </Grid>
+                <Grid item xs={12} sm={8} md={8}>
+                  <TextField
+                    fullWidth
+                    variant="standard"
+                    disabled
+                    defaultValue={showItem ? showItem.User_Name : ""}
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid container item columnSpacing={2}>
+                <Grid item xs={12} sm={4} md={4} alignSelf="center">
+                  <label className="form-edit-add__label">Mật khẩu</label>
+                </Grid>
+                <Grid item xs={12} sm={8} md={8}>
+                  <TextField
+                    fullWidth
+                    variant="standard"
+                    disabled
+                    defaultValue={showItem ? showItem.Password : ""}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+          </form>
+          <div className="form-detail__cta">
+            <Grid container direction="row" alignItems="center">
+              <Grid
+                item
+                container
+                xs={12}
+                sm={12}
+                md={12}
+                direction="column"
+                alignItems="end"
+              >
+                <Grid item>
+                  <button
+                    onClick={handleCloseDetailDialog}
+                    className="btn btn-primary"
+                  >
+                    Đóng
                   </button>
                 </Grid>
               </Grid>
