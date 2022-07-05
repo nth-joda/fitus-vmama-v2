@@ -237,6 +237,7 @@ const Vouchers = () => {
   }, [currentPage]);
 
   const onHandleCancel = () => {
+    setEditItem(-1);
     setAddOrEditMode(false);
   };
 
