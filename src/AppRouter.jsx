@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import { Navigate, useNavigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import UserManagement from "./pages/UserManagement";
+import Transactions from "./pages/Transactions";
 
 const AppRouter = () => {
   let navigate = useNavigate();
@@ -67,6 +68,18 @@ const AppRouter = () => {
             ) : (
               <Navigate
                 to={{ pathname: "/login", state: { from: "/vmachines" } }}
+              />
+            )
+          }
+        ></Route>
+        <Route
+          path="/transactions"
+          element={
+            localStorage.getItem("token") ? (
+              <Transactions />
+            ) : (
+              <Navigate
+                to={{ pathname: "/login", state: { from: "/transactions" } }}
               />
             )
           }

@@ -12,6 +12,7 @@ body {
   --blue-text-color: rgba(0, 85, 147, 0.78);
   --green-color: #2e7d32;
   --red-color: #a00000;
+  --secondary-color: #603e9f;
   --white-color: #fff;
   --gray-bg-color: #dededefa;
   --gray-text: #898989;
@@ -72,7 +73,12 @@ li {
 }
 
 .btn-secondary {
-  background-color: var(--red-color);
+  background-color: var(--secondary-color);
+  text-transform: uppercase;
+}
+
+.btn-orange {
+  background-color: #e65100;
   text-transform: uppercase;
 }
 
