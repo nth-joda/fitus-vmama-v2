@@ -80,7 +80,7 @@ const Transactions = () => {
                         9:20
                       </span>
                     </td>
-                    <td className="td-item">
+                    <td className="td-item" onClick={() => setShowItem(item)}>
                       <span className="history-table__mobile-title">
                         Mã hóa đơn
                       </span>
@@ -88,7 +88,7 @@ const Transactions = () => {
                         {item.billNum}
                       </span>
                     </td>
-                    <td className="td-item">
+                    <td className="td-item" onClick={() => setShowItem(item)}>
                       <span className="history-table__mobile-title">
                         Tổng hóa đơn
                       </span>
@@ -96,7 +96,7 @@ const Transactions = () => {
                         {item.totalMoney}
                       </span>
                     </td>
-                    <td className="td-item">
+                    <td className="td-item" onClick={() => setShowItem(item)}>
                       <span className="history-table__mobile-title">
                         Mã nhân viên
                       </span>
