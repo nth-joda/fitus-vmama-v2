@@ -77,6 +77,11 @@ li {
   text-transform: uppercase;
 }
 
+.btn-orange {
+  background-color: #e65100;
+  text-transform: uppercase;
+}
+
 .btn:disabled {
   background-color: var(--gray-bg-color);
   color: var(--gray-text);

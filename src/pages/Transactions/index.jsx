@@ -10,6 +10,8 @@ import MainContentHeader from "../../components/MainContent/MainContentHeader";
 import SideBar from "../../components/Sidebar";
 import Wrapper from "../../utils/Wrapper";
 import "./transactions.css";
+import TransactionList from "../../assets/MOCK_DATA.json";
+
 const Transactions = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -20,6 +22,17 @@ const Transactions = () => {
   const onHandleAddClicked = () => {};
 
   const title_cell_width = 5;
+
+  const doCheckBtn = (checkItem) => {
+    return (
+      <button
+        className="btn btn-orange"
+        onClick={() => alert("Kiểm traing : " + checkItem.staffAccount)}
+      >
+        kiểm tra
+      </button>
+    );
+  };
 
   const historyTable = () => {
     return (
@@ -34,7 +47,6 @@ const Transactions = () => {
             </Grid>
           </Grid>
         </div>
-
         <table className="history-table">
           <thead>
             <tr className="history-table__title">
@@ -45,87 +57,61 @@ const Transactions = () => {
               <td>Trạng thái</td>
             </tr>
           </thead>
-
           <tbody className="history-table__body">
-            <tr className="history-table__row">
-              <td className="td-key">
-                <span className="history-table__mobile-title">Thời gian</span>
-                <span className="history-table__value bold-value">21:30</span>
-              </td>
-              <td className="td-item">
-                <span className="history-table__mobile-title">Mã hóa đơn</span>
-                <span className="history-table__value">213</span>
-              </td>
-              <td className="td-item">
-                <span className="history-table__mobile-title">
-                  Tổng hóa đơn
-                </span>
-                <span className="history-table__value">213.000</span>
-              </td>
-              <td className="td-item">
-                <span className="history-table__mobile-title">
-                  Mã nhân viên
-                </span>
-                <span className="history-table__value bold-value">ABCXYZ</span>
-              </td>
-              <td className="td-item">
-                <span className="history-table__mobile-title">Trạng thái</span>
-                <span className="history-table__value">Chờ kiểm tra</span>
-              </td>
-            </tr>
-
-            <tr className="history-table__row">
-              <td className="td-key">
-                <span className="history-table__mobile-title">Thời gian</span>
-                <span className="history-table__value">21:30</span>
-              </td>
-              <td className="td-item">
-                <span className="history-table__mobile-title">Mã hóa đơn</span>
-                <span className="history-table__value">213</span>
-              </td>
-              <td className="td-item">
-                <span className="history-table__mobile-title">
-                  Tổng hóa đơn
-                </span>
-                <span className="history-table__value">213.000</span>
-              </td>
-              <td className="td-item">
-                <span className="history-table__mobile-title">
-                  Mã nhân viên
-                </span>
-                <span className="history-table__value">ABCXYZ</span>
-              </td>
-              <td className="td-item">
-                <span className="history-table__mobile-title">Trạng thái</span>
-                <span className="history-table__value">Chờ kiểm tra</span>
-              </td>
-            </tr>
-            <tr className="history-table__row">
-              <td className="td-key">
-                <span className="history-table__mobile-title">Thời gian</span>
-                <span className="history-table__value">21:30</span>
-              </td>
-              <td className="td-item">
-                <span className="history-table__mobile-title">Mã hóa đơn</span>
-                <span className="history-table__value">213</span>
-              </td>
-              <td className="td-item">
-                <span className="history-table__mobile-title">
-                  Tổng hóa đơn
-                </span>
-                <span className="history-table__value">213.000</span>
-              </td>
-              <td className="td-item">
-                <span className="history-table__mobile-title">
-                  Mã nhân viên
-                </span>
-                <span className="history-table__value">ABCXYZ</span>
-              </td>
-              <td className="td-item">
-                <span className="history-table__mobile-title">Trạng thái</span>
-                <span className="history-table__value">Chờ kiểm tra</span>
-              </td>
-            </tr>
+            {TransactionList.map((item, index) => {
+              return (
+                <Wrapper>
+                  <tr className="history-table__row" key={item.ID}>
+                    <td className="td-key">
+                      <span className="history-table__mobile-title">
+                        Thời gian
+                      </span>
+                      <span className="history-table__value bold-value">
+                        9:20
+                      </span>
+                    </td>
+                    <td className="td-item">
+                      <span className="history-table__mobile-title">
+                        Mã hóa đơn
+                      </span>
+                      <span className="history-table__value">
+                        {item.billNum}
+                      </span>
+                    </td>
+                    <td className="td-item">
+                      <span className="history-table__mobile-title">
+                        Tổng hóa đơn
+                      </span>
+                      <span className="history-table__value">
+                        {item.totalMoney}
+                      </span>
+                    </td>
+                    <td className="td-item">
+                      <span className="history-table__mobile-title">
+                        Mã nhân viên
+                      </span>
+                      <span className="history-table__value bold-value">
+                        {item.staffAccount}
+                      </span>
+                    </td>
+                    <td className="td-item">
+                      <span className="history-table__mobile-title">
+                        Trạng thái
+                      </span>
+                      <span className="history-table__value">
+                        {item.status == null && doCheckBtn(item)}
+                        {item.status === true && (
+                          <span className="approved">Hợp lệ</span>
+                        )}
+                        {item.status === false && (
+                          <span className="rejected">Không hợp lệ</span>
+                        )}
+                      </span>
+                    </td>
+                  </tr>
+                </Wrapper>
+              );
+            })}
           </tbody>
         </table>
       </Wrapper>
