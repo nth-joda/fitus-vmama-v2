@@ -4,6 +4,12 @@ import React, { useState } from "react";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import EqualizerIcon from "@mui/icons-material/Equalizer";
 import TodayIcon from "@mui/icons-material/Today";
+import Dialog from "@mui/material/Dialog";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import TextField from "@mui/material/TextField";
+import { useTheme } from "@mui/material/styles";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
 import Header from "../../components/Header";
 import MainContent from "../../components/MainContent";
 import MainContentHeader from "../../components/MainContent/MainContentHeader";
@@ -16,18 +22,22 @@ const Transactions = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedList, setSelectedList] = useState([]);
+  const [showItem, setShowItem] = useState(null);
+  const theme = useTheme();
+  const [imgOnShow, setImgOnShow] = useState(null);
+  const handleImgChange = (event, newValue) => {
+    setImgOnShow(newValue);
+  };
 
   const onHandleRefreshClicked = () => {};
   const onHandleDeleteClicked = () => {};
   const onHandleAddClicked = () => {};
 
-  const title_cell_width = 5;
-
   const doCheckBtn = (checkItem) => {
     return (
       <button
         className="btn btn-orange"
-        onClick={() => alert("Kiểm traing : " + checkItem.staffAccount)}
+        onClick={() => alert("TODO Kiểm traing : " + checkItem.staffAccount)}
       >
         kiểm tra
       </button>
@@ -62,7 +72,7 @@ const Transactions = () => {
               return (
                 <Wrapper>
                   <tr className="history-table__row" key={item.ID}>
-                    <td className="td-key">
+                    <td className="td-key" onClick={() => setShowItem(item)}>
                       <span className="history-table__mobile-title">
                         Thời gian
                       </span>
@@ -155,6 +165,185 @@ const Transactions = () => {
           </MainContent>
         </Grid>
       </Grid>
+      {/* Detail */}
+      <Dialog
+        open={showItem}
+        onClose={() => {
+          setShowItem(null);
+        }}
+        fullWidth={true}
+        maxWidth={"xl"}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <div className="dialog-content">
+          <div className="dialog-title detail">Thông tin cho tiết</div>
+          <Grid container>
+            <Grid container item xs={12} sm={12} md={6} rowSpacing={1.2}>
+              <Grid item xs={12} sm={4} md={4} alignSelf="center">
+                <label className="form-edit-add__label">Thời gian</label>
+              </Grid>
+              <Grid item xs={12} sm={8} md={8}>
+                <TextField
+                  fullWidth
+                  disabled
+                  variant="standard"
+                  defaultValue="27/07/2000 9:20"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4} md={4} alignSelf="center">
+                <label className="form-edit-add__label">Mã hóa đơn</label>
+              </Grid>
+              <Grid item xs={12} sm={8} md={8}>
+                <TextField
+                  fullWidth
+                  disabled
+                  variant="standard"
+                  defaultValue={showItem ? showItem.billNum : ""}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4} md={4} alignSelf="center">
+                <label className="form-edit-add__label">Tổng hóa đơn</label>
+              </Grid>
+              <Grid item xs={12} sm={8} md={8}>
+                <TextField
+                  fullWidth
+                  disabled
+                  variant="standard"
+                  defaultValue={showItem ? showItem.totalMoney : ""}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4} md={4} alignSelf="center">
+                <label className="form-edit-add__label">Mã nhân viên</label>
+              </Grid>
+              <Grid item xs={12} sm={8} md={8}>
+                <TextField
+                  fullWidth
+                  disabled
+                  variant="standard"
+                  defaultValue={showItem ? showItem.staffAccount : ""}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4} md={4} alignSelf="center">
+                <label className="form-edit-add__label">Trạng thái</label>
+              </Grid>
+              <Grid item xs={12} sm={8} md={8}>
+                <TextField
+                  fullWidth
+                  disabled
+                  variant="standard"
+                  defaultValue={"Todo: làm sau"}
+                />
+              </Grid>
+              <Grid item xs={12} sm={12} md={12} alignSelf="center">
+                <label className="form-edit-add__label">
+                  Danh sách sách sản phẩm
+                </label>
+              </Grid>
+              <Grid
+                container
+                item
+                xs={12}
+                sm={12}
+                md={12}
+                rowSpacing={1.5}
+                alignSelf="center"
+              >
+                {showItem
+                  ? showItem.productsList.map((item, index) => {
+                      return (
+                        <Grid item container columnSpacing={2}>
+                          <Grid
+                            item
+                            xs={2}
+                            sm={2}
+                            md={2}
+                            alignSelf="center"
+                            textAlign={"center"}
+                          >
+                            {index + 1}
+                          </Grid>
+                          <Grid item xs={5} sm={5} md={5}>
+                            {item.productName}
+                          </Grid>
+                          <Grid
+                            item
+                            xs={2}
+                            sm={2}
+                            md={2}
+                            alignSelf="center"
+                            textAlign={"center"}
+                          >
+                            {"(x" + item.productAmount + ")"}
+                          </Grid>
+                          <Grid
+                            item
+                            xs={3}
+                            sm={3}
+                            md={3}
+                            alignSelf="center"
+                            textAlign={"center"}
+                          >
+                            {item.productPricePerUnit}
+                          </Grid>
+                        </Grid>
+                      );
+                    })
+                  : null}
+              </Grid>
+            </Grid>
+
+            <Grid container item xs={12} sm={12} md={6} rowSpacing={2}>
+              <Grid item xs={12} sm={12} md={12}>
+                <Tabs
+                  value={imgOnShow}
+                  onChange={handleImgChange}
+                  textColor="secondary"
+                  variant="scrollable"
+                  scrollButtons="auto"
+                  indicatorColor="secondary"
+                  aria-label="secondary tabs example"
+                >
+                  {showItem
+                    ? showItem.imageList.map((im, id) => {
+                        return <Tab value={im.uri} label={"Ảnh " + (id + 1)} />;
+                      })
+                    : null}
+                </Tabs>
+              </Grid>
+              <Grid item xs={12} sm={12} md={12}>
+                <img alt="" src={imgOnShow} className="image-scaned" />
+              </Grid>
+            </Grid>
+          </Grid>
+          <div className="form-detail__cta">
+            <Grid container direction="row" alignItems="center">
+              <Grid
+                item
+                container
+                xs={12}
+                sm={12}
+                md={12}
+                direction="column"
+                alignItems="end"
+              >
+                <Grid item>
+                  <button
+                    onClick={() => setShowItem(null)}
+                    className="btn btn-primary"
+                  >
+                    Đóng
+                  </button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 };
