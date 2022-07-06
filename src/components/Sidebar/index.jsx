@@ -7,7 +7,7 @@ import DiscountIcon from "@mui/icons-material/Discount";
 import CategoryIcon from "@mui/icons-material/Category";
 import Grid from "@mui/material/Grid";
 import GroupIcon from "@mui/icons-material/Group";
-
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 const SideBar = (props) => {
   const navigate = useNavigate();
   const goTo = (location) => {
@@ -20,7 +20,7 @@ const SideBar = (props) => {
       justify="center"
       justifyContent="center"
     >
-      <Grid item xs={4} sm={2.5} md={12}>
+      <Grid item xs={6} sm={2.5} md={12}>
         <Card
           isActive={props.location === "/vouchers" ? true : false}
           icon={<DiscountIcon />}
@@ -30,7 +30,7 @@ const SideBar = (props) => {
           Vouchers
         </Card>
       </Grid>
-      <Grid item xs={4} sm={2.5} md={12}>
+      <Grid item xs={6} sm={2.5} md={12}>
         <Card
           isActive={props.location === "/products" ? true : false}
           endpoint="products"
@@ -40,7 +40,7 @@ const SideBar = (props) => {
           Products
         </Card>
       </Grid>
-      <Grid item xs={4} sm={2.5} md={12}>
+      <Grid item xs={6} sm={2.5} md={12}>
         <Card
           isActive={props.location === "/user-management" ? true : false}
           endpoint="user-management"
@@ -48,6 +48,17 @@ const SideBar = (props) => {
           onNavigate={(where) => goTo(where)}
         >
           Người dùng
+        </Card>
+      </Grid>
+
+      <Grid item xs={6} sm={2.5} md={12}>
+        <Card
+          isActive={props.location === "/transactions" ? true : false}
+          endpoint="transactions"
+          icon={<ReceiptLongIcon />}
+          onNavigate={(where) => goTo(where)}
+        >
+          Giao dịch
         </Card>
       </Grid>
     </Grid>

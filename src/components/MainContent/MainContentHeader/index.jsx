@@ -3,6 +3,7 @@ import Grid from "@mui/material/Grid";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
+
 import SearchIcon from "@mui/icons-material/Search";
 import AddIcon from "@mui/icons-material/Add";
 import RefreshIcon from "@mui/icons-material/Refresh";
@@ -132,21 +133,35 @@ const MainContentHeader = (props) => {
             disabled={props.isAddDisabled}
             onClick={() => props.handleAddClicked()}
           >
-            <AddIcon sx={{ verticalAlign: "middle", marginRight: "0.5rem" }} />
-            Thêm
+            {props.addIcon ? (
+              props.addIcon
+            ) : (
+              <AddIcon
+                sx={{ verticalAlign: "middle", marginRight: "0.5rem" }}
+              />
+            )}
+            {props.addName ? props.addName : "Thêm"}
           </button>
         </Grid>
 
         <Grid item xs={4} sm={4} md={4}>
           <button
-            className="btn btn-danger fullWidth"
+            className={
+              props.deleteColor
+                ? "btn btn-" + props.deleteColor + " fullWidth"
+                : "btn btn-danger fullWidth"
+            }
             disabled={props.isDeleteDisabled}
             onClick={() => props.handleDeleteClicked()}
           >
-            <DeleteForeverIcon
-              sx={{ verticalAlign: "middle", marginRight: "0.5rem" }}
-            />
-            Xóa
+            {props.deleteIcon ? (
+              props.deleteIcon
+            ) : (
+              <DeleteForeverIcon
+                sx={{ verticalAlign: "middle", marginRight: "0.5rem" }}
+              />
+            )}
+            {props.deleteName ? props.deleteName : "Xóa Bỏ"}
           </button>
         </Grid>
       </Grid>
