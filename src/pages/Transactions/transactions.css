@@ -33,6 +33,10 @@
   font-weight: 700;
 }
 
+.image-scaned {
+  width: 100%;
+}
+
 @media screen and (max-width: 450px) {
   .history-table__title {
     display: none;
