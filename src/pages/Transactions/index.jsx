@@ -189,7 +189,7 @@ const Transactions = () => {
         aria-describedby="alert-dialog-description"
       >
         <div className="dialog-content">
-          <div className="dialog-title detail">Thông tin cho tiết</div>
+          <div className="dialog-title detail">Thông tin chi tiết</div>
           <Grid item container columnSpacing={2} rowSpacing={2}>
             <Grid
               container
