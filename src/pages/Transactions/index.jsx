@@ -17,6 +17,7 @@ import SideBar from "../../components/Sidebar";
 import Wrapper from "../../utils/Wrapper";
 import "./transactions.css";
 import TransactionList from "../../assets/MOCK_DATA.json";
+import { useEffect } from "react";
 
 const Transactions = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -28,6 +29,12 @@ const Transactions = () => {
   const handleImgChange = (event, newValue) => {
     setImgOnShow(newValue);
   };
+
+  useEffect(() => {
+    if (showItem != null) {
+      setImgOnShow(showItem.imageList[0].uri);
+    } else setImgOnShow(null);
+  }, [showItem]);
 
   const onHandleRefreshClicked = () => {};
   const onHandleDeleteClicked = () => {};
@@ -76,7 +83,6 @@ const Transactions = () => {
                       className="td-key"
                       onClick={() => {
                         setShowItem(item);
-                        setImgOnShow(item.imageList[0]);
                       }}
                     >
                       <span className="history-table__mobile-title">
@@ -335,22 +341,14 @@ const Transactions = () => {
               sm={12}
               md={6}
               rowSpacing={1.2}
-              alignContent="center"
+              alignContent="flex-start"
             >
               <Grid item xs={12} sm={12} md={12} alignSelf="center">
                 <label className="form-edit-add__label">
-                  Danh sách sách sản phẩm:
+                  Danh sách sản phẩm:
                 </label>
               </Grid>
-              <Grid
-                container
-                item
-                xs={12}
-                sm={12}
-                md={12}
-                rowSpacing={1.5}
-                alignSelf="center"
-              >
+              <Grid container item xs={12} sm={12} md={12} rowSpacing={1.5}>
                 {showItem
                   ? showItem.productsList.map((item, index) => {
                       return (
@@ -431,7 +429,9 @@ const Transactions = () => {
               >
                 <Grid item>
                   <button
-                    onClick={() => setShowItem(null)}
+                    onClick={() => {
+                      setShowItem(null);
+                    }}
                     className="btn btn-primary"
                   >
                     Đóng
