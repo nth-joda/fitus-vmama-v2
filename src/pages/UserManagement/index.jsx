@@ -12,8 +12,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import Dialog from "@mui/material/Dialog";
-import useMediaQuery from "@mui/material/useMediaQuery";
-import { useTheme } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import { useFormik } from "formik";
 
@@ -71,12 +69,11 @@ const UserManagement = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [editItem, setEditItem] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [showItem, setShowItem] = useState(null);
 
   // Diaglog:
   const [openAddDialog, setOpenAddDialog] = React.useState(false);
-  const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   const handleClickOpenAddDialog = () => {
     setOpenAddDialog(true);
@@ -96,9 +93,9 @@ const UserManagement = () => {
 
   const formik = useFormik({
     initialValues: {
-      fullName: editItem ? editItem.Full_Name : "",
-      userName: editItem ? editItem.User_Name : "",
-      password: editItem ? editItem.Password : "",
+      fullName: "",
+      userName: "",
+      password: "",
     },
 
     onSubmit: (values) => {
@@ -106,6 +103,21 @@ const UserManagement = () => {
       handleCloseAddEditDialog();
     },
   });
+
+  useEffect(() => {
+    if (editItem != null) {
+      formik.setFieldValue("fullName", editItem.Full_Name);
+      formik.setFieldValue("userName", editItem.User_Name);
+      formik.setFieldValue("password", editItem.User_Name);
+      setIsEditing(true);
+    } else {
+      formik.setFieldValue("fullName", "");
+      formik.setFieldValue("userName", "");
+      formik.setFieldValue("password", "");
+      setIsEditing(false);
+    }
+    console.log(editItem);
+  }, [editItem]);
 
   const onHandleRefreshClicked = () => {};
 
@@ -217,9 +229,7 @@ const UserManagement = () => {
                   <IconButton
                     color="primary"
                     aria-label="chinh sua"
-                    onClick={() => {
-                      setEditItem(item);
-                    }}
+                    onClick={() => setEditItem(item)}
                   >
                     <EditIcon />
                   </IconButton>
@@ -305,7 +315,7 @@ const UserManagement = () => {
                     label="Bắt buộc *"
                     variant="filled"
                     name="fullName"
-                    defaultValue={formik.values.fullName}
+                    value={formik.values.fullName}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   />
@@ -322,7 +332,7 @@ const UserManagement = () => {
                     label="Bắt buộc *"
                     variant="filled"
                     name="userName"
-                    defaultValue={formik.values.userName}
+                    value={formik.values.userName}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   />
@@ -340,7 +350,7 @@ const UserManagement = () => {
                     label="Bắt buộc *"
                     variant="filled"
                     name="password"
-                    defaultValue={formik.values.password}
+                    value={formik.values.password}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
                   />
@@ -393,7 +403,7 @@ const UserManagement = () => {
 
       {/* EDIT */}
       <Dialog
-        open={editItem}
+        open={isEditing}
         fullWidth={true}
         maxWidth="sm"
         aria-labelledby="alert-dialog-title"
@@ -512,7 +522,7 @@ const UserManagement = () => {
         aria-describedby="alert-dialog-description"
       >
         <div className="dialog-content">
-          <div className="dialog-title detail">Thông tin cho tiết</div>
+          <div className="dialog-title detail">Thông tin chi tiết</div>
           <form className="form-edit-add">
             <Grid container rowSpacing={2}>
               <Grid container item columnSpacing={2}>
