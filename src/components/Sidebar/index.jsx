@@ -27,7 +27,7 @@ const SideBar = (props) => {
           endpoint="vouchers"
           onNavigate={(where) => goTo(where)}
         >
-          Vouchers
+          Khuyến mãi
         </Card>
       </Grid>
       <Grid item xs={6} sm={2.5} md={12}>
@@ -37,7 +37,7 @@ const SideBar = (props) => {
           icon={<CategoryIcon />}
           onNavigate={(where) => goTo(where)}
         >
-          Products
+          Sản phẩm
         </Card>
       </Grid>
       <Grid item xs={6} sm={2.5} md={12}>

@@ -140,9 +140,14 @@ const Vouchers = () => {
                 <span className="table__value">{item.Name}</span>
               </td>
 
-              <td className="table__td">
+              <td className="table__td table__value-description">
                 <span className="table__mobile-caption">Miêu tả</span>
-                <span className="table__value">{item.Description}</span>
+                <span
+                  style={{ "white-space": "pre-line" }}
+                  className="table__value"
+                >
+                  {item.Description.replace(/\\n/g, "")}
+                </span>
               </td>
 
               <td className="table__td">

@@ -171,3 +171,9 @@
     font-weight: 600;
   }
 }
+
+.checking-help {
+  font-size: 0.8rem;
+  color: var(--red-color);
+  font-style: italic;
+}
