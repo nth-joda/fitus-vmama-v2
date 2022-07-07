@@ -283,7 +283,8 @@ const UserManagement = () => {
       </Grid>
       <Dialog
         open={openAddDialog}
-        fullScreen={fullScreen}
+        fullWidth={true}
+        maxWidth="sm"
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -393,7 +394,8 @@ const UserManagement = () => {
       {/* EDIT */}
       <Dialog
         open={editItem}
-        fullScreen={fullScreen}
+        fullWidth={true}
+        maxWidth="sm"
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
@@ -504,7 +506,8 @@ const UserManagement = () => {
         onClose={() => {
           setShowItem(null);
         }}
-        fullScreen={fullScreen}
+        fullWidth={true}
+        maxWidth="sm"
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >

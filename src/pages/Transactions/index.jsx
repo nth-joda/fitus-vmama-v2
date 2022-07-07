@@ -72,7 +72,13 @@ const Transactions = () => {
               return (
                 <Wrapper>
                   <tr className="history-table__row" key={item.ID}>
-                    <td className="td-key" onClick={() => setShowItem(item)}>
+                    <td
+                      className="td-key"
+                      onClick={() => {
+                        setShowItem(item);
+                        setImgOnShow(item.imageList[0]);
+                      }}
+                    >
                       <span className="history-table__mobile-title">
                         Thời gian
                       </span>
@@ -178,70 +184,162 @@ const Transactions = () => {
       >
         <div className="dialog-content">
           <div className="dialog-title detail">Thông tin cho tiết</div>
-          <Grid container>
-            <Grid container item xs={12} sm={12} md={6} rowSpacing={1.2}>
-              <Grid item xs={12} sm={4} md={4} alignSelf="center">
-                <label className="form-edit-add__label">Thời gian</label>
-              </Grid>
-              <Grid item xs={12} sm={8} md={8}>
-                <TextField
-                  fullWidth
-                  disabled
-                  variant="standard"
-                  defaultValue="27/07/2000 9:20"
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={4} md={4} alignSelf="center">
-                <label className="form-edit-add__label">Mã hóa đơn</label>
-              </Grid>
-              <Grid item xs={12} sm={8} md={8}>
-                <TextField
-                  fullWidth
-                  disabled
-                  variant="standard"
-                  defaultValue={showItem ? showItem.billNum : ""}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={4} md={4} alignSelf="center">
-                <label className="form-edit-add__label">Tổng hóa đơn</label>
-              </Grid>
-              <Grid item xs={12} sm={8} md={8}>
-                <TextField
-                  fullWidth
-                  disabled
-                  variant="standard"
-                  defaultValue={showItem ? showItem.totalMoney : ""}
-                />
+          <Grid item container columnSpacing={2} rowSpacing={2}>
+            <Grid
+              container
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              columnSpacing={2}
+              rowSpacing={2}
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Grid container item xs={12} sm={12} md={12}>
+                <Grid item xs={12} sm={6} md={6}>
+                  <label className="form-edit-add__label">Thời gian</label>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    variant="standard"
+                    defaultValue="27/07/2000 9:20"
+                  />
+                </Grid>
               </Grid>
 
-              <Grid item xs={12} sm={4} md={4} alignSelf="center">
-                <label className="form-edit-add__label">Mã nhân viên</label>
+              <Grid container item xs={12} sm={12} md={12}>
+                <Grid item xs={12} sm={6} md={6}>
+                  <label className="form-edit-add__label">
+                    Tên NV đăng nhập
+                  </label>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    variant="standard"
+                    defaultValue={showItem ? showItem.staffAccount : ""}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12} sm={8} md={8}>
-                <TextField
-                  fullWidth
-                  disabled
-                  variant="standard"
-                  defaultValue={showItem ? showItem.staffAccount : ""}
-                />
+              <Grid container item xs={12} sm={12} md={12}>
+                <Grid item xs={12} sm={6} md={6}>
+                  <label className="form-edit-add__label">Trạng thái</label>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    variant="standard"
+                    defaultValue="TODO: Làm sau"
+                  />
+                </Grid>
               </Grid>
+            </Grid>
 
-              <Grid item xs={12} sm={4} md={4} alignSelf="center">
-                <label className="form-edit-add__label">Trạng thái</label>
+            <Grid
+              container
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              columnSpacing={2}
+              rowSpacing={2}
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Grid container item xs={12} sm={12} md={12}>
+                <Grid item xs={12} sm={6} md={6}>
+                  <label className="form-edit-add__label">Mã hóa đơn</label>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    variant="standard"
+                    defaultValue={showItem ? showItem.billNum : ""}
+                  />
+                </Grid>
               </Grid>
-              <Grid item xs={12} sm={8} md={8}>
-                <TextField
-                  fullWidth
-                  disabled
-                  variant="standard"
-                  defaultValue={"Todo: làm sau"}
-                />
+              <Grid container item xs={12} sm={12} md={12}>
+                <Grid item xs={12} sm={6} md={6}>
+                  <label className="form-edit-add__label">
+                    Tên voucher đã đổi
+                  </label>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    variant="standard"
+                    defaultValue="Voucher ABC"
+                  />
+                </Grid>
               </Grid>
+            </Grid>
+            <Grid
+              container
+              item
+              xs={12}
+              sm={12}
+              md={4}
+              columnSpacing={2}
+              rowSpacing={2}
+              justifyContent="center"
+              alignItems="center"
+            >
+              <Grid container item xs={12} sm={6} md={12}>
+                <Grid item xs={12} sm={6} md={6}>
+                  <label className="form-edit-add__label">Tên khách hàng</label>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    variant="standard"
+                    defaultValue={showItem ? showItem.clientName : ""}
+                  />
+                </Grid>
+              </Grid>
+              <Grid container item xs={12} sm={6} md={12}>
+                <Grid item xs={12} sm={6} md={6}>
+                  <label className="form-edit-add__label">Sdt khách hàng</label>
+                </Grid>
+                <Grid item xs={12} sm={6} md={6}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    variant="standard"
+                    defaultValue={showItem ? showItem.clientPhoneNum : ""}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <Grid container sx={{ marginTop: "1rem" }}>
+            <Grid
+              container
+              item
+              xs={12}
+              sm={12}
+              md={6}
+              rowSpacing={1.2}
+              alignContent="center"
+            >
               <Grid item xs={12} sm={12} md={12} alignSelf="center">
                 <label className="form-edit-add__label">
-                  Danh sách sách sản phẩm
+                  Danh sách sách sản phẩm:
                 </label>
               </Grid>
               <Grid
