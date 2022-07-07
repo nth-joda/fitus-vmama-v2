@@ -1,5 +1,5 @@
 .dialog-content {
-  padding: 1.5rem 3.5rem;
+  padding: 1.5rem 1.5rem;
 }
 
 .dialog-title {
@@ -31,7 +31,7 @@
 }
 
 .form-detail__cta {
-  margin: 1.5rem 0;
+  margin: 0.5rem 0;
   background-color: var(--white-color);
   padding: 0.5rem;
   border-radius: 0.6rem;
