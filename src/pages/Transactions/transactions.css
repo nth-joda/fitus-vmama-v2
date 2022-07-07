@@ -14,7 +14,7 @@
 }
 
 .history-table__date {
-  color: var(--black-color);
+  color: var(--white-color);
   font-size: 1.2rem;
   font-weight: 500;
   margin-top: 1.5rem;
@@ -120,6 +120,7 @@
   .history-table__row td {
     display: table-cell;
     text-align: center;
+    cursor: pointer;
   }
 
   .td-key {
@@ -169,4 +170,10 @@
   .bold-value {
     font-weight: 600;
   }
+}
+
+.checking-help {
+  font-size: 0.8rem;
+  color: var(--red-color);
+  font-style: italic;
 }
