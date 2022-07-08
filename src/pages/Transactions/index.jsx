@@ -23,18 +23,20 @@ import "./transactions.css";
 import TransactionList from "../../assets/MOCK_DATA.json";
 import { useEffect } from "react";
 import CheckBoxOutlineBlank from "@mui/icons-material/CheckBoxOutlineBlank";
-import { useFormik } from "formik";
+import { Formik, useFormik } from "formik";
 
 const RenderStatus = (props) => {
   return (
     <Wrapper>
       {props.checkingItem.status == null && (
-        <button
-          className="btn btn-orange"
-          onClick={() => props.handleDoCheckClicked(props.checkingItem)}
-        >
-          kiểm tra
-        </button>
+        <span className="history-table__value">
+          <button
+            className="btn btn-orange"
+            onClick={() => props.handleDoCheckClicked(props.checkingItem)}
+          >
+            kiểm tra
+          </button>
+        </span>
       )}
       {props.checkingItem.status === true && (
         <span className="history-table__value">
@@ -82,6 +84,24 @@ const Transactions = () => {
   const onHandleRefreshClicked = () => {};
   const onHandleDeleteClicked = () => {};
   const onHandleAddClicked = () => {};
+
+  const handleCheckYes = (value) => {
+    console.log(value);
+    if (value === true) {
+      checkingFormik.setFieldValue("isError", false);
+    } else {
+      checkingFormik.setFieldValue("isError", null);
+    }
+  };
+
+  const handleCheckError = (value) => {
+    console.log(value);
+    if (value === true) {
+      checkingFormik.setFieldValue("isError", true);
+    } else {
+      checkingFormik.setFieldValue("isError", null);
+    }
+  };
 
   const historyTable = () => {
     return (
@@ -426,7 +446,7 @@ const Transactions = () => {
                   : null}
               </Grid>
             </Grid>
-            <Grid container item xs={12} sm={12} md={6}>
+            <Grid container item xs={12} sm={12} md={6} alignSelf="flex-start">
               <Grid item xs={12} sm={12} md={12}>
                 <Tabs
                   value={mainTabOnShown}
@@ -444,7 +464,7 @@ const Transactions = () => {
                   <Tab value={"images"} label={"Ảnh chụp hóa đơn"} />
                 </Tabs>
               </Grid>
-              <Grid item xs={12} sm={12} md={12}>
+              <Grid item xs={12} sm={12} md={12} alignSelf="flex-start">
                 {mainTabOnShown === "images" && (
                   <Grid container item xs={12} sm={12} md={12}>
                     <Grid item xs={12} sm={12} md={12}>
@@ -472,163 +492,194 @@ const Transactions = () => {
                   </Grid>
                 )}
                 {mainTabOnShown === "voucher" && (
-                  <Grid
-                    item
-                    container
-                    sx={{ margin: "0.5rem 0" }}
-                    columnSpacing={2}
-                    rowSpacing={3}
+                  <div
+                    style={{
+                      background: "#ccccccc9",
+                      borderRadius: "0.5rem",
+                      padding: "0.5rem 0.5rem 2rem",
+                      margin: "0.5rem",
+                    }}
                   >
-                    <Grid item container xs={12} sm={12} md={12}>
-                      <Grid item xs={12} sm={5} md={4}>
-                        <label className="form-edit-add__label">
-                          Tên voucher:
-                        </label>
-                      </Grid>
-                      <Grid item xs={12} sm={7} md={8}>
-                        <TextField
-                          fullWidth
-                          disabled
-                          inputProps={{
-                            min: 0,
-                            style: { textAlign: "center" },
-                          }}
-                          variant="standard"
-                          defaultValue="TODO: Hiện tên voucher chổ này"
-                        />
-                      </Grid>
-                    </Grid>
-
-                    <Grid item container xs={12} sm={12} md={12}>
-                      <Grid item xs={12} sm={4} md={4}>
-                        <label className="form-edit-add__label">
-                          Tổng hóa đơn phải từ:
-                        </label>
-                      </Grid>
-                      <Grid item xs={5} sm={5} md={3.5}>
-                        <TextField
-                          fullWidth
-                          disabled
-                          inputProps={{
-                            min: 0,
-                            style: { textAlign: "center" },
-                          }}
-                          variant="standard"
-                          defaultValue="TODO: minMoney"
-                        />
-                      </Grid>
-                      <Grid
-                        item
-                        xs={2}
-                        sm={1}
-                        md={1}
-                        alignSelf="center"
-                        textAlign={"center"}
-                      >
-                        <label className="form-edit-add__label">đến</label>
-                      </Grid>
-                      <Grid item xs={5} sm={5} md={3.5}>
-                        <TextField
-                          fullWidth
-                          disabled
-                          inputProps={{
-                            min: 0,
-                            style: { textAlign: "center" },
-                          }}
-                          variant="standard"
-                          defaultValue="TODO: maxMoney"
-                        />
-                      </Grid>
-                    </Grid>
-
                     <Grid
                       item
                       container
-                      xs={12}
-                      sm={12}
-                      md={12}
-                      rowSpacing={2}
+                      sx={{ margin: "0.5rem 0" }}
                       columnSpacing={2}
+                      rowSpacing={3}
                     >
-                      <Grid item xs={12} sm={12} md={12}>
-                        <label className="form-edit-add__label">
-                          Hóa đơn phải có các sản phẩm sau:
-                        </label>
-                      </Grid>
-                      {
-                        // TODO: map chổ này list ra các sản phẩm
-                      }
-                      <Grid item xs={6} sm={4} md={4}>
-                        <TextField
-                          fullWidth
-                          disabled
-                          inputProps={{
-                            min: 0,
-                            style: { textAlign: "center" },
-                          }}
-                          variant="standard"
-                          defaultValue="TODO: Sản phẩm 1"
-                        />
+                      <Grid item container xs={11} sm={11} md={12}>
+                        <Grid item xs={12} sm={3} md={3} alignSelf="center">
+                          <label className="form-edit-add__label">
+                            Tên voucher:
+                          </label>
+                        </Grid>
+                        <Grid item xs={12} sm={9} md={8.5}>
+                          <TextField
+                            fullWidth
+                            disabled
+                            inputProps={{
+                              min: 0,
+                              style: { textAlign: "center" },
+                            }}
+                            variant="standard"
+                            defaultValue="TODO: Hiện tên voucher chổ này"
+                          />
+                        </Grid>
                       </Grid>
 
-                      <Grid item xs={6} sm={4} md={4}>
-                        <TextField
-                          fullWidth
-                          disabled
-                          inputProps={{
-                            min: 0,
-                            style: { textAlign: "center" },
-                          }}
-                          variant="standard"
-                          defaultValue="TODO: Sản phẩm 2"
-                        />
+                      <Grid item container xs={11} sm={11} md={12}>
+                        <Grid item xs={12} sm={3} md={3} alignSelf="center">
+                          <label className="form-edit-add__label">
+                            Điều kiện áp dụng:
+                          </label>
+                        </Grid>
+                        <Grid item xs={5} sm={4} md={3.5}>
+                          <TextField
+                            fullWidth
+                            disabled
+                            inputProps={{
+                              min: 0,
+                              style: { textAlign: "center" },
+                            }}
+                            variant="standard"
+                            defaultValue="TODO: minMoney"
+                          />
+                        </Grid>
+                        <Grid
+                          item
+                          xs={2}
+                          sm={1}
+                          md={1.5}
+                          alignSelf="center"
+                          textAlign={"center"}
+                        >
+                          <label className="form-edit-add__label">đến</label>
+                        </Grid>
+                        <Grid item xs={5} sm={4} md={3.5}>
+                          <TextField
+                            fullWidth
+                            disabled
+                            inputProps={{
+                              min: 0,
+                              style: { textAlign: "center" },
+                            }}
+                            variant="standard"
+                            defaultValue="TODO: maxMoney"
+                          />
+                        </Grid>
                       </Grid>
-                      <Grid item xs={6} sm={4} md={4}>
-                        <TextField
-                          fullWidth
-                          disabled
-                          inputProps={{
-                            min: 0,
-                            style: { textAlign: "center" },
-                          }}
-                          variant="standard"
-                          defaultValue="TODO: Sản phẩm 3"
-                        />
-                      </Grid>
-                      <Grid item xs={6} sm={4} md={4}>
-                        <TextField
-                          fullWidth
-                          disabled
-                          inputProps={{
-                            min: 0,
-                            style: { textAlign: "center" },
-                          }}
-                          variant="standard"
-                          defaultValue="TODO: Sản phẩm 4"
-                        />
-                      </Grid>
-                    </Grid>
 
-                    <Grid item container xs={12} sm={12} md={12}>
-                      <Grid item xs={12} sm={5} md={4}>
-                        <label className="form-edit-add__label">
-                          Quà tặng:
-                        </label>
+                      <Grid
+                        item
+                        container
+                        xs={11}
+                        sm={11}
+                        md={12}
+                        rowSpacing={2}
+                        columnSpacing={2}
+                      >
+                        <Grid item xs={12} sm={3} md={3}>
+                          <label className="form-edit-add__label">
+                            Sản phẩm phải có:
+                          </label>
+                        </Grid>
+                        {
+                          // TODO: map chổ này list ra các sản phẩm
+                        }
+                        <Grid
+                          item
+                          container
+                          xs={12}
+                          sm={8}
+                          md={8.5}
+                          rowSpacing={2}
+                          columnSpacing={2}
+                        >
+                          <Grid item xs={5.5} sm={5.5} md={5.5}>
+                            <TextField
+                              fullWidth
+                              disabled
+                              inputProps={{
+                                min: 0,
+                                style: { textAlign: "center" },
+                              }}
+                              variant="standard"
+                              defaultValue="TODO: Sản phẩm 1"
+                            />
+                          </Grid>
+                          <Grid item xs={0.5} sm={0.5} md={0.5}>
+                            <label className="form-edit-add__label">;</label>
+                          </Grid>
+
+                          <Grid item xs={5.5} sm={5.5} md={5.5}>
+                            <TextField
+                              fullWidth
+                              disabled
+                              inputProps={{
+                                min: 0,
+                                style: { textAlign: "center" },
+                              }}
+                              variant="standard"
+                              defaultValue="TODO: Sản phẩm 2"
+                            />
+                          </Grid>
+                          <Grid item xs={0.5} sm={0.5} md={0.5}>
+                            <label className="form-edit-add__label">;</label>
+                          </Grid>
+                          <Grid item xs={5.5} sm={5.5} md={5.5}>
+                            <TextField
+                              fullWidth
+                              disabled
+                              inputProps={{
+                                min: 0,
+                                style: { textAlign: "center" },
+                              }}
+                              variant="standard"
+                              defaultValue="TODO: Sản phẩm 3"
+                            />
+                          </Grid>
+                          <Grid item xs={0.5} sm={0.5} md={0.5}>
+                            <label className="form-edit-add__label">;</label>
+                          </Grid>
+                          <Grid item xs={5.5} sm={5.5} md={5.5}>
+                            <TextField
+                              fullWidth
+                              disabled
+                              inputProps={{
+                                min: 0,
+                                style: { textAlign: "center" },
+                              }}
+                              variant="standard"
+                              defaultValue="TODO: Sản phẩm 4"
+                            />
+                          </Grid>
+                          <Grid item xs={0.5} sm={0.5} md={0.5}>
+                            <label className="form-edit-add__label">;</label>
+                          </Grid>
+                        </Grid>
                       </Grid>
-                      <Grid item xs={12} sm={7} md={8}>
-                        <TextField
-                          fullWidth
-                          disabled
-                          inputProps={{
-                            min: 0,
-                            style: { textAlign: "center" },
-                          }}
-                          variant="standard"
-                          defaultValue="TODO: Tên quà tặng"
-                        />
+
+                      <Grid item container xs={11} sm={11} md={12}>
+                        <Grid item xs={12} sm={3} md={3} alignSelf="center">
+                          <label className="form-edit-add__label">
+                            Quà tặng:
+                          </label>
+                        </Grid>
+                        <Grid item xs={12} sm={9} md={8.5}>
+                          <TextField
+                            fullWidth
+                            disabled
+                            inputProps={{
+                              min: 0,
+                              style: { textAlign: "center" },
+                            }}
+                            variant="standard"
+                            defaultValue="TODO: Tên quà tặng"
+                          />
+                        </Grid>
                       </Grid>
                     </Grid>
-                  </Grid>
+                  </div>
                 )}
               </Grid>
             </Grid>
@@ -665,10 +716,10 @@ const Transactions = () => {
           </div>
         </div>
       </Dialog>
-      <Dialog open={checkingTransaction}>
+      <Dialog open={checkingTransaction} fullWidth={true} maxWidth={"lg"}>
         <div className="dialog-content">
           <div className="dialog-title detail">Thẩm định giao dịch</div>
-          <Grid container>
+          <Grid container columnSpacing={10} rowSpacing={2}>
             <Grid item container xs={12} sm={12} md={6}>
               <Grid item xs={12} sm={12} md={6}>
                 <label className="form-edit-add__label">Mã hóa đơn</label>
@@ -763,62 +814,108 @@ const Transactions = () => {
                   }
                 />
               </Grid>
-              <Grid item container xs={12} sm={12} md={12}>
-                <Grid item xs={12} sm={12} md={12}>
-                  <label className="form-edit-add__label">
-                    Đánh giá giao dịch
-                  </label>
+              <div
+                style={
+                  checkingFormik.values.isError == null ||
+                  (checkingFormik.values.isError === true &&
+                    checkingFormik.values.comment === "")
+                    ? {
+                        border: "2px solid #a00000",
+                        background: "#c3727253",
+                        borderRadius: "1rem",
+                        margin: "0.8rem",
+                        padding: "0.8rem",
+                      }
+                    : {
+                        border: "2px solid #2e7d32",
+                        background: "#6bcb6f6e",
+                        borderRadius: "1rem",
+                        margin: "0.8rem",
+                        padding: "0.8rem",
+                      }
+                }
+              >
+                <Grid item container xs={12} sm={12} md={12}>
+                  <Grid item xs={12} sm={12} md={12}>
+                    <label className="form-edit-add__label">
+                      Đánh giá giao dịch
+                    </label>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={6}
+                    justifyContent="center"
+                    alignSelf="center"
+                    sx={{ padding: "0.5rem 3rem" }}
+                  >
+                    <FormControlLabel
+                      value="top"
+                      control={
+                        <Checkbox
+                          inputProps={{ "aria-label": "Checkbox demo" }}
+                          icon={<CheckBoxOutlineBlank />}
+                          checkedIcon={<CheckBoxIcon />}
+                          color="success"
+                          onClick={(e) => {
+                            handleCheckYes(e.target.checked);
+                          }}
+                          checked={
+                            checkingFormik.values.isError != null
+                              ? !checkingFormik.values.isError
+                              : false
+                          }
+                        />
+                      }
+                      label="Hợp lệ"
+                      labelPlacement="end"
+                    />
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={6}
+                    sx={{ padding: "0.5rem 3rem" }}
+                  >
+                    <FormControlLabel
+                      value="top"
+                      control={
+                        <Checkbox
+                          inputProps={{ "aria-label": "Checkbox demo" }}
+                          icon={<ErrorOutlineIcon />}
+                          checkedIcon={<ErrorIcon />}
+                          sx={{
+                            color: "default",
+                            "&.Mui-checked": {
+                              color: "#a00000",
+                            },
+                          }}
+                          onChange={(e) => {
+                            handleCheckError(e.target.checked);
+                          }}
+                          checked={
+                            checkingFormik.values.isError
+                              ? checkingFormik.values.isError
+                              : false
+                          }
+                        />
+                      }
+                      label="Không hợp lệ"
+                      labelPlacement="end"
+                    />
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} sm={12} md={6}>
-                  <FormControlLabel
-                    value="top"
-                    control={
-                      <Checkbox
-                        inputProps={{ "aria-label": "Checkbox demo" }}
-                        icon={<CheckBoxOutlineBlank />}
-                        checkedIcon={<CheckBoxIcon />}
-                        onChange={(e) => {
-                          checkingFormik.setFieldValue(
-                            "isError",
-                            e.target.value
-                          );
-                        }}
-                        color="success"
-                      />
-                    }
-                    label="Hợp lệ"
-                    labelPlacement="end"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={12} md={6}>
-                  <FormControlLabel
-                    value="top"
-                    control={
-                      <Checkbox
-                        inputProps={{ "aria-label": "Checkbox demo" }}
-                        icon={<ErrorOutlineIcon />}
-                        checkedIcon={<ErrorIcon />}
-                        sx={{
-                          color: "default",
-                          "&.Mui-checked": {
-                            color: "#a00000",
-                          },
-                        }}
-                      />
-                    }
-                    label="Không hợp lệ"
-                    labelPlacement="end"
-                  />
-                </Grid>
-              </Grid>
-              {checkingFormik.values.isError == null && (
-                <Grid item xs={12} sm={12} md={12}>
-                  <span className="checking-help">
-                    {"Hãy chọn [Hợp lệ] / [Không hợp lệ]"}
-                  </span>
-                </Grid>
-              )}
-              {true && (
+
+                {checkingFormik.values.isError == null && (
+                  <Grid item xs={12} sm={12} md={12}>
+                    <span className="checking-help">
+                      {"Hãy chọn [Hợp lệ] / [Không hợp lệ]"}
+                    </span>
+                  </Grid>
+                )}
+
                 <Grid item xs={12} sm={12} md={12}>
                   <TextField
                     id="filled-multiline-static"
@@ -826,11 +923,18 @@ const Transactions = () => {
                     fullWidth
                     multiline
                     rows={3}
-                    defaultValue="Default Value"
+                    placeholder=" Nhập bình luận.
+                    Nếu chọn [Không hợp lệ] thì mục này là bắt buộc (lý do không hợp lệ)."
                     variant="filled"
+                    name="comment"
+                    onChange={checkingFormik.handleChange}
+                    error={
+                      checkingFormik.values.isError === true &&
+                      checkingFormik.values.comment === ""
+                    }
                   />
                 </Grid>
-              )}
+              </div>
             </Grid>
           </Grid>
           <div className="form-detail__cta">
@@ -841,8 +945,11 @@ const Transactions = () => {
                 xs={12}
                 sm={12}
                 md={12}
-                direction="column"
+                direction="row"
                 alignItems="end"
+                justifyContent="flex-end"
+                rowSpacing={2}
+                columnSpacing={3}
               >
                 <Grid item>
                   <button
@@ -852,6 +959,21 @@ const Transactions = () => {
                     className="btn btn-primary"
                   >
                     Hủy
+                  </button>
+                </Grid>
+                <Grid item>
+                  <button
+                    onClick={() => {
+                      setCheckingTransaction(null);
+                    }}
+                    className="btn btn-safe"
+                    disabled={
+                      checkingFormik.values.isError === null ||
+                      (checkingFormik.values.isError === true &&
+                        checkingFormik.values.comment === "")
+                    }
+                  >
+                    Xác nhận
                   </button>
                 </Grid>
               </Grid>
