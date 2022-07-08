@@ -955,6 +955,7 @@ const Transactions = () => {
                   <button
                     onClick={() => {
                       setCheckingTransaction(null);
+                      checkingFormik.setFieldValue("isError", null);
                     }}
                     className="btn btn-primary"
                   >

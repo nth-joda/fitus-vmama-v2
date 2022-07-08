@@ -15,6 +15,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContentText from "@mui/material/DialogContentText";
 import axios from "axios";
+import TextField from "@mui/material/TextField";
 
 import Header from "../../components/Header";
 import SideBar from "../../components/Sidebar";
@@ -43,6 +44,7 @@ const Vouchers = () => {
   const [deleting, setDeleting] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showItem, setShowItem] = useState(null);
 
   const onHandleCheck = (item, isCheck) => {
     if (
@@ -79,14 +81,36 @@ const Vouchers = () => {
           />
           {selectedList.length > 0 ? "Chọn " + selectedList.length : null}
         </th>
-        <th className="table__th">ID</th>
-        <th className="table__th">Tên voucher</th>
+        <th className="table__th small">ID</th>
+        <th className="table__th simi-small">Tên voucher</th>
         <th className="table__th">Miêu tả</th>
-        <th className="table__th">Còn lại</th>
-        <th className="table__th">Số lượng</th>
+        <th className="table__th small">Còn lại</th>
+        <th className="table__th small">Số lượng</th>
         <th className="table__th">Chỉnh sửa</th>
       </Wrapper>
     );
+  };
+
+  const handleShowItem = (item) => {
+    const local_token = localStorage.getItem("token");
+    const config = {
+      headers: {
+        Authorization: "Bearer " + local_token,
+        "Content-Type": "application/json",
+      },
+    };
+    axios
+      .get(SERVER_API.BASE_URL + SERVER_API.GET_VOUCHER_BY_ID + item.ID, config)
+      .then((res) => {
+        // catchData(res);
+        // setIsLoading(false);
+        setShowItem(res.data.data.voucher);
+      })
+      .catch((err) => {
+        console.log(err);
+        // setIsLoading(false);
+        catchError(err);
+      });
   };
 
   const renderBody = (prods) => {
@@ -129,15 +153,32 @@ const Vouchers = () => {
                     onChange={(e) => onHandleCheck(item, e.target.checked)}
                   />
                 </span>
-                <span className="table__mobile-name">{item.Name}</span>
+                <span
+                  className="table__mobile-name"
+                  onClick={() => {
+                    handleShowItem(item);
+                  }}
+                >
+                  {item.Name}
+                </span>
               </td>
-              <td className="table__td">
+              <td className="table__td small">
                 <span className="table__mobile-caption">ID</span>
-                <span className="table__value">{item.ID}</span>
+                <span
+                  className="table__value"
+                  onClick={() => handleShowItem(item)}
+                >
+                  {item.ID}
+                </span>
               </td>
-              <td className="table__td">
+              <td className="table__td simi-small">
                 <span className="table__mobile-caption">Tên voucher</span>
-                <span className="table__value">{item.Name}</span>
+                <span
+                  className="table__value"
+                  onClick={() => handleShowItem(item)}
+                >
+                  {item.Name}
+                </span>
               </td>
 
               <td className="table__td table__value-description">
@@ -145,19 +186,30 @@ const Vouchers = () => {
                 <span
                   style={{ "white-space": "pre-line" }}
                   className="table__value"
+                  onClick={() => handleShowItem(item)}
                 >
                   {item.Description.replace(/\\n/g, "")}
                 </span>
               </td>
 
-              <td className="table__td">
+              <td className="table__td small">
                 <span className="table__mobile-caption">Còn lại</span>
-                <span className="table__value">{item.Remaining}</span>
+                <span
+                  className="table__value"
+                  onClick={() => handleShowItem(item)}
+                >
+                  {item.Remaining}
+                </span>
               </td>
 
-              <td className="table__td">
+              <td className="table__td small">
                 <span className="table__mobile-caption">Số lượng</span>
-                <span className="table__value">{item.Total}</span>
+                <span
+                  className="table__value"
+                  onClick={() => handleShowItem(item)}
+                >
+                  {item.Total}
+                </span>
               </td>
 
               <td className="table__td">
@@ -216,6 +268,7 @@ const Vouchers = () => {
           config
         )
         .then((res) => {
+          console.log(res);
           catchData(res.data);
           setIsLoading(false);
         })
@@ -531,6 +584,240 @@ const Vouchers = () => {
             </Wrapper>
           )}
         </DialogActions>
+      </Dialog>
+      <Dialog
+        open={showItem}
+        onClose={() => setShowItem(null)}
+        fullWidth
+        maxWidth="lg"
+      >
+        <div className="dialog-content">
+          <div className="dialog-title detail">
+            <Grid container>
+              <Grid item xs={10} sm={10} md={11}>
+                Thông tin chi tiết
+              </Grid>
+              <Grid item xs={2} sm={2} md={1}>
+                <span style={{ marginLeft: "1rem" }}>
+                  <IconButton
+                    color="primary"
+                    aria-label="chinh sua"
+                    onClick={() => {
+                      setEditItem(showItem.ID);
+                      setShowItem(null);
+                      setAddOrEditMode(true);
+                    }}
+                  >
+                    <EditIcon sx={{ fontSize: "2rem" }} />
+                  </IconButton>
+                </span>
+              </Grid>
+            </Grid>
+          </div>
+
+          <Grid
+            container
+            rowSpacing={2}
+            columnSpacing={8}
+            sx={{ padding: { md: "0 5rem" } }}
+          >
+            {/* Chia 2 cột cho 2 steps */}
+            <Grid
+              item
+              container
+              xs={12}
+              sm={6}
+              md={6}
+              rowSpacing={2}
+              columnSpacing={2}
+            >
+              {/* Step1 */}
+              <Grid item container xs={12} sm={12} md={12}>
+                {/* Field1 */}
+                <Grid item xs={4} sm={6} md={3} alignSelf="center">
+                  <label className="form-edit-add__label">Tên Voucher</label>
+                </Grid>
+                <Grid item xs={8} sm={6} md={8}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    variant="standard"
+                    defaultValue={showItem ? showItem.Name : ""}
+                  />
+                </Grid>
+              </Grid>
+              <Grid item container xs={12} sm={12} md={12}>
+                {/* Field2 */}
+                <Grid item xs={4} sm={6} md={3} alignSelf="center">
+                  <label className="form-edit-add__label">Miêu tả</label>
+                </Grid>
+                <Grid item xs={8} sm={6} md={8}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    maxRows={5}
+                    variant="filled"
+                    disabled
+                    inputProps={{ min: 0, style: { textAlign: "left" } }}
+                    defaultValue={
+                      showItem ? showItem.Description.replace(/\\n/g, "") : ""
+                    }
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid item container xs={12} sm={12} md={12}>
+                {/* Field3 */}
+                <Grid item xs={4} sm={6} md={3} alignSelf="center">
+                  <label className="form-edit-add__label">Tổng tiền</label>
+                </Grid>
+                <Grid item xs={3} sm={6} md={3.5}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    variant="standard"
+                    defaultValue={showItem ? showItem.TotalPriceMin : ""}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  xs={2}
+                  sm={1.5}
+                  md={1.5}
+                  alignSelf="center"
+                  textAlign="center"
+                >
+                  <label className="form-edit-add__label">đến</label>
+                </Grid>
+                <Grid item xs={3} sm={6} md={3.5}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    variant="standard"
+                    defaultValue={showItem ? showItem.TotalPriceMax : ""}
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid item container xs={12} sm={12} md={12}>
+                {/* Field4, 5 */}
+                <Grid item xs={4} sm={6} md={3} alignSelf="center">
+                  <label className="form-edit-add__label">Số lượng</label>
+                </Grid>
+                <Grid item xs={3} sm={3} md={3}>
+                  <TextField
+                    fullWidth
+                    disabled
+                    inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    variant="standard"
+                    defaultValue={showItem ? showItem.Total : ""}
+                  />
+                </Grid>
+                <Grid
+                  item
+                  xs={3}
+                  sm={3}
+                  md={3}
+                  alignSelf="center"
+                  textAlign={"center"}
+                >
+                  <label className="form-edit-add__label">Publish</label>
+                </Grid>
+                <Grid item xs={2} sm={2} md={2} alignSelf="center">
+                  <Checkbox
+                    value={showItem ? showItem.Published : false}
+                    disabled
+                    sx={{ "& .MuiSvgIcon-root": { fontSize: 28 } }}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid
+              item
+              container
+              xs={12}
+              sm={6}
+              md={6}
+              rowSpacing={5}
+              columnSpacing={2}
+            >
+              {/* Step2 */}
+              <Grid item container xs={12} sm={12} md={12}>
+                {/* Field1 */}
+                <Grid item container xs={12} sm={12} md={12}>
+                  <Grid item xs={4} sm={6} md={3}>
+                    <label className="form-edit-add__label">Sản phẩm</label>
+                  </Grid>
+                  <Grid item container xs={8} sm={6} md={8}>
+                    {showItem
+                      ? showItem.Products.map((p, pIdx) => {
+                          return (
+                            <Wrapper>
+                              <Grid item xs={6} sm={6} md={12}>
+                                <TextField
+                                  fullWidth
+                                  disabled
+                                  inputProps={{
+                                    min: 0,
+                                    style: { textAlign: "center" },
+                                  }}
+                                  variant="standard"
+                                  defaultValue={p ? p.ProductName : ""}
+                                />
+                              </Grid>
+                            </Wrapper>
+                          );
+                        })
+                      : null}
+                  </Grid>
+                </Grid>
+              </Grid>
+
+              <Grid item container xs={12} sm={12} md={12}>
+                {/* Field2 */}
+                <Grid item xs={4} sm={6} md={3} alignSelf="center">
+                  <label className="form-edit-add__label">Quà tặng</label>
+                </Grid>
+                <Grid item xs={8} sm={6} md={8} alignSelf="center">
+                  <TextField
+                    fullWidth
+                    disabled
+                    inputProps={{ min: 0, style: { textAlign: "center" } }}
+                    variant="standard"
+                    defaultValue={showItem ? showItem.Gift.GiftName : ""}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+          <div className="form-detail__cta">
+            <Grid container direction="row" alignItems="center">
+              <Grid
+                item
+                container
+                xs={12}
+                sm={12}
+                md={12}
+                direction="column"
+                alignItems="end"
+              >
+                <Grid item>
+                  <button
+                    onClick={() => {
+                      setShowItem(null);
+                    }}
+                    className="btn btn-primary"
+                  >
+                    Đóng
+                  </button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </div>
+        </div>
       </Dialog>
     </div>
   );

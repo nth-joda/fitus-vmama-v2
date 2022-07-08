@@ -1,3 +1,7 @@
 .table__td.table__value-description {
   text-align: left;
 }
+
+.table__value {
+  cursor: pointer;
+}
