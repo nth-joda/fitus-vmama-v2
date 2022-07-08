@@ -45,7 +45,7 @@
 .table__mobile-name {
   margin: auto;
 }
-@media screen and (min-width: 769px) {
+@media screen and (min-width: 821px) {
   .table__tr:hover {
     background-color: var(--tableRowBgColorHover);
   }

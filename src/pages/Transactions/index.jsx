@@ -108,7 +108,7 @@ const Transactions = () => {
       <Wrapper>
         <div className="history-table__date">
           <Grid container>
-            <Grid item xs={2} sm={2} md={0.5}>
+            <Grid item xs={2} sm={0.7} md={0.5}>
               <TodayIcon />
             </Grid>
             <Grid item xs={10}>
@@ -457,10 +457,7 @@ const Transactions = () => {
                   indicatorColor="primary"
                   aria-label="primary tabs example"
                 >
-                  <Tab
-                    value={"voucher"}
-                    label={"Thông tin voucher đã áp dụng"}
-                  />
+                  <Tab value={"voucher"} label={"Voucher đã áp dụng"} />
                   <Tab value={"images"} label={"Ảnh chụp hóa đơn"} />
                 </Tabs>
               </Grid>

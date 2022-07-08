@@ -34,7 +34,17 @@ const internalServerError = {
   status: 500,
 };
 
+const NetworkError = {
+  data: null,
+  error: "Network Error",
+  message: "Lỗi đường truyền, thử lại sau",
+  status: 405,
+};
+
 const ServerResponse = (props) => {
+  if (props.code === "ERR_NETWORK") {
+    return NetworkError;
+  }
   if (props.status === 200) {
     return props.data;
   }
@@ -56,7 +66,7 @@ const ServerResponse = (props) => {
       }
     }
   }
-  return props.data;
+  return props.data ? props.data : props;
 };
 
 export default ServerResponse;
