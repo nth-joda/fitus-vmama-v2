@@ -43,3 +43,10 @@
   font-weight: 700;
   font-size: 2rem;
 }
+
+@media screen and (max-width: 420px) {
+  .dialog-title {
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+  }
+}

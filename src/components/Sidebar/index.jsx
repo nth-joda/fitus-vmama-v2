@@ -47,7 +47,7 @@ const SideBar = (props) => {
           icon={<GroupIcon />}
           onNavigate={(where) => goTo(where)}
         >
-          Người dùng
+          Nhân viên
         </Card>
       </Grid>
 

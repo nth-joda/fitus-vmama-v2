@@ -190,13 +190,19 @@ const Products = () => {
 
   const catchError = (err) => {
     err = ServerResponse(err);
-    if (err.status === 401)
+    if (err.status && err.status === 405) {
+      setServerStatus({
+        code: err.status,
+        msg: err.message,
+        hint: "Kiểm tra lại kết nối internet và thử lại...",
+      });
+    } else if (err.status === 401)
       setServerStatus({
         code: err.status,
         msg: err.message,
         hint: "Đăng nhập lại",
       });
-    else setServerStatus({ code: err.status, msg: err.message, hint: "" });
+    else setServerStatus({ code: err.status, msg: err.message, hint: "..." });
     setOpenDialog(true);
   };
 
@@ -223,7 +229,11 @@ const Products = () => {
         .catch((err) => {
           setIsLoading(false);
           console.log(err);
-          if (err.response.data.status === 404 && currentPage > 1) {
+          if (
+            err.response.data &&
+            err.response.data.status === 404 &&
+            currentPage > 1
+          ) {
             const prevPage = currentPage - 1;
             setCurrentPage(prevPage);
             loadData(prevPage);

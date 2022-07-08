@@ -146,7 +146,7 @@ const UserManagement = () => {
           {selectedList.length > 0 ? "Chọn " + selectedList.length : null}
         </th>
         <th className="table__th small">ID</th>
-        <th className="table__th">Tên người dùng</th>
+        <th className="table__th">Tên nhân viên</th>
         <th className="table__th">Tên đăng nhập</th>
         <th className="table__th small">Admin</th>
         <th className="table__th">Chỉnh sửa</th>
@@ -203,7 +203,7 @@ const UserManagement = () => {
                 <span className="table__value">{item.ID}</span>
               </td>
               <td className="table__td" onClick={() => setShowItem(item)}>
-                <span className="table__mobile-caption">Tên người dùng</span>
+                <span className="table__mobile-caption">Tên nhân viên</span>
                 <span>{item.Full_Name}</span>
               </td>
 
@@ -252,7 +252,7 @@ const UserManagement = () => {
           <MainContent>
             <Box>
               <MainContentHeader
-                of="tên người dùng"
+                of="thông tin nhân viên"
                 isRefreshDisabled={isLoading}
                 isDeleteDisabled={selectedList.length > 0 ? false : true}
                 handleRefreshClicked={onHandleRefreshClicked}
