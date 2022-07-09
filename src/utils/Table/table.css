@@ -226,4 +226,11 @@
   .melnik909 {
     display: none;
   }
+  .table__tr.table__tr-selected .table__td.table__mobile-title {
+    background-color: #21455f;
+    color: #ccc;
+  }
+  .table__tr.table__tr-selected .table__td {
+    background-color: #ccc;
+  }
 }

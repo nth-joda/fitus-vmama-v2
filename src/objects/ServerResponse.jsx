@@ -8,7 +8,8 @@ const validateError = {
 const authenticationError = {
   data: null,
   error: "Unauthorized",
-  message: "Sai thông tin đăng nhập hoặc phiên đăng nhập hết hạn.",
+  message:
+    "Sai thông tin đăng nhập, hoặc phiên đăng nhập hết hạn, hoặc tài khoản được đăng nhập ở nơi khác.",
   status: 401,
 };
 
@@ -41,6 +42,13 @@ const NetworkError = {
   status: 405,
 };
 
+const UnknownError = {
+  data: null,
+  error: "Unknown Error",
+  message: "Lỗi không xác định, thử lại sau",
+  status: 999,
+};
+
 const ServerResponse = (props) => {
   if (props.code === "ERR_NETWORK") {
     return NetworkError;
@@ -66,7 +74,7 @@ const ServerResponse = (props) => {
       }
     }
   }
-  return props.data ? props.data : props;
+  return props.data ? props.data : UnknownError;
 };
 
 export default ServerResponse;

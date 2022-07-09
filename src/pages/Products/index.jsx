@@ -25,6 +25,7 @@ import Table from "../../utils/Table";
 import Wrapper from "../../utils/Wrapper";
 import SERVER_API from "../../objects/ServerApi";
 import ServerResponse from "../../objects/ServerResponse";
+import { TextField } from "@mui/material";
 
 const Products = () => {
   let navigate = useNavigate();
@@ -40,14 +41,9 @@ const Products = () => {
   const [openConfirmDel, setOpenConfirmDel] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showItem, setShowItem] = useState(null);
 
   const onHandleCheck = (item, isCheck) => {
-    // if (selectedList.includes(item.ID) && isCheck === false) {
-    //   const newList = selectedList.filter((it) => it.ID !== item.ID);
-    //   setSelectedList(newList);
-    // } else if (!selectedList.includes(item.ID) && isCheck === true) {
-    //   setSelectedList([...selectedList, item]);
-    // }
     if (
       selectedList.filter((fitem, fid) => fitem.ID === item.ID).length > 0 &&
       isCheck === false
@@ -91,6 +87,10 @@ const Products = () => {
     );
   };
 
+  const handleShowItem = (item) => {
+    setShowItem(item);
+  };
+
   const renderBody = (prods) => {
     return (
       <Wrapper>
@@ -117,9 +117,9 @@ const Products = () => {
                 <span className="table__mobile-value">
                   <Checkbox
                     sx={{
-                      color: { xs: "white", sm: "black", md: "black" },
+                      color: { xs: "white", sm: "white", md: "black" },
                       "&.Mui-checked": {
-                        color: { xs: "white", sm: "black", md: "black" },
+                        color: { xs: "white", sm: "white", md: "black" },
                       },
                     }}
                     checked={
@@ -131,13 +131,21 @@ const Products = () => {
                     onChange={(e) => onHandleCheck(item, e.target.checked)}
                   />
                 </span>
-                <span className="table__mobile-name">{item.ProductName}</span>
+                <span
+                  className="table__mobile-name"
+                  onClick={() => handleShowItem(item)}
+                >
+                  {item.ProductName}
+                </span>
               </td>
-              <td className="table__td small">
+              <td
+                className="table__td small"
+                onClick={() => handleShowItem(item)}
+              >
                 <span className="table__mobile-caption">ID</span>
                 <span className="table__value">{item.ID}</span>
               </td>
-              <td className="table__td">
+              <td className="table__td" onClick={() => handleShowItem(item)}>
                 <span className="table__mobile-caption">Tên sản phẩm</span>
                 <span>{item.ProductName}</span>
               </td>
@@ -159,24 +167,6 @@ const Products = () => {
               </td>
             </tr>
           ))}
-
-        {/* <tr className="table__tr">
-          <td className="table__td table__mobile-title">
-            <span>Post production</span>
-          </td>
-          <td className="table__td">
-            <span className="table__mobile-caption">Silver Package</span>
-            <span className="table__value">2 weeks</span>
-          </td>
-          <td className="table__td">
-            <span className="table__mobile-caption">Gold Package</span>
-            <span className="table__value">3 weeks</span>
-          </td>
-          <td className="table__td">
-            <span className="table__mobile-caption">Platinum Package</span>
-            <span className="table__value">4 weeks</span>
-          </td>
-        </tr> */}
       </Wrapper>
     );
   };
@@ -458,6 +448,89 @@ const Products = () => {
             </Wrapper>
           )}
         </DialogActions>
+      </Dialog>
+      <Dialog
+        open={showItem != null}
+        onClose={() => setShowItem(null)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <div className="dialog-content">
+          <div className="dialog-title detail">
+            <Grid container>
+              <Grid item xs={10} sm={10} md={11}>
+                Thông tin chi tiết
+              </Grid>
+              <Grid item xs={2} sm={2} md={1}>
+                <span style={{ marginLeft: "1rem" }}>
+                  <IconButton
+                    color="primary"
+                    aria-label="chinh sua"
+                    onClick={() => {
+                      setEditItem(showItem);
+                      setShowItem(null);
+                      setAddOrEditMode(true);
+                    }}
+                  >
+                    <EditIcon sx={{ fontSize: "2rem" }} />
+                  </IconButton>
+                </span>
+              </Grid>
+            </Grid>
+          </div>
+          <Grid container rowSpacing={8}>
+            <Grid
+              item
+              container
+              xs={12}
+              sm={12}
+              md={12}
+              rowSpacing={1}
+              columnSpacing={5}
+            >
+              <Grid
+                item
+                xs={12}
+                sm={4}
+                md={4}
+                alignSelf="center"
+                textAlign={{ md: "right", xs: "left" }}
+              >
+                <label className="form-edit-add__label">Tên sản phẩm</label>
+              </Grid>
+              <Grid item xs={12} sm={8} md={8}>
+                <TextField
+                  fullWidth
+                  disabled
+                  inputProps={{
+                    min: 0,
+                    style: { textAlign: "center", fontSize: "1.2rem" },
+                  }}
+                  variant="standard"
+                  defaultValue={showItem ? showItem.ProductName : ""}
+                />
+              </Grid>
+            </Grid>
+            <Grid
+              item
+              container
+              xs={12}
+              sm={12}
+              md={12}
+              direction="column"
+              alignContent="flex-end"
+            >
+              <button
+                onClick={() => {
+                  setShowItem(null);
+                }}
+                className="btn btn-primary"
+              >
+                Đóng
+              </button>
+            </Grid>
+          </Grid>
+        </div>
       </Dialog>
     </div>
   );
