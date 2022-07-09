@@ -166,31 +166,29 @@ const Vouchers = () => {
                   {item.Name}
                 </span>
               </td>
-              <td className="table__td small">
+              <td
+                className="table__td small"
+                onClick={() => handleShowItem(item)}
+              >
                 <span className="table__mobile-caption">ID</span>
-                <span
-                  className="table__value"
-                  onClick={() => handleShowItem(item)}
-                >
-                  {item.ID}
-                </span>
+                <span className="table__value">{item.ID}</span>
               </td>
-              <td className="table__td simi-small">
+              <td
+                className="table__td simi-small"
+                onClick={() => handleShowItem(item)}
+              >
                 <span className="table__mobile-caption">Tên voucher</span>
-                <span
-                  className="table__value"
-                  onClick={() => handleShowItem(item)}
-                >
-                  {item.Name}
-                </span>
+                <span className="table__value">{item.Name}</span>
               </td>
 
-              <td className="table__td table__value-description">
+              <td
+                className="table__td table__value-description"
+                onClick={() => handleShowItem(item)}
+              >
                 <span className="table__mobile-caption">Miêu tả</span>
                 <span
                   style={{ whiteSpace: "pre-line" }}
                   className="table__value"
-                  onClick={() => handleShowItem(item)}
                 >
                   {item.Description.replace(/\\n/g, "")}
                 </span>

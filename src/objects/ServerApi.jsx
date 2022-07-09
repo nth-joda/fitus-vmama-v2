@@ -11,6 +11,7 @@ const ServerApi = {
   GET_VOUCHER_BY_ID: "/api/v1/admin/vouchers/",
   CREATE_PRODUCT: "/api/v1/admin/products",
   DELETE_PRODUCTS: "/api/v1/admin/products/delete_products",
+  GET_STAFFS: "/api/v1/admin/accounts?page=",
 };
 
 export default ServerApi;

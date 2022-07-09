@@ -14,6 +14,7 @@ import ClearIcon from "@mui/icons-material/Clear";
 import Dialog from "@mui/material/Dialog";
 import TextField from "@mui/material/TextField";
 import { useFormik } from "formik";
+import axios from "axios";
 
 import Header from "../../components/Header";
 import SideBar from "../../components/Sidebar";
@@ -22,55 +23,137 @@ import MainContentHeader from "../../components/MainContent/MainContentHeader";
 import Table from "../../utils/Table";
 import Wrapper from "../../utils/Wrapper";
 import { useEffect } from "react";
+import ServerResponse from "../../objects/ServerResponse";
+import ServerApi from "../../objects/ServerApi";
+import { DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-const usersList = [
-  {
-    ID: 1,
-    Full_Name: "Nguyễn Văn A",
-    User_Name: "user1",
-    Password: "nvauser1",
-    Admin: false,
-  },
-  {
-    ID: 2,
-    Full_Name: "Nguyễn Văn B",
-    User_Name: "user2",
-    Password: "nvbuser2",
-    Admin: false,
-  },
-  {
-    ID: 3,
-    Full_Name: "Nguyễn Văn C",
-    User_Name: "user3",
-    Password: "nvcuser3",
-    Admin: true,
-  },
-  {
-    ID: 4,
-    Full_Name: "Nguyễn Văn D",
-    User_Name: "user4",
-    Password: "nvduser4",
-    Admin: false,
-  },
-  {
-    ID: 5,
-    Full_Name: "Nguyễn Văn E",
-    User_Name: "user5",
-    Password: "nveuser5",
-    Admin: false,
-  },
-];
+// const usersList = [
+//   {
+//     ID: 1,
+//     Full_Name: "Nguyễn Văn A",
+//     User_Name: "user1",
+//     Password: "nvauser1",
+//     Admin: false,
+//   },
+//   {
+//     ID: 2,
+//     Full_Name: "Nguyễn Văn B",
+//     User_Name: "user2",
+//     Password: "nvbuser2",
+//     Admin: false,
+//   },
+//   {
+//     ID: 3,
+//     Full_Name: "Nguyễn Văn C",
+//     User_Name: "user3",
+//     Password: "nvcuser3",
+//     Admin: true,
+//   },
+//   {
+//     ID: 4,
+//     Full_Name: "Nguyễn Văn D",
+//     User_Name: "user4",
+//     Password: "nvduser4",
+//     Admin: false,
+//   },
+//   {
+//     ID: 5,
+//     Full_Name: "Nguyễn Văn E",
+//     User_Name: "user5",
+//     Password: "nveuser5",
+//     Admin: false,
+//   },
+// ];
+
+const getRoleText = (id) => {
+  if (id === 1) return "Quản trị viên";
+  else if (id === 2) return "Nhân viên bán hàn";
+  else return "Chưa xác định";
+};
 
 const UserManagement = () => {
+  let navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedList, setSelectedList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [usersOnCurrentPage, setUsersOnCurrentPage] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [editItem, setEditItem] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [showItem, setShowItem] = useState(null);
+  const [serverStatus, setServerStatus] = useState(null);
+  const [serverDialog, setServerDialog] = useState(false);
+  const [usersOnCurrentPage, setUsersOnCurrentPage] = useState(null);
+
+  // Load data:
+  const catchData = (res) => {
+    const meta = res.data.metadata;
+    const prods = res.data.accounts;
+    if (meta != null) setTotalPages(meta.total_pages);
+    if (prods != null) setUsersOnCurrentPage(prods);
+  };
+
+  const catchError = (err) => {
+    err = ServerResponse(err);
+    if (err.status && err.status === 405) {
+      setServerStatus({
+        code: err.status,
+        msg: err.message,
+        hint: "Kiểm tra lại kết nối internet và thử lại...",
+      });
+    } else if (err.status === 401)
+      setServerStatus({
+        code: err.status,
+        msg: err.message,
+        hint: "Đăng nhập lại",
+      });
+    else setServerStatus({ code: err.status, msg: err.message, hint: "..." });
+    setServerDialog(true);
+  };
+
+  const loadData = (pageNum) => {
+    const local_token = localStorage.getItem("token");
+    setIsLoading(true);
+    if (local_token !== null || local_token !== "") {
+      const config = {
+        headers: {
+          Authorization: "Bearer " + local_token,
+          "Content-Type": "application/json",
+        },
+      };
+      axios
+        .get(ServerApi.BASE_URL + ServerApi.GET_STAFFS + pageNum, config)
+        .then((res) => {
+          console.log(res);
+          catchData(res.data);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setIsLoading(false);
+          console.log(err);
+          if (
+            err.response.data &&
+            err.response.data.status === 404 &&
+            currentPage > 1
+          ) {
+            const prevPage = currentPage - 1;
+            setCurrentPage(prevPage);
+            loadData(prevPage);
+            setSelectedList([]);
+          } else {
+            catchError(err);
+          }
+        });
+    } else {
+      localStorage.removeItem("name");
+      localStorage.removeItem("token");
+    }
+  };
+
+  useEffect(() => {
+    loadData(currentPage);
+  }, [currentPage]);
 
   // Diaglog:
   const [openAddDialog, setOpenAddDialog] = React.useState(false);
@@ -84,6 +167,13 @@ const UserManagement = () => {
     setEditItem(null);
   };
   // End dialog
+  const handleAgree = () => {
+    if (serverStatus.code === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      navigate("/login");
+    } else setServerDialog(false);
+  };
 
   // thong tin chi tiet:
 
@@ -97,7 +187,6 @@ const UserManagement = () => {
       userName: "",
       password: "",
     },
-
     onSubmit: (values) => {
       alert("Send Request to BE: " + JSON.stringify(values));
       handleCloseAddEditDialog();
@@ -106,9 +195,12 @@ const UserManagement = () => {
 
   useEffect(() => {
     if (editItem != null) {
-      formik.setFieldValue("fullName", editItem.Full_Name);
-      formik.setFieldValue("userName", editItem.User_Name);
-      formik.setFieldValue("password", editItem.User_Name);
+      formik.setFieldValue("fullName", editItem.Name);
+      formik.setFieldValue("userName", editItem.Username);
+      formik.setFieldValue(
+        "password",
+        "Todo: kiểm tra quyền, only enable for ADMIN"
+      );
       setIsEditing(true);
     } else {
       formik.setFieldValue("fullName", "");
@@ -119,7 +211,11 @@ const UserManagement = () => {
     console.log(editItem);
   }, [editItem]);
 
-  const onHandleRefreshClicked = () => {};
+  const onHandleRefreshClicked = () => {
+    setIsLoading(true);
+    setSelectedList([]);
+    loadData(currentPage);
+  };
 
   const onHandleDeleteClicked = () => {};
 
@@ -153,90 +249,112 @@ const UserManagement = () => {
       </Wrapper>
     );
   };
-  const onHandleCheck = (it, isCheck) => {};
+  const onHandleCheck = (item, isCheck) => {
+    if (
+      selectedList.filter((fitem, fid) => fitem.ID === item.ID).length > 0 &&
+      isCheck === false
+    ) {
+      const newList = selectedList.filter((fitem) => fitem.ID !== item.ID);
+      setSelectedList(newList);
+    } else if (
+      !selectedList.filter((fitem, fid) => fitem.ID === item.ID).length > 0 &&
+      isCheck === true
+    ) {
+      setSelectedList([...selectedList, item]);
+    }
+  };
 
   const renderBody = (users) => {
     return (
       <Wrapper>
         {users
-          .filter((val) => {
-            if (searchTerm === "") {
-              return val;
-            } else if (
-              val.User_Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-              val.Full_Name.toLowerCase().includes(searchTerm.toLowerCase())
-            ) {
-              return val;
-            }
-            return false;
-          })
-          .map((item) => (
-            <tr
-              className={
-                selectedList.filter((it, id) => it.ID === item.ID).length > 0
-                  ? "table__tr table__tr-selected"
-                  : "table__tr"
-              }
-            >
-              <td className="table__td table__mobile-title">
-                <span className="table__mobile-value">
-                  <Checkbox
-                    sx={{
-                      color: { xs: "white", sm: "black", md: "black" },
-                      "&.Mui-checked": {
-                        color: { xs: "white", sm: "black", md: "black" },
-                      },
-                    }}
-                    checked={
-                      selectedList.filter((it, id) => it.ID === item.ID)
-                        .length > 0
-                        ? true
-                        : false
-                    }
-                    onChange={(e) => onHandleCheck(item, e.target.checked)}
-                  />
-                </span>
-                <span className="table__mobile-name">{item.Full_Name}</span>
-              </td>
-              <td className="table__td small" onClick={() => setShowItem(item)}>
-                <span className="table__mobile-caption">ID</span>
-                <span className="table__value">{item.ID}</span>
-              </td>
-              <td className="table__td" onClick={() => setShowItem(item)}>
-                <span className="table__mobile-caption">Tên nhân viên</span>
-                <span>{item.Full_Name}</span>
-              </td>
-
-              <td className="table__td" onClick={() => setShowItem(item)}>
-                <span className="table__mobile-caption">Tên đăng nhập</span>
-                <span>{item.User_Name}</span>
-              </td>
-
-              <td className="table__td small" onClick={() => setShowItem(item)}>
-                <span className="table__mobile-caption">Admin</span>
-                <span>
-                  {item.Admin ? (
-                    <CheckIcon sx={{ color: "#2e7d32" }} />
-                  ) : (
-                    <ClearIcon sx={{ color: "#a00000" }} />
-                  )}
-                </span>
-              </td>
-
-              <td className="table__td">
-                <span className="table__mobile-caption">Chỉnh sửa</span>
-                <span className="table__value">
-                  <IconButton
-                    color="primary"
-                    aria-label="chinh sua"
-                    onClick={() => setEditItem(item)}
+          ? users
+              .filter((val) => {
+                if (searchTerm === "") {
+                  return val;
+                } else if (
+                  val.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  val.Username.toLowerCase().includes(searchTerm.toLowerCase())
+                ) {
+                  return val;
+                }
+                return false;
+              })
+              .map((item) => (
+                <tr
+                  className={
+                    selectedList.filter((it, id) => it.ID === item.ID).length >
+                    0
+                      ? "table__tr table__tr-selected"
+                      : "table__tr"
+                  }
+                >
+                  <td className="table__td table__mobile-title">
+                    <span className="table__mobile-value">
+                      <Checkbox
+                        sx={{
+                          color: { xs: "white", sm: "white", md: "black" },
+                          "&.Mui-checked": {
+                            color: { xs: "white", sm: "white", md: "black" },
+                          },
+                        }}
+                        checked={
+                          selectedList.filter((it, id) => it.ID === item.ID)
+                            .length > 0
+                            ? true
+                            : false
+                        }
+                        onChange={(e) => onHandleCheck(item, e.target.checked)}
+                      />
+                    </span>
+                    <span className="table__mobile-name">{item.Name}</span>
+                  </td>
+                  <td
+                    className="table__td small"
+                    onClick={() => setShowItem(item)}
                   >
-                    <EditIcon />
-                  </IconButton>
-                </span>
-              </td>
-            </tr>
-          ))}
+                    <span className="table__mobile-caption">ID</span>
+                    <span className="table__value">{item.ID}</span>
+                  </td>
+                  <td className="table__td" onClick={() => setShowItem(item)}>
+                    <span className="table__mobile-caption">Tên nhân viên</span>
+                    <span>{item.Name}</span>
+                  </td>
+
+                  <td className="table__td" onClick={() => setShowItem(item)}>
+                    <span className="table__mobile-caption">Tên đăng nhập</span>
+                    <span>{item.Username}</span>
+                  </td>
+
+                  <td
+                    className="table__td small"
+                    onClick={() => setShowItem(item)}
+                  >
+                    <span className="table__mobile-caption">Admin</span>
+                    <span>
+                      {item.Role.ID === 1 ? (
+                        <CheckIcon sx={{ color: "#2e7d32" }} />
+                      ) : (
+                        <ClearIcon sx={{ color: "#a00000" }} />
+                      )}
+                    </span>
+                  </td>
+
+                  <td className="table__td">
+                    <span className="table__mobile-caption">Chỉnh sửa</span>
+                    <span className="table__value">
+                      <IconButton
+                        color="primary"
+                        aria-label="chinh sua"
+                        onClick={() => setEditItem(item)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </span>
+                  </td>
+                </tr>
+              ))
+          : null}
       </Wrapper>
     );
   };
@@ -268,7 +386,7 @@ const UserManagement = () => {
                 <div className="content_body">
                   <Table
                     headers={renderHeaders()}
-                    body={renderBody(usersList)}
+                    body={renderBody(usersOnCurrentPage)}
                   />
                   <div className="mainContent__footer">
                     <Stack spacing={2}>
@@ -291,6 +409,27 @@ const UserManagement = () => {
           </MainContent>
         </Grid>
       </Grid>
+      {serverStatus && (
+        <Dialog
+          open={serverDialog}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle>{serverStatus.msg}</DialogTitle>
+          <DialogContent>
+            <p>{serverStatus.hint}</p>
+          </DialogContent>
+          <DialogActions>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={handleAgree}
+            >
+              Đồng ý
+            </button>
+          </DialogActions>
+        </Dialog>
+      )}
       <Dialog
         open={openAddDialog}
         fullWidth={true}
@@ -534,7 +673,7 @@ const UserManagement = () => {
                     fullWidth
                     disabled
                     variant="standard"
-                    defaultValue={showItem ? showItem.Full_Name : ""}
+                    defaultValue={showItem ? showItem.Name : ""}
                   />
                 </Grid>
               </Grid>
@@ -547,7 +686,25 @@ const UserManagement = () => {
                     fullWidth
                     variant="standard"
                     disabled
-                    defaultValue={showItem ? showItem.User_Name : ""}
+                    defaultValue={showItem ? showItem.Username : ""}
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid container item columnSpacing={2}>
+                <Grid item xs={12} sm={4} md={4} alignSelf="center">
+                  <label className="form-edit-add__label">Vai trò</label>
+                </Grid>
+                <Grid item xs={12} sm={8} md={8}>
+                  <TextField
+                    fullWidth
+                    variant="standard"
+                    disabled
+                    defaultValue={
+                      showItem && showItem.Role
+                        ? getRoleText(showItem.Role.ID)
+                        : "[Lỗi hệ thống]"
+                    }
                   />
                 </Grid>
               </Grid>
@@ -561,7 +718,11 @@ const UserManagement = () => {
                     fullWidth
                     variant="standard"
                     disabled
-                    defaultValue={showItem ? showItem.Password : ""}
+                    defaultValue={
+                      showItem && showItem.Password
+                        ? showItem.Password
+                        : "[Hệ thống: Bạn không có quyền xem]"
+                    }
                   />
                 </Grid>
               </Grid>
