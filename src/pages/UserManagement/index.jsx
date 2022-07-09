@@ -249,7 +249,20 @@ const UserManagement = () => {
       </Wrapper>
     );
   };
-  const onHandleCheck = (it, isCheck) => {};
+  const onHandleCheck = (item, isCheck) => {
+    if (
+      selectedList.filter((fitem, fid) => fitem.ID === item.ID).length > 0 &&
+      isCheck === false
+    ) {
+      const newList = selectedList.filter((fitem) => fitem.ID !== item.ID);
+      setSelectedList(newList);
+    } else if (
+      !selectedList.filter((fitem, fid) => fitem.ID === item.ID).length > 0 &&
+      isCheck === true
+    ) {
+      setSelectedList([...selectedList, item]);
+    }
+  };
 
   const renderBody = (users) => {
     return (
@@ -280,9 +293,9 @@ const UserManagement = () => {
                     <span className="table__mobile-value">
                       <Checkbox
                         sx={{
-                          color: { xs: "white", sm: "black", md: "black" },
+                          color: { xs: "white", sm: "white", md: "black" },
                           "&.Mui-checked": {
-                            color: { xs: "white", sm: "black", md: "black" },
+                            color: { xs: "white", sm: "white", md: "black" },
                           },
                         }}
                         checked={
