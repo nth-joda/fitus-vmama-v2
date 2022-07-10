@@ -206,7 +206,10 @@ const Transactions = () => {
     } else setImgOnShow(null);
   }, [showItem]);
 
-  const onHandleRefreshClicked = () => {};
+  const onHandleRefreshClicked = () => {
+    setIsLoading(true);
+    loadData(currentPage);
+  };
   const onHandleDeleteClicked = () => {};
   const onHandleAddClicked = () => {};
 
