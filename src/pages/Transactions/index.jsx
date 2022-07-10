@@ -600,7 +600,8 @@ const Transactions = () => {
                                 min: 0,
                                 style: { textAlign: "center" },
                               }}
-                              variant="standard"
+                              variant="outlined"
+                              size="small"
                               defaultValue="TODO: Sản phẩm 1"
                             />
                           </Grid>
@@ -616,7 +617,8 @@ const Transactions = () => {
                                 min: 0,
                                 style: { textAlign: "center" },
                               }}
-                              variant="standard"
+                              variant="outlined"
+                              size="small"
                               defaultValue="TODO: Sản phẩm 2"
                             />
                           </Grid>
@@ -631,7 +633,8 @@ const Transactions = () => {
                                 min: 0,
                                 style: { textAlign: "center" },
                               }}
-                              variant="standard"
+                              variant="outlined"
+                              size="small"
                               defaultValue="TODO: Sản phẩm 3"
                             />
                           </Grid>
@@ -646,7 +649,8 @@ const Transactions = () => {
                                 min: 0,
                                 style: { textAlign: "center" },
                               }}
-                              variant="standard"
+                              variant="outlined"
+                              size="small"
                               defaultValue="TODO: Sản phẩm 4"
                             />
                           </Grid>
