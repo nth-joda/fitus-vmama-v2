@@ -12,6 +12,8 @@ const ServerApi = {
   CREATE_PRODUCT: "/api/v1/admin/products",
   DELETE_PRODUCTS: "/api/v1/admin/products/delete_products",
   GET_STAFFS: "/api/v1/admin/accounts?page=",
+  GET_TRANSACTIONS: "/api/v1/admin/transactions?page=",
+  GET_TRANSACTION_DETAIL: "/api/v1/admin/transactions/",
 };
 
 export default ServerApi;
