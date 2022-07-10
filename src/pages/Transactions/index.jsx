@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import { CircularProgress, Grid } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useState } from "react";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -14,6 +14,11 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import ErrorIcon from "@mui/icons-material/Error";
+import axios from "axios";
+import { useEffect } from "react";
+import CheckBoxOutlineBlank from "@mui/icons-material/CheckBoxOutlineBlank";
+import { Formik, useFormik } from "formik";
+
 import Header from "../../components/Header";
 import MainContent from "../../components/MainContent";
 import MainContentHeader from "../../components/MainContent/MainContentHeader";
@@ -21,14 +26,15 @@ import SideBar from "../../components/Sidebar";
 import Wrapper from "../../utils/Wrapper";
 import "./transactions.css";
 import TransactionList from "../../assets/MOCK_DATA.json";
-import { useEffect } from "react";
-import CheckBoxOutlineBlank from "@mui/icons-material/CheckBoxOutlineBlank";
-import { Formik, useFormik } from "formik";
+import ServerResponse from "../../objects/ServerResponse";
+import ServerApi from "../../objects/ServerApi";
+
+const SYSTEM_ERROR_MSG = "[Lỗi hệ thống]";
 
 const RenderStatus = (props) => {
   return (
     <Wrapper>
-      {props.checkingItem.status == null && (
+      {props.checkingItem.Status && props.checkingItem.Status.ID === 1 && (
         <span className="history-table__value">
           <button
             className="btn btn-orange"
@@ -38,13 +44,13 @@ const RenderStatus = (props) => {
           </button>
         </span>
       )}
-      {props.checkingItem.status === true && (
+      {props.checkingItem.Status && props.checkingItem.Status.ID === 2 && (
         <span className="history-table__value">
           <span className="approved">Hợp lệ</span>
         </span>
       )}
 
-      {props.checkingItem.status === false && (
+      {props.checkingItem.Status && props.checkingItem.Status.ID === 3 && (
         <span className="history-table__value">
           <span className="rejected">Không hợp lệ</span>
         </span>
@@ -61,6 +67,55 @@ const Transactions = () => {
   const [mainTabOnShown, setMainTabOnSHown] = useState("voucher");
   const [isChecking, setIsChecking] = useState(false);
   const [checkingTransaction, setCheckingTransaction] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [transactionsOnCurrentPage, setTransactionsOnCurrentPage] =
+    useState(null);
+  const [serverStatus, setServerStatus] = useState(null);
+  const [serverDialog, setServerDialog] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [transactionOnFocus, setTransactionOnFocus] = useState(null);
+
+  useEffect(() => {
+    if (transactionOnFocus != null) {
+      const local_token = localStorage.getItem("token");
+      if (local_token !== null || local_token !== "") {
+        const config = {
+          headers: {
+            Authorization: "Bearer " + local_token,
+            "Content-Type": "application/json",
+          },
+        };
+        axios
+          .get(
+            ServerApi.BASE_URL +
+              ServerApi.GET_TRANSACTION_DETAIL +
+              transactionOnFocus.ID,
+            config
+          )
+          .then((res) => {
+            console.log("detail: ", res.data.data);
+            setShowItem(res.data.data);
+          })
+          .catch((err) => {
+            console.log(err);
+            if (
+              err.response.data &&
+              err.response.data.status === 404 &&
+              currentPage > 1
+            ) {
+              const prevPage = currentPage - 1;
+              setCurrentPage(prevPage);
+              loadData(prevPage);
+            } else {
+              catchError(err);
+            }
+          });
+      } else {
+        localStorage.removeItem("name");
+        localStorage.removeItem("token");
+      }
+    }
+  }, [transactionOnFocus]);
 
   const checkingFormik = useFormik({
     initialValues: {
@@ -70,14 +125,84 @@ const Transactions = () => {
     },
     onSubmit: (values) => alert(JSON.stringify(values)),
   });
+  const catchData = (res) => {
+    const meta = res.data.metadata;
+    const recs = res.data.receipts;
+    if (meta != null) setTotalPages(meta.total_pages);
+    if (recs != null) setTransactionsOnCurrentPage(recs);
+  };
+
+  const catchError = (err) => {
+    err = ServerResponse(err);
+    if (err.status && err.status === 405) {
+      setServerStatus({
+        code: err.status,
+        msg: err.message,
+        hint: "Kiểm tra lại kết nối internet và thử lại...",
+      });
+    } else if (err.status === 401)
+      setServerStatus({
+        code: err.status,
+        msg: err.message,
+        hint: "Đăng nhập lại",
+      });
+    else setServerStatus({ code: err.status, msg: err.message, hint: "..." });
+    setServerDialog(true);
+  };
+
+  const loadData = (pageNum) => {
+    const local_token = localStorage.getItem("token");
+    setIsLoading(true);
+    if (local_token !== null || local_token !== "") {
+      const config = {
+        headers: {
+          Authorization: "Bearer " + local_token,
+          "Content-Type": "application/json",
+        },
+      };
+      axios
+        .get(ServerApi.BASE_URL + ServerApi.GET_TRANSACTIONS + pageNum, config)
+        .then((res) => {
+          console.log(res);
+          catchData(res.data);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setIsLoading(false);
+          console.log(err);
+          if (
+            err.response.data &&
+            err.response.data.status === 404 &&
+            currentPage > 1
+          ) {
+            const prevPage = currentPage - 1;
+            setCurrentPage(prevPage);
+            loadData(prevPage);
+          } else {
+            catchError(err);
+          }
+        });
+    } else {
+      localStorage.removeItem("name");
+      localStorage.removeItem("token");
+    }
+  };
+
+  useEffect(() => {
+    loadData(currentPage);
+  }, [currentPage]);
 
   const handleImgChange = (event, newValue) => {
     setImgOnShow(newValue);
   };
 
   useEffect(() => {
-    if (showItem != null) {
-      setImgOnShow(showItem.imageList[0].uri);
+    if (
+      showItem != null &&
+      showItem.receipts &&
+      showItem.receipts.ReceiptImages != null
+    ) {
+      setImgOnShow(showItem.receipts.ReceiptImages[0].Url);
     } else setImgOnShow(null);
   }, [showItem]);
 
@@ -104,89 +229,131 @@ const Transactions = () => {
   };
 
   const historyTable = () => {
-    return (
-      <Wrapper>
-        <div className="history-table__date">
-          <Grid container>
-            <Grid item xs={2} sm={0.7} md={0.5}>
-              <TodayIcon />
+    if (isLoading !== true) {
+      return (
+        <Wrapper>
+          <div className="history-table__date">
+            <Grid container>
+              <Grid item xs={2} sm={0.7} md={0.5}>
+                <TodayIcon />
+              </Grid>
+              <Grid item xs={10}>
+                Ngày 27/07/2000
+              </Grid>
             </Grid>
-            <Grid item xs={10}>
-              Ngày 27/07/2000
-            </Grid>
+          </div>
+          <table className="history-table">
+            <thead>
+              <tr className="history-table__title">
+                <td>Thời gian</td>
+                <td>Mã giao dịch</td>
+                <td>Voucher đã đổi</td>
+                <td>Nh.viên thực hiện</td>
+                <td>Trạng thái</td>
+              </tr>
+            </thead>
+            <tbody className="history-table__body">
+              {transactionsOnCurrentPage
+                ? transactionsOnCurrentPage.map((item, index) => {
+                    return (
+                      <Wrapper>
+                        <tr className="history-table__row" key={item.ID}>
+                          <td
+                            className="td-key"
+                            onClick={() => {
+                              setTransactionOnFocus(item);
+                            }}
+                          >
+                            <span className="history-table__mobile-title">
+                              Thời gian
+                            </span>
+                            <span className="history-table__value bold-value">
+                              {item && item.CreatedAt
+                                ? item.CreatedAt.substring(
+                                    item.CreatedAt.indexOf("T") + 1,
+                                    item.CreatedAt.lastIndexOf(".")
+                                      ? item.CreatedAt.lastIndexOf(".")
+                                      : item.CreatedAt.lastIndexOf("Z")
+                                  )
+                                : SYSTEM_ERROR_MSG}
+                            </span>
+                          </td>
+                          <td
+                            className="td-item"
+                            onClick={() => setTransactionOnFocus(item)}
+                          >
+                            <span className="history-table__mobile-title">
+                              Mã giao dịch
+                            </span>
+                            <span className="history-table__value">
+                              {item && item.TransactionID
+                                ? item.TransactionID
+                                : SYSTEM_ERROR_MSG}
+                            </span>
+                          </td>
+                          <td
+                            className="td-item"
+                            onClick={() => setTransactionOnFocus(item)}
+                          >
+                            <span className="history-table__mobile-title">
+                              Voucher đã đổi
+                            </span>
+                            <span className="history-table__value">
+                              {item && item.Voucher
+                                ? item.Voucher
+                                : SYSTEM_ERROR_MSG}
+                            </span>
+                          </td>
+                          <td
+                            className="td-item"
+                            onClick={() => setTransactionOnFocus(item)}
+                          >
+                            <span className="history-table__mobile-title">
+                              Nh.viên thực hiện
+                            </span>
+                            <span className="history-table__value bold-value">
+                              {item && item.Account
+                                ? item.Account
+                                : SYSTEM_ERROR_MSG}
+                            </span>
+                          </td>
+                          <td className="td-item">
+                            <span className="history-table__mobile-title">
+                              Trạng thái
+                            </span>
+                            <RenderStatus
+                              checkingItem={item}
+                              handleDoCheckClicked={(checkedItem) => {
+                                if (showItem === null)
+                                  setTransactionOnFocus(checkedItem);
+                                else setCheckingTransaction(checkedItem);
+                              }}
+                            />
+                          </td>
+                        </tr>
+                      </Wrapper>
+                    );
+                  })
+                : null}
+            </tbody>
+          </table>
+        </Wrapper>
+      );
+    } else
+      return (
+        <Grid container alignContent={"center"}>
+          <Grid
+            item
+            xs={12}
+            sm={12}
+            md={12}
+            alignSelf="center"
+            textAlign={"center"}
+          >
+            <CircularProgress sx={{ color: "white", margin: "2rem" }} />;
           </Grid>
-        </div>
-        <table className="history-table">
-          <thead>
-            <tr className="history-table__title">
-              <td>Thời gian</td>
-              <td>Mã hóa đơn</td>
-              <td>Tổng tiền</td>
-              <td>Mã nhân viên</td>
-              <td>Trạng thái</td>
-            </tr>
-          </thead>
-          <tbody className="history-table__body">
-            {TransactionList.map((item, index) => {
-              return (
-                <Wrapper>
-                  <tr className="history-table__row" key={item.ID}>
-                    <td
-                      className="td-key"
-                      onClick={() => {
-                        setShowItem(item);
-                      }}
-                    >
-                      <span className="history-table__mobile-title">
-                        Thời gian
-                      </span>
-                      <span className="history-table__value bold-value">
-                        9:20
-                      </span>
-                    </td>
-                    <td className="td-item" onClick={() => setShowItem(item)}>
-                      <span className="history-table__mobile-title">
-                        Mã hóa đơn
-                      </span>
-                      <span className="history-table__value">
-                        {item.billNum}
-                      </span>
-                    </td>
-                    <td className="td-item" onClick={() => setShowItem(item)}>
-                      <span className="history-table__mobile-title">
-                        Tổng hóa đơn
-                      </span>
-                      <span className="history-table__value">
-                        {item.totalMoney}
-                      </span>
-                    </td>
-                    <td className="td-item" onClick={() => setShowItem(item)}>
-                      <span className="history-table__mobile-title">
-                        Mã nhân viên
-                      </span>
-                      <span className="history-table__value bold-value">
-                        {item.staffAccount}
-                      </span>
-                    </td>
-                    <td className="td-item">
-                      <span className="history-table__mobile-title">
-                        Trạng thái
-                      </span>
-                      <RenderStatus
-                        checkingItem={item}
-                        handleDoCheckClicked={(checkedItem) => {
-                          setCheckingTransaction(checkedItem);
-                        }}
-                      />
-                    </td>
-                  </tr>
-                </Wrapper>
-              );
-            })}
-          </tbody>
-        </table>
-      </Wrapper>
-    );
+        </Grid>
+      );
   };
 
   return (
@@ -228,9 +395,10 @@ const Transactions = () => {
       </Grid>
       {/* Detail */}
       <Dialog
-        open={showItem}
+        open={showItem != null}
         onClose={() => {
           setShowItem(null);
+          setTransactionOnFocus(null);
         }}
         fullWidth={true}
         maxWidth={"xl"}
@@ -260,14 +428,21 @@ const Transactions = () => {
                     disabled
                     inputProps={{ min: 0, style: { textAlign: "center" } }}
                     variant="standard"
-                    defaultValue="Todo 27/07/2000 9:20"
+                    defaultValue={
+                      showItem && showItem.receipts
+                        ? showItem.receipts.CreatedAt.replace("Z", "").replace(
+                            "T",
+                            "   "
+                          )
+                        : SYSTEM_ERROR_MSG
+                    }
                   />
                 </Grid>
               </Grid>
 
               <Grid item container xs={12} sm={12} md={12}>
                 <Grid item xs={4} sm={6} md={4}>
-                  <label className="form-edit-add__label">Mã hóa đơn</label>
+                  <label className="form-edit-add__label">Mã giao dịch</label>
                 </Grid>
                 <Grid item xs={8} sm={6} md={8}>
                   <TextField
@@ -275,7 +450,11 @@ const Transactions = () => {
                     disabled
                     inputProps={{ min: 0, style: { textAlign: "center" } }}
                     variant="standard"
-                    defaultValue={showItem ? showItem.billNum : ""}
+                    defaultValue={
+                      showItem && showItem.receipts
+                        ? showItem.receipts.TransactionID
+                        : SYSTEM_ERROR_MSG
+                    }
                   />
                 </Grid>
               </Grid>
@@ -300,13 +479,21 @@ const Transactions = () => {
                   <label className="form-edit-add__label">Tên voucher</label>
                 </Grid>
                 <Grid item xs={8} sm={6} md={8}>
-                  <TextField
-                    fullWidth
-                    disabled
-                    inputProps={{ min: 0, style: { textAlign: "center" } }}
-                    variant="standard"
-                    defaultValue="Todo: Tên voucher ABC"
-                  />
+                  {showItem && showItem.receipts.Customer ? (
+                    <TextField
+                      fullWidth
+                      disabled
+                      inputProps={{ min: 0, style: { textAlign: "center" } }}
+                      variant="standard"
+                      defaultValue={showItem.receipts.Voucher[0].Name}
+                    />
+                  ) : (
+                    <Grid item xs={12} sm={12} md={12}>
+                      <span className="checking-help">
+                        {"[Hệ thống: Không có dữ liệu hoặc hệ thống đang tải]"}
+                      </span>
+                    </Grid>
+                  )}
                 </Grid>
               </Grid>
             </Grid>
@@ -317,13 +504,21 @@ const Transactions = () => {
                   <label className="form-edit-add__label">Tên khách hàng</label>
                 </Grid>
                 <Grid item xs={8} sm={6} md={8}>
-                  <TextField
-                    fullWidth
-                    disabled
-                    inputProps={{ min: 0, style: { textAlign: "center" } }}
-                    variant="standard"
-                    defaultValue={showItem ? showItem.clientName : ""}
-                  />
+                  {showItem && showItem.receipts.Customer ? (
+                    <TextField
+                      fullWidth
+                      disabled
+                      inputProps={{ min: 0, style: { textAlign: "center" } }}
+                      variant="standard"
+                      defaultValue={showItem.receipts.Customer.Name}
+                    />
+                  ) : (
+                    <Grid item xs={12} sm={12} md={12}>
+                      <span className="checking-help">
+                        {"[Hệ thống: Không có dữ liệu hoặc hệ thống đang tải]"}
+                      </span>
+                    </Grid>
+                  )}
                 </Grid>
               </Grid>
 
@@ -332,13 +527,21 @@ const Transactions = () => {
                   <label className="form-edit-add__label">Sđt khách hàng</label>
                 </Grid>
                 <Grid item xs={8} sm={6} md={8}>
-                  <TextField
-                    fullWidth
-                    disabled
-                    inputProps={{ min: 0, style: { textAlign: "center" } }}
-                    variant="standard"
-                    defaultValue={showItem ? showItem.clientPhoneNum : ""}
-                  />
+                  {showItem && showItem.receipts ? (
+                    <TextField
+                      fullWidth
+                      disabled
+                      inputProps={{ min: 0, style: { textAlign: "center" } }}
+                      variant="standard"
+                      defaultValue={showItem.receipts.Customer.Phone}
+                    />
+                  ) : (
+                    <Grid item xs={12} sm={12} md={12}>
+                      <span className="checking-help">
+                        {"[Hệ thống: Không có dữ liệu hoặc hệ thống đang tải]"}
+                      </span>
+                    </Grid>
+                  )}
                 </Grid>
               </Grid>
 
@@ -354,7 +557,16 @@ const Transactions = () => {
                     disabled
                     inputProps={{ min: 0, style: { textAlign: "center" } }}
                     variant="standard"
-                    defaultValue={showItem ? showItem.staffAccount : ""}
+                    defaultValue={
+                      showItem && showItem.account
+                        ? "(" +
+                          showItem.account.Role.Description +
+                          ") " +
+                          showItem.account.Name +
+                          ", @" +
+                          showItem.account.Username
+                        : SYSTEM_ERROR_MSG
+                    }
                   />
                 </Grid>
               </Grid>
@@ -371,9 +583,9 @@ const Transactions = () => {
                     defaultValue="Todo làm sau"
                   /> */}
                   <span className="history-table__value">
-                    {showItem ? (
+                    {transactionOnFocus ? (
                       <RenderStatus
-                        checkingItem={showItem}
+                        checkingItem={transactionOnFocus}
                         handleDoCheckClicked={(checkedItem) =>
                           setCheckingTransaction(checkedItem)
                         }
@@ -403,47 +615,53 @@ const Transactions = () => {
                 </label>
               </Grid>
               <Grid container item xs={12} sm={12} md={12} rowSpacing={1.5}>
-                {showItem
-                  ? showItem.productsList.map((item, index) => {
-                      return (
-                        <Grid item container columnSpacing={2}>
-                          <Grid
-                            item
-                            xs={2}
-                            sm={2}
-                            md={2}
-                            alignSelf="center"
-                            textAlign={"center"}
-                          >
-                            {index + 1}
-                          </Grid>
-                          <Grid item xs={5} sm={5} md={5}>
-                            {item.productName}
-                          </Grid>
-                          <Grid
-                            item
-                            xs={2}
-                            sm={2}
-                            md={2}
-                            alignSelf="center"
-                            textAlign={"center"}
-                          >
-                            {"(x" + item.productAmount + ")"}
-                          </Grid>
-                          <Grid
-                            item
-                            xs={3}
-                            sm={3}
-                            md={3}
-                            alignSelf="center"
-                            textAlign={"center"}
-                          >
-                            {item.productPricePerUnit}
-                          </Grid>
+                {showItem && showItem.receipts ? (
+                  showItem.receipts.ReceiptItems.map((item, index) => {
+                    return (
+                      <Grid item container columnSpacing={2}>
+                        <Grid
+                          item
+                          xs={2}
+                          sm={2}
+                          md={2}
+                          alignSelf="center"
+                          textAlign={"center"}
+                        >
+                          {index + 1}
                         </Grid>
-                      );
-                    })
-                  : null}
+                        <Grid item xs={5} sm={5} md={5}>
+                          {item.Name}
+                        </Grid>
+                        <Grid
+                          item
+                          xs={2}
+                          sm={2}
+                          md={2}
+                          alignSelf="center"
+                          textAlign={"center"}
+                        >
+                          {"(x " + item.Amount + ")"}
+                        </Grid>
+                        <Grid
+                          item
+                          xs={3}
+                          sm={3}
+                          md={3}
+                          alignSelf="center"
+                          textAlign={"center"}
+                        >
+                          {item.ID + "bổ sung đơn giá"}
+                        </Grid>
+                      </Grid>
+                    );
+                  })
+                ) : (
+                  <Grid item xs={12} sm={12} md={12}>
+                    <span className="checking-help">
+                      {"[Hệ thống: Không có dữ liệu hoặc hệ thống đang tải]"}
+                    </span>
+                  </Grid>
+                )}
               </Grid>
             </Grid>
             <Grid container item xs={12} sm={12} md={6} alignSelf="flex-start">
@@ -474,13 +692,23 @@ const Transactions = () => {
                         indicatorColor="secondary"
                         aria-label="secondary tabs example"
                       >
-                        {showItem
-                          ? showItem.imageList.map((im, id) => {
-                              return (
-                                <Tab value={im.uri} label={"Ảnh " + (id + 1)} />
-                              );
-                            })
-                          : null}
+                        {showItem != null &&
+                        showItem.receipts &&
+                        showItem.receipts.ReceiptImages != null ? (
+                          showItem.receipts.ReceiptImages.map((im, id) => {
+                            return (
+                              <Tab value={im.Url} label={"Ảnh " + (id + 1)} />
+                            );
+                          })
+                        ) : (
+                          <Grid item xs={12} sm={12} md={12}>
+                            <span className="checking-help">
+                              {
+                                "[Hệ thống: Không có ảnh hoặc hệ thống đang tải dữ liệu]"
+                              }
+                            </span>
+                          </Grid>
+                        )}
                       </Tabs>
                     </Grid>
                     <Grid item xs={12} sm={12} md={12}>
@@ -511,16 +739,26 @@ const Transactions = () => {
                           </label>
                         </Grid>
                         <Grid item xs={12} sm={9} md={8.5}>
-                          <TextField
-                            fullWidth
-                            disabled
-                            inputProps={{
-                              min: 0,
-                              style: { textAlign: "center" },
-                            }}
-                            variant="standard"
-                            defaultValue="TODO: Hiện tên voucher chổ này"
-                          />
+                          {showItem &&
+                          showItem.receipts &&
+                          showItem.receipts.Voucher ? (
+                            <TextField
+                              fullWidth
+                              disabled
+                              inputProps={{
+                                min: 0,
+                                style: { textAlign: "center" },
+                              }}
+                              variant="standard"
+                              defaultValue={showItem.receipts.Voucher[0].Name}
+                            />
+                          ) : (
+                            <Grid item xs={12} sm={12} md={12}>
+                              <span className="checking-help">
+                                {"[Hệ thống đang tải]"}
+                              </span>
+                            </Grid>
+                          )}
                         </Grid>
                       </Grid>
 
@@ -531,16 +769,28 @@ const Transactions = () => {
                           </label>
                         </Grid>
                         <Grid item xs={5} sm={4} md={3.5}>
-                          <TextField
-                            fullWidth
-                            disabled
-                            inputProps={{
-                              min: 0,
-                              style: { textAlign: "center" },
-                            }}
-                            variant="standard"
-                            defaultValue="TODO: minMoney"
-                          />
+                          {showItem &&
+                          showItem.receipts &&
+                          showItem.receipts.Voucher ? (
+                            <TextField
+                              fullWidth
+                              disabled
+                              inputProps={{
+                                min: 0,
+                                style: { textAlign: "center" },
+                              }}
+                              variant="standard"
+                              defaultValue={
+                                showItem.receipts.Voucher[0].TotalPriceMin
+                              }
+                            />
+                          ) : (
+                            <Grid item xs={12} sm={12} md={12}>
+                              <span className="checking-help">
+                                {"[Hệ thống đang tải]"}
+                              </span>
+                            </Grid>
+                          )}
                         </Grid>
                         <Grid
                           item
@@ -553,16 +803,28 @@ const Transactions = () => {
                           <label className="form-edit-add__label">đến</label>
                         </Grid>
                         <Grid item xs={5} sm={4} md={3.5}>
-                          <TextField
-                            fullWidth
-                            disabled
-                            inputProps={{
-                              min: 0,
-                              style: { textAlign: "center" },
-                            }}
-                            variant="standard"
-                            defaultValue="TODO: maxMoney"
-                          />
+                          {showItem &&
+                          showItem.receipts &&
+                          showItem.receipts.Voucher ? (
+                            <TextField
+                              fullWidth
+                              disabled
+                              inputProps={{
+                                min: 0,
+                                style: { textAlign: "center" },
+                              }}
+                              variant="standard"
+                              defaultValue={
+                                showItem.receipts.Voucher[0].TotalPriceMax
+                              }
+                            />
+                          ) : (
+                            <Grid item xs={12} sm={12} md={12}>
+                              <span className="checking-help">
+                                {"[Hệ thống đang tải]"}
+                              </span>
+                            </Grid>
+                          )}
                         </Grid>
                       </Grid>
 
@@ -592,71 +854,39 @@ const Transactions = () => {
                           rowSpacing={2}
                           columnSpacing={2}
                         >
-                          <Grid item xs={5.5} sm={5.5} md={5.5}>
-                            <TextField
-                              fullWidth
-                              disabled
-                              inputProps={{
-                                min: 0,
-                                style: { textAlign: "center" },
-                              }}
-                              variant="outlined"
-                              size="small"
-                              defaultValue="TODO: Sản phẩm 1"
-                            />
-                          </Grid>
-                          <Grid item xs={0.5} sm={0.5} md={0.5}>
-                            <label className="form-edit-add__label">;</label>
-                          </Grid>
-
-                          <Grid item xs={5.5} sm={5.5} md={5.5}>
-                            <TextField
-                              fullWidth
-                              disabled
-                              inputProps={{
-                                min: 0,
-                                style: { textAlign: "center" },
-                              }}
-                              variant="outlined"
-                              size="small"
-                              defaultValue="TODO: Sản phẩm 2"
-                            />
-                          </Grid>
-                          <Grid item xs={0.5} sm={0.5} md={0.5}>
-                            <label className="form-edit-add__label">;</label>
-                          </Grid>
-                          <Grid item xs={5.5} sm={5.5} md={5.5}>
-                            <TextField
-                              fullWidth
-                              disabled
-                              inputProps={{
-                                min: 0,
-                                style: { textAlign: "center" },
-                              }}
-                              variant="outlined"
-                              size="small"
-                              defaultValue="TODO: Sản phẩm 3"
-                            />
-                          </Grid>
-                          <Grid item xs={0.5} sm={0.5} md={0.5}>
-                            <label className="form-edit-add__label">;</label>
-                          </Grid>
-                          <Grid item xs={5.5} sm={5.5} md={5.5}>
-                            <TextField
-                              fullWidth
-                              disabled
-                              inputProps={{
-                                min: 0,
-                                style: { textAlign: "center" },
-                              }}
-                              variant="outlined"
-                              size="small"
-                              defaultValue="TODO: Sản phẩm 4"
-                            />
-                          </Grid>
-                          <Grid item xs={0.5} sm={0.5} md={0.5}>
-                            <label className="form-edit-add__label">;</label>
-                          </Grid>
+                          {showItem &&
+                          showItem.receipts &&
+                          showItem.receipts.Voucher &&
+                          showItem.receipts.Voucher.Products ? (
+                            showItem.Voucher.Products.map((p, pIdx) => {
+                              <Grid item xs={5.5} sm={5.5} md={5.5}>
+                                <TextField
+                                  fullWidth
+                                  disabled
+                                  inputProps={{
+                                    min: 0,
+                                    style: { textAlign: "center" },
+                                  }}
+                                  variant="outlined"
+                                  size="small"
+                                  defaultValue={p.Name}
+                                />
+                              </Grid>;
+                              <Grid item xs={0.5} sm={0.5} md={0.5}>
+                                <label className="form-edit-add__label">
+                                  ;
+                                </label>
+                              </Grid>;
+                            })
+                          ) : (
+                            <Grid item xs={12} sm={12} md={12}>
+                              <span className="checking-help">
+                                {
+                                  "[Hệ thống: Không có dữ liệu hoặc hệ thống đang tải]"
+                                }
+                              </span>
+                            </Grid>
+                          )}
                         </Grid>
                       </Grid>
 
@@ -667,16 +897,22 @@ const Transactions = () => {
                           </label>
                         </Grid>
                         <Grid item xs={12} sm={9} md={8.5}>
-                          <TextField
-                            fullWidth
-                            disabled
-                            inputProps={{
-                              min: 0,
-                              style: { textAlign: "center" },
-                            }}
-                            variant="standard"
-                            defaultValue="TODO: Tên quà tặng"
-                          />
+                          {showItem &&
+                          showItem.receipts &&
+                          showItem.receipts.Voucher ? (
+                            <TextField
+                              fullWidth
+                              disabled
+                              inputProps={{
+                                min: 0,
+                                style: { textAlign: "center" },
+                              }}
+                              variant="standard"
+                              defaultValue={
+                                showItem.receipts.Voucher[0].Gift.GiftName
+                              }
+                            />
+                          ) : null}
                         </Grid>
                       </Grid>
                     </Grid>
@@ -706,6 +942,7 @@ const Transactions = () => {
                   <button
                     onClick={() => {
                       setShowItem(null);
+                      setTransactionOnFocus(null);
                     }}
                     className="btn btn-primary"
                   >
@@ -717,13 +954,17 @@ const Transactions = () => {
           </div>
         </div>
       </Dialog>
-      <Dialog open={checkingTransaction} fullWidth={true} maxWidth={"lg"}>
+      <Dialog
+        open={checkingTransaction != null}
+        fullWidth={true}
+        maxWidth={"lg"}
+      >
         <div className="dialog-content">
           <div className="dialog-title detail">Thẩm định giao dịch</div>
           <Grid container columnSpacing={10} rowSpacing={2}>
             <Grid item container xs={12} sm={12} md={6}>
               <Grid item xs={12} sm={12} md={6}>
-                <label className="form-edit-add__label">Mã hóa đơn</label>
+                <label className="form-edit-add__label">Mã giao dịch</label>
               </Grid>
               <Grid item xs={12} sm={12} md={6}>
                 <TextField
@@ -732,7 +973,9 @@ const Transactions = () => {
                   inputProps={{ min: 0, style: { textAlign: "center" } }}
                   variant="standard"
                   defaultValue={
-                    checkingTransaction ? checkingTransaction.billNum : ""
+                    checkingTransaction && checkingTransaction.TransactionID
+                      ? checkingTransaction.TransactionID
+                      : SYSTEM_ERROR_MSG
                   }
                 />
               </Grid>
@@ -745,7 +988,14 @@ const Transactions = () => {
                   disabled
                   inputProps={{ min: 0, style: { textAlign: "center" } }}
                   variant="standard"
-                  defaultValue={"TODO: 9h20"}
+                  defaultValue={
+                    checkingTransaction && checkingTransaction.CreatedAt
+                      ? checkingTransaction.CreatedAt.replace("Z", "").replace(
+                          "T",
+                          "   "
+                        )
+                      : SYSTEM_ERROR_MSG
+                  }
                 />
               </Grid>
               <Grid item xs={12} sm={12} md={6}>
@@ -758,7 +1008,9 @@ const Transactions = () => {
                   inputProps={{ min: 0, style: { textAlign: "center" } }}
                   variant="standard"
                   defaultValue={
-                    checkingTransaction ? checkingTransaction.clientName : ""
+                    showItem && showItem && showItem.receipts.Customer
+                      ? showItem.receipts.Customer.Name
+                      : ""
                   }
                 />
               </Grid>
@@ -772,8 +1024,8 @@ const Transactions = () => {
                   inputProps={{ min: 0, style: { textAlign: "center" } }}
                   variant="standard"
                   defaultValue={
-                    checkingTransaction
-                      ? checkingTransaction.clientPhoneNum
+                    showItem && showItem && showItem.receipts.Customer
+                      ? showItem.receipts.Customer.Phone
                       : ""
                   }
                 />
@@ -787,7 +1039,11 @@ const Transactions = () => {
                   disabled
                   inputProps={{ min: 0, style: { textAlign: "center" } }}
                   variant="standard"
-                  defaultValue={"TODO: tên quà tặng trong voucher"}
+                  defaultValue={
+                    showItem && showItem.receipts
+                      ? showItem.receipts.Voucher[0].Gift.GiftName
+                      : ""
+                  }
                 />
               </Grid>
             </Grid>
@@ -811,7 +1067,9 @@ const Transactions = () => {
                   }}
                   variant="standard"
                   defaultValue={
-                    checkingTransaction ? checkingTransaction.staffAccount : ""
+                    transactionOnFocus && transactionOnFocus.Account
+                      ? transactionOnFocus.Account
+                      : SYSTEM_ERROR_MSG
                   }
                 />
               </Grid>
