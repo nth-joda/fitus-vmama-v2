@@ -83,13 +83,9 @@ const Transactions = () => {
 
   // Trigger dialog to pick time
   const [isPickingTime, setIsPickingTime] = useState(false);
-  const [fromDateValue, setFromDateValue] = React.useState(
-    new Date("2022-07-18T21:11:54")
-  );
+  const [fromDateValue, setFromDateValue] = React.useState(new Date());
 
-  const [toDateValue, setToDateValue] = React.useState(
-    new Date("2022-07-18T21:11:54")
-  );
+  const [toDateValue, setToDateValue] = React.useState(new Date());
 
   const handleFromDateChange = (newValue) => {
     setFromDateValue(newValue);
@@ -1292,7 +1288,13 @@ const Transactions = () => {
         open={isPickingTime}
         fullWidth={true}
         maxWidth={"sm"}
-        onClose={() => setIsPickingTime(false)}
+        onClose={() => {
+          if (fromDateValue > toDateValue) {
+            setFromDateValue(new Date());
+            setToDateValue(new Date());
+          }
+          setIsPickingTime(false);
+        }}
       >
         <div className="dialog-content">
           <div className="dialog-title detail">Tìm các giao dịch</div>
@@ -1396,6 +1398,27 @@ const Transactions = () => {
                   </span>
                 </Grid>
               )}
+              {fromDateValue <= toDateValue && (
+                <Grid item xs={12} sm={12} md={12} alignSelf="center">
+                  <span className="checking-success">
+                    {(toDateValue.getTime() - fromDateValue.getTime()) /
+                      86400000 ===
+                    0
+                      ? "Tìm trong ngày: " +
+                        toDateValue.getDate() +
+                        "/" +
+                        (toDateValue.getMonth() + 1) +
+                        "/" +
+                        toDateValue.getFullYear()
+                      : "Tìm trong " +
+                        (
+                          (toDateValue.getTime() - fromDateValue.getTime()) /
+                          86400000
+                        ).toFixed() +
+                        " ngày."}
+                  </span>
+                </Grid>
+              )}
             </Grid>
           </LocalizationProvider>
           <div className="form-detail__cta">
@@ -1415,6 +1438,10 @@ const Transactions = () => {
                 <Grid item>
                   <button
                     onClick={() => {
+                      if (fromDateValue > toDateValue) {
+                        setFromDateValue(new Date());
+                        setToDateValue(new Date());
+                      }
                       setIsPickingTime(false);
                     }}
                     className="btn btn-primary"
