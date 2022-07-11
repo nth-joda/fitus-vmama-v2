@@ -9,6 +9,7 @@ import { Navigate, useNavigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
 import UserManagement from "./pages/UserManagement";
 import Transactions from "./pages/Transactions";
+import TestChart from "./pages/TestCharts";
 
 const AppRouter = () => {
   let navigate = useNavigate();
@@ -84,6 +85,7 @@ const AppRouter = () => {
             )
           }
         ></Route>
+        <Route path="/charts" element={<TestChart />}></Route>
         <Route path="*" element={<NotFound />}></Route>
       </Routes>
     </div>
