@@ -373,7 +373,7 @@ const Transactions = () => {
             alignSelf="center"
             textAlign={"center"}
           >
-            <CircularProgress sx={{ color: "white", margin: "2rem" }} />;
+            <CircularProgress sx={{ color: "white", margin: "2rem" }} />
           </Grid>
         </Grid>
       );
