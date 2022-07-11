@@ -892,35 +892,44 @@ const Transactions = () => {
                           item
                           container
                           xs={12}
-                          sm={8}
+                          sm={9}
                           md={8.5}
                           rowSpacing={2}
                           columnSpacing={2}
                         >
                           {showItem &&
                           showItem.receipts &&
-                          showItem.receipts.Voucher &&
-                          showItem.receipts.Voucher.Products ? (
-                            showItem.Voucher.Products.map((p, pIdx) => {
-                              <Grid item xs={5.5} sm={5.5} md={5.5}>
-                                <TextField
-                                  fullWidth
-                                  disabled
-                                  inputProps={{
-                                    min: 0,
-                                    style: { textAlign: "center" },
-                                  }}
-                                  variant="outlined"
-                                  size="small"
-                                  defaultValue={p.Name}
-                                />
-                              </Grid>;
-                              <Grid item xs={0.5} sm={0.5} md={0.5}>
-                                <label className="form-edit-add__label">
-                                  ;
-                                </label>
-                              </Grid>;
-                            })
+                          showItem.receipts.Voucher ? (
+                            showItem.receipts.Voucher[0].Products.map(
+                              (p, pIdx) => {
+                                return (
+                                  <Wrapper>
+                                    <Grid item xs={11} sm={5.5} md={5.5}>
+                                      <TextField
+                                        fullWidth
+                                        disabled
+                                        inputProps={{
+                                          min: 0,
+                                          style: {
+                                            textAlign: "center",
+                                            fontSize: "0.8rem",
+                                          },
+                                        }}
+                                        variant="outlined"
+                                        size="small"
+                                        defaultValue={p.ProductName}
+                                      />
+                                    </Grid>
+
+                                    <Grid item xs={1} sm={0.5} md={0.5}>
+                                      <label className="form-edit-add__label">
+                                        ;
+                                      </label>
+                                    </Grid>
+                                  </Wrapper>
+                                );
+                              }
+                            )
                           ) : (
                             <Grid item xs={12} sm={12} md={12}>
                               <span className="checking-help">
