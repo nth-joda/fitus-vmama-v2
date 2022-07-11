@@ -1,4 +1,12 @@
-import { Badge, CircularProgress, Grid, Stack } from "@mui/material";
+import {
+  Badge,
+  CircularProgress,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  Stack,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useState } from "react";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -35,6 +43,7 @@ import "./transactions.css";
 import TransactionList from "../../assets/MOCK_DATA.json";
 import ServerResponse from "../../objects/ServerResponse";
 import ServerApi from "../../objects/ServerApi";
+import { useNavigate } from "react-router-dom";
 
 const SYSTEM_ERROR_MSG = "[Lỗi hệ thống]";
 
@@ -67,6 +76,7 @@ const RenderStatus = (props) => {
 };
 
 const Transactions = () => {
+  let navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showItem, setShowItem] = useState(null);
@@ -93,6 +103,14 @@ const Transactions = () => {
 
   const handleToDateChange = (newValue) => {
     setToDateValue(newValue);
+  };
+
+  const handleDialogAgree = () => {
+    if (serverStatus.code === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      navigate("/login");
+    } else setServerDialog(false);
   };
 
   useEffect(() => {
@@ -442,10 +460,10 @@ const Transactions = () => {
                 columnSpacing={2}
                 rowSpacing={2}
               >
-                <Grid item xs={4} sm={6} md={4}>
+                <Grid item xs={4} sm={6} md={4} alignSelf="center">
                   <label className="form-edit-add__label">Thời gian</label>
                 </Grid>
-                <Grid item xs={8} sm={6} md={8}>
+                <Grid item xs={8} sm={6} md={8} alignSelf="center">
                   <TextField
                     fullWidth
                     disabled
@@ -464,10 +482,10 @@ const Transactions = () => {
               </Grid>
 
               <Grid item container xs={12} sm={12} md={12}>
-                <Grid item xs={4} sm={6} md={4}>
+                <Grid item xs={4} sm={6} md={4} alignSelf="center">
                   <label className="form-edit-add__label">Mã giao dịch</label>
                 </Grid>
-                <Grid item xs={8} sm={6} md={8}>
+                <Grid item xs={8} sm={6} md={8} alignSelf="center">
                   <TextField
                     fullWidth
                     disabled
@@ -482,12 +500,12 @@ const Transactions = () => {
                 </Grid>
               </Grid>
               <Grid item container xs={12} sm={12} md={12}>
-                <Grid item xs={4} sm={6} md={4}>
+                <Grid item xs={4} sm={6} md={4} alignSelf="center">
                   <label className="form-edit-add__label">
                     Tổng tiền trên hóa đơn
                   </label>
                 </Grid>
-                <Grid item xs={8} sm={6} md={8}>
+                <Grid item xs={8} sm={6} md={8} alignSelf="center">
                   <TextField
                     fullWidth
                     disabled
@@ -498,10 +516,10 @@ const Transactions = () => {
                 </Grid>
               </Grid>
               <Grid item container xs={12} sm={12} md={12}>
-                <Grid item xs={4} sm={6} md={4}>
+                <Grid item xs={4} sm={6} md={4} alignSelf="center">
                   <label className="form-edit-add__label">Tên voucher</label>
                 </Grid>
-                <Grid item xs={8} sm={6} md={8}>
+                <Grid item xs={8} sm={6} md={8} alignSelf="center">
                   {showItem && showItem.receipts.Customer ? (
                     <TextField
                       fullWidth
@@ -522,8 +540,8 @@ const Transactions = () => {
             </Grid>
             {/* Right Coulumn */}
             <Grid item container xs={12} sm={6} md={6} rowSpacing={2}>
-              <Grid item container xs={12} sm={12} md={12}>
-                <Grid item xs={4} sm={6} md={4}>
+              <Grid item container xs={12} sm={12} md={12} alignSelf="center">
+                <Grid item xs={4} sm={6} md={4} alignSelf="center">
                   <label className="form-edit-add__label">Tên khách hàng</label>
                 </Grid>
                 <Grid item xs={8} sm={6} md={8}>
@@ -546,10 +564,10 @@ const Transactions = () => {
               </Grid>
 
               <Grid item container xs={12} sm={12} md={12}>
-                <Grid item xs={4} sm={6} md={4}>
+                <Grid item xs={4} sm={6} md={4} alignSelf="center">
                   <label className="form-edit-add__label">Sđt khách hàng</label>
                 </Grid>
-                <Grid item xs={8} sm={6} md={8}>
+                <Grid item xs={8} sm={6} md={8} alignSelf="center">
                   {showItem && showItem.receipts ? (
                     <TextField
                       fullWidth
@@ -568,8 +586,8 @@ const Transactions = () => {
                 </Grid>
               </Grid>
 
-              <Grid item container xs={12} sm={12} md={12}>
-                <Grid item xs={4} sm={6} md={4}>
+              <Grid item container xs={12} sm={12} md={12} alignSelf="center">
+                <Grid item xs={4} sm={6} md={4} alignSelf="center">
                   <label className="form-edit-add__label">
                     Nhân viên thực hiện giao dịch
                   </label>
@@ -578,8 +596,10 @@ const Transactions = () => {
                   <TextField
                     fullWidth
                     disabled
-                    inputProps={{ min: 0, style: { textAlign: "center" } }}
-                    variant="standard"
+                    multiline
+                    maxRows={5}
+                    inputProps={{ min: 0, style: { textAlign: "left" } }}
+                    variant="outlined"
                     defaultValue={
                       showItem && showItem.account
                         ? "(" +
@@ -1474,6 +1494,27 @@ const Transactions = () => {
           </div>
         </div>
       </Dialog>
+      {serverStatus && (
+        <Dialog
+          open={serverDialog}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle>{serverStatus.msg}</DialogTitle>
+          <DialogContent>
+            <p>{serverStatus.hint}</p>
+          </DialogContent>
+          <DialogActions>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={handleDialogAgree}
+            >
+              Đồng ý
+            </button>
+          </DialogActions>
+        </Dialog>
+      )}
     </div>
   );
 };

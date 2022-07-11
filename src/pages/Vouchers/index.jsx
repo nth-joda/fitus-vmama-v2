@@ -145,9 +145,9 @@ const Vouchers = () => {
                 <span className="table__mobile-value">
                   <Checkbox
                     sx={{
-                      color: { xs: "white", sm: "black", md: "black" },
+                      color: { xs: "white", sm: "white", md: "black" },
                       "&.Mui-checked": {
-                        color: { xs: "white", sm: "black", md: "black" },
+                        color: { xs: "white", sm: "white", md: "black" },
                       },
                     }}
                     checked={
