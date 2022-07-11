@@ -34,7 +34,12 @@
 }
 
 .image-scaned {
+  display: block;
   width: 80%;
+  margin: 0.4rem auto;
+  border-radius: 0.5rem;
+  border: 2px solid #ccc;
+  padding: 1px;
 }
 
 @media screen and (max-width: 450px) {
