@@ -163,15 +163,25 @@ const UserManagement = () => {
   };
 
   const handleCloseAddEditDialog = () => {
+    formik.setFieldValue("userName", "");
+    formik.setFieldValue("fullName", "");
+    formik.setFieldValue("password", "");
+    formik.setFieldValue("repassword", "");
+
     setOpenAddDialog(false);
     setEditItem(null);
   };
   // End dialog
   const handleAgree = () => {
+    console.log("server: ", serverStatus);
     if (serverStatus.code === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("name");
       navigate("/login");
+    } else if (serverStatus.code === 200) {
+      loadData(totalPages);
+      setServerDialog(false);
+      setServerStatus(null);
     } else setServerDialog(false);
   };
 
@@ -186,10 +196,57 @@ const UserManagement = () => {
       fullName: "",
       userName: "",
       password: "",
+      repassword: "",
     },
     onSubmit: (values) => {
-      alert("Send Request to BE: " + JSON.stringify(values));
+      const local_token = localStorage.getItem("token");
       handleCloseAddEditDialog();
+      if (local_token !== null || local_token !== "") {
+        const config = {
+          headers: {
+            Authorization: "Bearer " + local_token,
+            "Content-Type": "application/json",
+          },
+        };
+        const body_params = {
+          username: values.userName,
+          password: values.password,
+          confirmed_password: values.repassword,
+          name: values.fullName,
+        };
+
+        axios
+          .post(
+            ServerApi.BASE_URL + ServerApi.REGISTER_STAFF,
+            body_params,
+            config
+          )
+          .then((res) => {
+            console.log("Đăng ký thành công: ", res);
+            res = ServerResponse(res);
+            setServerStatus({ code: res.status, msg: res.message, hint: "" });
+
+            setServerDialog(true);
+          })
+          .catch((err) => {
+            console.log(err);
+            if (
+              err.response.data &&
+              err.response.data.status === 404 &&
+              currentPage > 1
+            ) {
+              const prevPage = currentPage - 1;
+              setCurrentPage(prevPage);
+              loadData(prevPage);
+              setSelectedList([]);
+            } else {
+              catchError(err);
+            }
+          });
+      } else {
+        localStorage.removeItem("name");
+        localStorage.removeItem("token");
+      }
     },
   });
 
@@ -437,11 +494,11 @@ const UserManagement = () => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <div className="dialog-content">
+        <form className="dialog-content">
           <div className="dialog-title">
-            {editItem ? "Chỉnh sửa thông tin" : "Thêm người dùng"}
+            {editItem ? "Chỉnh sửa thông tin" : "Thêm nhân viên"}
           </div>
-          <form className="form-edit-add">
+          <div className="form-edit-add">
             <Grid container rowSpacing={2}>
               <Grid container item columnSpacing={2}>
                 <Grid item xs={12} sm={4} md={4} alignSelf="center">
@@ -457,6 +514,7 @@ const UserManagement = () => {
                     value={formik.values.fullName}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
+                    error={formik.values.fullName === ""}
                   />
                 </Grid>
               </Grid>
@@ -474,6 +532,7 @@ const UserManagement = () => {
                     value={formik.values.userName}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
+                    error={formik.values.userName === ""}
                   />
                 </Grid>
               </Grid>
@@ -489,14 +548,53 @@ const UserManagement = () => {
                     label="Bắt buộc *"
                     variant="filled"
                     name="password"
+                    type="password"
                     value={formik.values.password}
                     onChange={formik.handleChange}
                     onBlur={formik.handleBlur}
+                    error={
+                      formik.values.password === "" ||
+                      formik.values.password !== formik.values.repassword
+                    }
+                    helperText={
+                      formik.values.password !== formik.values.repassword
+                        ? "Mật khẩu không khớp"
+                        : ""
+                    }
+                  />
+                </Grid>
+              </Grid>
+              <Grid container item columnSpacing={2}>
+                <Grid item xs={12} sm={4} md={4} alignSelf="center">
+                  <label className="form-edit-add__label">
+                    Xác nhận Mật khẩu
+                  </label>
+                </Grid>
+                <Grid item xs={12} sm={8} md={8}>
+                  <TextField
+                    fullWidth
+                    id="repassword"
+                    label="Bắt buộc *"
+                    variant="filled"
+                    name="repassword"
+                    type="password"
+                    value={formik.values.repassword}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.values.password === "" ||
+                      formik.values.password !== formik.values.repassword
+                    }
+                    helperText={
+                      formik.values.password !== formik.values.repassword
+                        ? "Mật khẩu không khớp"
+                        : ""
+                    }
                   />
                 </Grid>
               </Grid>
             </Grid>
-          </form>
+          </div>
           <div className="form-edit-add__cta">
             <Grid container direction="row" alignItems="center">
               <Grid
@@ -512,6 +610,14 @@ const UserManagement = () => {
                   <button
                     onClick={() => formik.handleSubmit(formik.values)}
                     className="btn btn-safe"
+                    type="submit"
+                    disabled={
+                      formik.values.fullName === "" ||
+                      formik.values.userName === "" ||
+                      formik.values.password === "" ||
+                      formik.values.repassword === "" ||
+                      formik.values.repassword !== formik.values.password
+                    }
                   >
                     Xác nhận
                   </button>
@@ -537,7 +643,7 @@ const UserManagement = () => {
               </Grid>
             </Grid>
           </div>
-        </div>
+        </form>
       </Dialog>
 
       {/* EDIT */}

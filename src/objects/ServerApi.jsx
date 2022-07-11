@@ -14,6 +14,7 @@ const ServerApi = {
   GET_STAFFS: "/api/v1/admin/accounts?page=",
   GET_TRANSACTIONS: "/api/v1/admin/transactions?page=",
   GET_TRANSACTION_DETAIL: "/api/v1/admin/transactions/",
+  REGISTER_STAFF: "/api/v1/admin/auth/register_sales",
 };
 
 export default ServerApi;
