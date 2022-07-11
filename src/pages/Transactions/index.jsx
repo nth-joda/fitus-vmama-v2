@@ -610,7 +610,7 @@ const Transactions = () => {
               sm={12}
               md={6}
               rowSpacing={1.2}
-              alignContent="flex-start"
+              alignContent="center"
             >
               <Grid item xs={12} sm={12} md={12} alignSelf="center">
                 <label className="form-edit-add__label">

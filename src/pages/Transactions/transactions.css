@@ -36,6 +36,7 @@
 .image-scaned {
   display: block;
   width: 80%;
+  transition: transform 0.4s; /* Animation */
   margin: 0.4rem auto;
   border-radius: 0.5rem;
   border: 2px solid #ccc;
@@ -96,6 +97,9 @@
     background-color: var(--white-color);
     border-radius: 0.5rem;
     margin-bottom: 1rem;
+  }
+  .image-scaned {
+    width: 100%;
   }
 }
 
@@ -174,6 +178,12 @@
 
   .bold-value {
     font-weight: 600;
+  }
+  .image-scaned {
+    width: 40%;
+  }
+  .image-scaned:hover {
+    transform: scale(1.5);
   }
 }
 
