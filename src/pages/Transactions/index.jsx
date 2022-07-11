@@ -1,4 +1,4 @@
-import { CircularProgress, Grid } from "@mui/material";
+import { Badge, CircularProgress, Grid, Stack } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useState } from "react";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -9,6 +9,7 @@ import TextField from "@mui/material/TextField";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Checkbox from "@mui/material/Checkbox";
+import SearchIcon from "@mui/icons-material/Search";
 
 import FormControlLabel from "@mui/material/FormControlLabel";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
@@ -18,6 +19,12 @@ import axios from "axios";
 import { useEffect } from "react";
 import CheckBoxOutlineBlank from "@mui/icons-material/CheckBoxOutlineBlank";
 import { Formik, useFormik } from "formik";
+
+// Time picker
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { PickersDay } from "@mui/x-date-pickers/PickersDay";
 
 import Header from "../../components/Header";
 import MainContent from "../../components/MainContent";
@@ -65,7 +72,6 @@ const Transactions = () => {
   const [showItem, setShowItem] = useState(null);
   const [imgOnShow, setImgOnShow] = useState(null);
   const [mainTabOnShown, setMainTabOnSHown] = useState("voucher");
-  const [isChecking, setIsChecking] = useState(false);
   const [checkingTransaction, setCheckingTransaction] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [transactionsOnCurrentPage, setTransactionsOnCurrentPage] =
@@ -74,6 +80,24 @@ const Transactions = () => {
   const [serverDialog, setServerDialog] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [transactionOnFocus, setTransactionOnFocus] = useState(null);
+
+  // Trigger dialog to pick time
+  const [isPickingTime, setIsPickingTime] = useState(false);
+  const [fromDateValue, setFromDateValue] = React.useState(
+    new Date("2022-07-18T21:11:54")
+  );
+
+  const [toDateValue, setToDateValue] = React.useState(
+    new Date("2022-07-18T21:11:54")
+  );
+
+  const handleFromDateChange = (newValue) => {
+    setFromDateValue(newValue);
+  };
+
+  const handleToDateChange = (newValue) => {
+    setToDateValue(newValue);
+  };
 
   useEffect(() => {
     if (transactionOnFocus != null) {
@@ -240,7 +264,7 @@ const Transactions = () => {
               <Grid item xs={2} sm={0.7} md={0.5}>
                 <TodayIcon />
               </Grid>
-              <Grid item xs={10}>
+              <Grid item xs={10} onClick={() => setIsPickingTime(true)}>
                 Ngày 27/07/2000
               </Grid>
             </Grid>
@@ -1255,6 +1279,167 @@ const Transactions = () => {
                     }
                   >
                     Xác nhận
+                  </button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* TIME PICKING */}
+      <Dialog
+        open={isPickingTime}
+        fullWidth={true}
+        maxWidth={"sm"}
+        onClose={() => setIsPickingTime(false)}
+      >
+        <div className="dialog-content">
+          <div className="dialog-title detail">Tìm các giao dịch</div>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <Grid
+              container
+              rowSpacing={4}
+              columnSpacing={3}
+              alignContent={"center"}
+            >
+              <Grid item sx={12} sm={6} md={6} alignSelf="center">
+                <DesktopDatePicker
+                  label="Từ ngày"
+                  inputFormat="dd/MM/yyyy"
+                  value={fromDateValue}
+                  onChange={handleFromDateChange}
+                  renderDay={(day, _value, DayComponentProps) => {
+                    const isSelected =
+                      !DayComponentProps.outsideCurrentMonth &&
+                      toDateValue.getDate() === day.getDate() &&
+                      toDateValue.getMonth() === day.getMonth() &&
+                      toDateValue.getFullYear() === day.getFullYear();
+                    const toDay =
+                      !DayComponentProps.outsideCurrentMonth &&
+                      new Date().getDate() === day.getDate() &&
+                      new Date().getMonth() === day.getMonth() &&
+                      new Date().getFullYear() === day.getFullYear();
+                    return (
+                      <Badge
+                        key={day.toString()}
+                        overlap="circular"
+                        badgeContent={
+                          isSelected ? "👈" : toDay ? "⌛" : undefined
+                        }
+                      >
+                        <PickersDay {...DayComponentProps} />
+                      </Badge>
+                    );
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      helperText={
+                        fromDateValue.getDate() === new Date().getDate()
+                          ? "Hôm nay"
+                          : "ngày/tháng/năm"
+                      }
+                      error={fromDateValue > toDateValue}
+                    />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={6} alignSelf="center">
+                <DesktopDatePicker
+                  label="Đến ngày"
+                  inputFormat="dd/MM/yyyy"
+                  value={toDateValue}
+                  onChange={handleToDateChange}
+                  renderDay={(day, _value, DayComponentProps) => {
+                    const isSelected =
+                      !DayComponentProps.outsideCurrentMonth &&
+                      fromDateValue.getDate() === day.getDate() &&
+                      fromDateValue.getMonth() === day.getMonth() &&
+                      fromDateValue.getFullYear() === day.getFullYear();
+                    const toDay =
+                      !DayComponentProps.outsideCurrentMonth &&
+                      new Date().getDate() === day.getDate() &&
+                      new Date().getMonth() === day.getMonth() &&
+                      new Date().getFullYear() === day.getFullYear();
+                    return (
+                      <Badge
+                        key={day.toString()}
+                        overlap="circular"
+                        badgeContent={
+                          isSelected ? "👉" : toDay ? "⌛" : undefined
+                        }
+                      >
+                        <PickersDay {...DayComponentProps} />
+                      </Badge>
+                    );
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      helperText={
+                        toDateValue.getDate() === new Date().getDate()
+                          ? "Hôm nay"
+                          : "ngày/tháng/năm"
+                      }
+                      error={fromDateValue > toDateValue}
+                    />
+                  )}
+                />
+              </Grid>
+              {fromDateValue > toDateValue && (
+                <Grid item xs={12} sm={12} md={12} alignSelf="center">
+                  <span className="checking-help">
+                    {
+                      "Khoảng thời gian không hợp lệ. Hãy chọn ngày [Từ ngày] trước ngày [Đến ngày]!"
+                    }
+                  </span>
+                </Grid>
+              )}
+            </Grid>
+          </LocalizationProvider>
+          <div className="form-detail__cta">
+            <Grid container direction="row" alignItems="center">
+              <Grid
+                item
+                container
+                xs={12}
+                sm={12}
+                md={12}
+                direction="row"
+                alignItems="end"
+                justifyContent="flex-end"
+                rowSpacing={2}
+                columnSpacing={3}
+              >
+                <Grid item>
+                  <button
+                    onClick={() => {
+                      setIsPickingTime(false);
+                    }}
+                    className="btn btn-primary"
+                  >
+                    Hủy
+                  </button>
+                </Grid>
+                <Grid item>
+                  <button
+                    onClick={() => {
+                      alert(
+                        "TODO: Tìm giao dịch, từ ngày: " +
+                          fromDateValue +
+                          " đến ngày: " +
+                          toDateValue
+                      );
+                      setIsPickingTime(false);
+                    }}
+                    className="btn btn-safe"
+                    disabled={fromDateValue > toDateValue}
+                  >
+                    <SearchIcon
+                      sx={{ verticalAlign: "middle", marginRight: "0.5rem" }}
+                    ></SearchIcon>
+                    Tìm
                   </button>
                 </Grid>
               </Grid>
