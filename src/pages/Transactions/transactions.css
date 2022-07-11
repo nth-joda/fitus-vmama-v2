@@ -177,3 +177,9 @@
   color: var(--red-color);
   font-style: italic;
 }
+
+.checking-success {
+  font-size: 0.8rem;
+  color: var(--green-color);
+  font-style: italic;
+}

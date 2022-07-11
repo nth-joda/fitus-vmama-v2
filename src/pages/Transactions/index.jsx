@@ -1178,6 +1178,24 @@ const Transactions = () => {
                   </Grid>
                 )}
 
+                {checkingFormik.values.isError === true &&
+                  checkingFormik.values.comment === "" && (
+                    <Grid item xs={12} sm={12} md={12}>
+                      <span className="checking-help">
+                        {"Hãy nhập lý do vì sao [không hợp lệ]"}
+                      </span>
+                    </Grid>
+                  )}
+                {(checkingFormik.values.isError === false ||
+                  (checkingFormik.values.comment !== "" &&
+                    checkingFormik.values.isError === true)) && (
+                  <Grid item xs={12} sm={12} md={12}>
+                    <span className="checking-success">
+                      {"Thông tin thẩm định hợp lệ, bạn có thể [xác nhận]"}
+                    </span>
+                  </Grid>
+                )}
+
                 <Grid item xs={12} sm={12} md={12}>
                   <TextField
                     id="filled-multiline-static"
