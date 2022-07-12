@@ -12,3 +12,9 @@
   height: 100%;
   vertical-align: middle;
 }
+
+.middle {
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}

@@ -14,8 +14,11 @@
 .card__name {
   margin: 0;
   padding: 0.8rem 0.2rem;
-  font-size: 0.8rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: 700;
+  align-items: center;
+  justify-content: center;
+  display: flex;
 }
 
 .card.card_active {

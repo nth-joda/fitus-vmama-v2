@@ -26,7 +26,15 @@ const Card = (props) => {
             {props.icon}
           </p>
         </Grid>
-        <Grid item xs={9} sm={6} md={9} container justifyContent="center">
+        <Grid
+          item
+          xs={9}
+          sm={6}
+          md={9}
+          container
+          justifyContent="center"
+          justify="center"
+        >
           <p className="card__name">{props.children.replace("-", " ")}</p>
         </Grid>
       </Grid>
