@@ -10,10 +10,11 @@ import RefreshIcon from "@mui/icons-material/Refresh";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { styled, alpha } from "@mui/material/styles";
 import InputBase from "@mui/material/InputBase";
+import IconButton from "@mui/material/IconButton";
 import "./mainContentHeader.css";
 
 const Search = styled("div")(({ theme }) => ({
-  position: "relative",
+  // position: "absolute",
   borderRadius: theme.shape.borderRadius,
   backgroundColor: alpha(theme.palette.common.white, 0.15),
   "&:hover": {
@@ -33,19 +34,20 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   height: "100%",
   position: "absolute",
   pointerEvents: "none",
-  display: "flex",
+  display: "inline-block",
   alignItems: "center",
   justifyContent: "center",
-  color: "white",
+  color: "#ccc",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "white",
-  width: "100%",
+  width: "95%",
   "& .MuiInputBase-input": {
     padding: theme.spacing(1, 1, 1, 0),
     // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1.5em + ${theme.spacing(4)})`,
+    paddingLeft: `calc(0.0em + ${theme.spacing(4)})`,
+
     transition: theme.transitions.create("width"),
     width: "100%",
     [theme.breakpoints.up("md")]: {
@@ -61,7 +63,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const MainContentHeader = (props) => {
-  // const [inputSearchTerm, setInputSearchTerm] = useState("");
+  const [inputSearchTerm, setInputSearchTerm] = useState(null);
   return (
     <Grid
       container
@@ -69,41 +71,45 @@ const MainContentHeader = (props) => {
       spacing={1}
       alignItems="center"
     >
-      <Grid item xs={12} sm={4} md={5}>
-        <Search>
-          <SearchIconWrapper>
-            <SearchIcon />
-          </SearchIconWrapper>
-          <StyledInputBase
-            placeholder={
-              props.of ? "Nhập tên " + props.of + " ..." : "Nhập từ khóa"
-            }
-            inputProps={{ "aria-label": "search" }}
-            onChange={(e) => props.catchTerm(e.target.value)}
-          />
-        </Search>
-        {/* <TextField
-          id="outlined-adornment-password"
-          variant="outlined"
-          type="text"
-          label={props.of ? "Nhập tên " + props.of + " ..." : "Nhập từ khóa"}
-          size="small"
-          sx={{ width: "100%" }}
-          onChange={(e) => props.catchTerm(e.target.value)}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <span fontSize={2}>I</span>
-                <IconButton color="primary" type="submit">
-                  <SearchIcon />
-                </IconButton>
-              </InputAdornment>
-            ),
-            className: { color: "red" },
+      <Grid container item xs={12} sm={4} md={7}>
+        <form
+          style={{ width: "100%" }}
+          onSubmit={(event) => {
+            event.preventDefault();
+
+            if (inputSearchTerm != null) props.catchTerm(inputSearchTerm);
+            else props.catchTerm("");
           }}
-        /> */}
+        >
+          <Grid container>
+            <Grid item xs={10} sm={10} md={8}>
+              <Search>
+                <StyledInputBase
+                  placeholder={
+                    props.of ? "Nhập tên " + props.of + " ..." : "Nhập từ khóa"
+                  }
+                  inputProps={{ "aria-label": "search" }}
+                  onChange={(e) => {
+                    if (e.target.value !== "")
+                      setInputSearchTerm(e.target.value);
+                    else {
+                      setInputSearchTerm(null);
+                      props.catchTerm("");
+                    }
+                  }}
+                  value={inputSearchTerm != null ? inputSearchTerm : ""}
+                />
+              </Search>
+            </Grid>
+            <Grid item xs={2} sm={2} md={0.5}>
+              <IconButton type="submit" sx={{ color: "white" }} size="medium">
+                <SearchIcon />
+              </IconButton>
+            </Grid>
+          </Grid>
+        </form>
       </Grid>
-      <Grid item xs={0} sm={0} md={2}></Grid>
+
       <Grid
         item
         xs={12}
@@ -111,10 +117,17 @@ const MainContentHeader = (props) => {
         md={5}
         container
         spacing={2}
-        justify="center"
+        justify="flex-end"
         justifyContent="center"
       >
-        <Grid item xs={4} sm={4} md={4}>
+        <Grid
+          item
+          xs={4}
+          sm={4}
+          md={4}
+          alignSelf="center"
+          justifyContent={"center"}
+        >
           <button
             className={"btn btn-primary fullWidth"}
             disabled={props.isRefreshDisabled}
@@ -126,8 +139,7 @@ const MainContentHeader = (props) => {
             Làm mới
           </button>
         </Grid>
-
-        <Grid item xs={4} sm={4} md={4}>
+        <Grid container item xs={4} sm={4} md={4}>
           <button
             className="btn btn-safe fullWidth"
             disabled={props.isAddDisabled}

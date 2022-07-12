@@ -9,6 +9,7 @@ const ServerApi = {
   CREATE_VOUCHER: "/api/v1/admin/vouchers",
   DELETE_VOUCHER: "/api/v1/admin/vouchers/",
   GET_VOUCHER_BY_ID: "/api/v1/admin/vouchers/",
+  SEARCH_VOUCHERS_BY_KW: "/api/v1/admin/vouchers/search?query=",
   CREATE_PRODUCT: "/api/v1/admin/products",
   DELETE_PRODUCTS: "/api/v1/admin/products/delete_products",
   GET_STAFFS: "/api/v1/admin/accounts?page=",
