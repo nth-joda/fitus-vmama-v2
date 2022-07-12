@@ -311,15 +311,36 @@ const Transactions = () => {
                   <Wrapper>
                     <div className="history-table__date">
                       <Grid container>
-                        <Grid item xs={2} sm={0.7} md={0.5}>
-                          <TodayIcon />
-                        </Grid>
                         <Grid
                           item
-                          xs={10}
+                          sx={{ cursor: "pointer" }}
+                          container
+                          xs={5.5}
+                          sm={2.5}
+                          md={1.4}
+                          columnSpacing={2}
                           onClick={() => setIsPickingTime(true)}
                         >
-                          {item.date}
+                          <Grid
+                            item
+                            xs={2}
+                            sm={2}
+                            md={2}
+                            container
+                            justifyContent="center"
+                          >
+                            <TodayIcon />
+                          </Grid>
+                          <Grid
+                            item
+                            xs={10}
+                            sm={10}
+                            md={10}
+                            container
+                            justifyContent="flex-end"
+                          >
+                            {item.date}
+                          </Grid>
                         </Grid>
                       </Grid>
                     </div>
@@ -1656,7 +1677,11 @@ const Transactions = () => {
                     disabled={fromDateValue > toDateValue}
                   >
                     <SearchIcon
-                      sx={{ verticalAlign: "middle", marginRight: "0.5rem" }}
+                      sx={{
+                        verticalAlign: "middle",
+                        marginRight: "0.5rem",
+                        fontSize: { xs: "0.9rem", sm: "1rem", md: "1.2rem" },
+                      }}
                     ></SearchIcon>
                     Tìm
                   </button>
