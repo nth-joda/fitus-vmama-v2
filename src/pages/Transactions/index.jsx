@@ -138,11 +138,65 @@ const Transactions = () => {
   };
 
   const handleDialogAgree = () => {
-    if (serverStatus.code === 401) {
+    if (serverStatus.code === 2001) {
+      setTransactionOnFocus(null);
+      setShowItem(null);
+      setServerDialog(false);
+      loadData(currentPage);
+    } else if (serverStatus.code === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("name");
       navigate("/login");
     } else setServerDialog(false);
+  };
+
+  const handleSubmitCheckingTransaction = () => {
+    const local_token = localStorage.getItem("token");
+    if (local_token !== null || local_token !== "") {
+      const config = {
+        headers: {
+          Authorization: "Bearer " + local_token,
+          "Content-Type": "application/json",
+        },
+      };
+      const body_put = { censor: checkingFormik.values.isError ? false : true };
+      axios
+        .put(
+          ServerApi.BASE_URL +
+            ServerApi.CHECK_TRANSACTION +
+            transactionOnFocus.ID,
+          body_put,
+          config
+        )
+        .then((res) => {
+          console.log(res);
+          console.log("check ", res.data);
+          res = ServerResponse(res);
+          setServerStatus({
+            code: 2001,
+            msg: "Đánh giá giao dịch thành công",
+            hint: "Quay lại trang lịch sử",
+          });
+          setServerDialog(true);
+        })
+        .catch((err) => {
+          console.log(err);
+          if (
+            err.response.data &&
+            err.response.data.status === 404 &&
+            currentPage > 1
+          ) {
+            const prevPage = currentPage - 1;
+            setCurrentPage(prevPage);
+            loadData(prevPage);
+          } else {
+            catchError(err);
+          }
+        });
+    } else {
+      localStorage.removeItem("name");
+      localStorage.removeItem("token");
+    }
   };
 
   useEffect(() => {
@@ -1478,6 +1532,7 @@ const Transactions = () => {
                 <Grid item>
                   <button
                     onClick={() => {
+                      handleSubmitCheckingTransaction();
                       setCheckingTransaction(null);
                     }}
                     className="btn btn-safe"
