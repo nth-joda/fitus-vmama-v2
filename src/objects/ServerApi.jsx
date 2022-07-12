@@ -12,6 +12,7 @@ const ServerApi = {
   SEARCH_VOUCHERS_BY_KW: "/api/v1/admin/vouchers/search?query=",
   CREATE_PRODUCT: "/api/v1/admin/products",
   DELETE_PRODUCTS: "/api/v1/admin/products/delete_products",
+  SEARCH_PRODUCTS_NY_KW: "/api/v1/admin/products/search?query=",
   GET_STAFFS: "/api/v1/admin/accounts?page=",
   GET_TRANSACTIONS: "/api/v1/admin/transactions?page=",
   GET_TRANSACTION_DETAIL: "/api/v1/admin/transactions/",
