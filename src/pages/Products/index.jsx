@@ -95,16 +95,16 @@ const Products = () => {
     return (
       <Wrapper>
         {prods
-          .filter((val) => {
-            if (searchTerm === "") {
-              return val;
-            } else if (
-              val.ProductName.toLowerCase().includes(searchTerm.toLowerCase())
-            ) {
-              return val;
-            }
-            return false;
-          })
+          // .filter((val) => {
+          //   if (searchTerm === "") {
+          //     return val;
+          //   } else if (
+          //     val.ProductName.toLowerCase().includes(searchTerm.toLowerCase())
+          //   ) {
+          //     return val;
+          //   }
+          //   return false;
+          // })
           .map((item) => (
             <tr
               className={
@@ -206,32 +206,61 @@ const Products = () => {
           "Content-Type": "application/json",
         },
       };
-      axios
-        .get(
-          SERVER_API.BASE_URL + SERVER_API.GETPRODUCTS_ENDPOINT + pageNum,
-          config
-        )
-        .then((res) => {
-          console.log(res);
-          catchData(res.data);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          setIsLoading(false);
-          console.log(err);
-          if (
-            err.response.data &&
-            err.response.data.status === 404 &&
-            currentPage > 1
-          ) {
-            const prevPage = currentPage - 1;
-            setCurrentPage(prevPage);
-            loadData(prevPage);
-            setSelectedList([]);
-          } else {
-            catchError(err);
-          }
-        });
+      if (searchTerm == null || searchTerm === "") {
+        axios
+          .get(
+            SERVER_API.BASE_URL + SERVER_API.GETPRODUCTS_ENDPOINT + pageNum,
+            config
+          )
+          .then((res) => {
+            console.log(res);
+            catchData(res.data);
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            setIsLoading(false);
+            console.log(err);
+            if (
+              err.response.data &&
+              err.response.data.status === 404 &&
+              currentPage > 1
+            ) {
+              const prevPage = currentPage - 1;
+              setCurrentPage(prevPage);
+              loadData(prevPage);
+              setSelectedList([]);
+            } else {
+              catchError(err);
+            }
+          });
+      } else {
+        axios
+          .get(
+            SERVER_API.BASE_URL + SERVER_API.SEARCH_PRODUCTS_NY_KW + searchTerm,
+            config
+          )
+          .then((res) => {
+            console.log(res);
+            catchData(res.data);
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            setIsLoading(false);
+            console.log(err);
+            if (
+              err.response.data &&
+              err.response.data.status === 404 &&
+              currentPage > 1
+            ) {
+              const prevPage = currentPage - 1;
+              setCurrentPage(prevPage);
+              loadData(prevPage);
+              setSelectedList([]);
+            } else {
+              catchError(err);
+            }
+          });
+      }
     } else {
       localStorage.removeItem("name");
       localStorage.removeItem("token");
@@ -240,7 +269,7 @@ const Products = () => {
 
   useEffect(() => {
     loadData(currentPage);
-  }, [currentPage]);
+  }, [currentPage, searchTerm]);
 
   const onHandleRefreshClicked = () => {
     setIsLoading(true);
