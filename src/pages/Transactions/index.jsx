@@ -75,6 +75,38 @@ const RenderStatus = (props) => {
   );
 };
 
+const splitTransactionsByDate = (trans) => {
+  let ret = [];
+  trans.map((item) => {
+    if (ret.length > 0) {
+      let objOfDate = ret.find((fitem) => {
+        return (
+          fitem.date ===
+          item.CreatedAt.substring(0, item.CreatedAt.indexOf("T"))
+        );
+      });
+      if (objOfDate ? true : false) {
+        ret[ret.indexOf(objOfDate)]?.trans.push(item);
+      } else {
+        const newObj = {
+          date: item.CreatedAt.substring(0, item.CreatedAt.indexOf("T")),
+          trans: [item],
+        };
+
+        ret.push(newObj);
+      }
+    } else {
+      const newObj = {
+        date: item.CreatedAt.substring(0, item.CreatedAt.indexOf("T")),
+        trans: [item],
+      };
+
+      ret.push(newObj);
+    }
+  });
+  return ret;
+};
+
 const Transactions = () => {
   let navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
@@ -165,7 +197,7 @@ const Transactions = () => {
   });
   const catchData = (res) => {
     const meta = res.data.metadata;
-    const recs = res.data.receipts;
+    const recs = splitTransactionsByDate(res.data.receipts);
     if (meta != null) setTotalPages(meta.total_pages);
     if (recs != null) setTransactionsOnCurrentPage(recs);
   };
@@ -273,7 +305,138 @@ const Transactions = () => {
     if (isLoading !== true) {
       return (
         <Wrapper>
-          <div className="history-table__date">
+          {transactionsOnCurrentPage
+            ? transactionsOnCurrentPage.map((item, index) => {
+                return (
+                  <Wrapper>
+                    <div className="history-table__date">
+                      <Grid container>
+                        <Grid item xs={2} sm={0.7} md={0.5}>
+                          <TodayIcon />
+                        </Grid>
+                        <Grid
+                          item
+                          xs={10}
+                          onClick={() => setIsPickingTime(true)}
+                        >
+                          {item.date}
+                        </Grid>
+                      </Grid>
+                    </div>
+                    <table className="history-table">
+                      <thead>
+                        <tr className="history-table__title">
+                          <td>Thời gian</td>
+                          <td>Mã giao dịch</td>
+                          <td>Voucher đã đổi</td>
+                          <td>Nh.viên thực hiện</td>
+                          <td>Trạng thái</td>
+                        </tr>
+                      </thead>
+                      <tbody className="history-table__body">
+                        {item.trans
+                          ? item.trans.map((item, index) => {
+                              return (
+                                <Wrapper>
+                                  <tr
+                                    className="history-table__row"
+                                    key={item.ID}
+                                  >
+                                    <td
+                                      className="td-key"
+                                      onClick={() => {
+                                        setTransactionOnFocus(item);
+                                      }}
+                                    >
+                                      <span className="history-table__mobile-title">
+                                        Thời gian
+                                      </span>
+                                      <span className="history-table__value bold-value">
+                                        {item && item.CreatedAt
+                                          ? item.CreatedAt.substring(
+                                              item.CreatedAt.indexOf("T") + 1,
+                                              item.CreatedAt.lastIndexOf(".")
+                                                ? item.CreatedAt.lastIndexOf(
+                                                    "."
+                                                  )
+                                                : item.CreatedAt.lastIndexOf(
+                                                    "Z"
+                                                  )
+                                            )
+                                          : SYSTEM_ERROR_MSG}
+                                      </span>
+                                    </td>
+                                    <td
+                                      className="td-item"
+                                      onClick={() =>
+                                        setTransactionOnFocus(item)
+                                      }
+                                    >
+                                      <span className="history-table__mobile-title">
+                                        Mã giao dịch
+                                      </span>
+                                      <span className="history-table__value">
+                                        {item && item.TransactionID
+                                          ? item.TransactionID
+                                          : SYSTEM_ERROR_MSG}
+                                      </span>
+                                    </td>
+                                    <td
+                                      className="td-item"
+                                      onClick={() =>
+                                        setTransactionOnFocus(item)
+                                      }
+                                    >
+                                      <span className="history-table__mobile-title">
+                                        Voucher đã đổi
+                                      </span>
+                                      <span className="history-table__value">
+                                        {item && item.Voucher
+                                          ? item.Voucher
+                                          : SYSTEM_ERROR_MSG}
+                                      </span>
+                                    </td>
+                                    <td
+                                      className="td-item"
+                                      onClick={() =>
+                                        setTransactionOnFocus(item)
+                                      }
+                                    >
+                                      <span className="history-table__mobile-title">
+                                        Nh.viên thực hiện
+                                      </span>
+                                      <span className="history-table__value bold-value">
+                                        {item && item.Account
+                                          ? item.Account
+                                          : SYSTEM_ERROR_MSG}
+                                      </span>
+                                    </td>
+                                    <td className="td-item">
+                                      <span className="history-table__mobile-title">
+                                        Trạng thái
+                                      </span>
+                                      <RenderStatus
+                                        checkingItem={item}
+                                        handleDoCheckClicked={(checkedItem) => {
+                                          if (showItem === null)
+                                            setTransactionOnFocus(checkedItem);
+                                          else
+                                            setCheckingTransaction(checkedItem);
+                                        }}
+                                      />
+                                    </td>
+                                  </tr>
+                                </Wrapper>
+                              );
+                            })
+                          : null}
+                      </tbody>
+                    </table>
+                  </Wrapper>
+                );
+              })
+            : "Kho cóa"}
+          {/* <div className="history-table__date">
             <Grid container>
               <Grid item xs={2} sm={0.7} md={0.5}>
                 <TodayIcon />
@@ -377,7 +540,7 @@ const Transactions = () => {
                   })
                 : null}
             </tbody>
-          </table>
+          </table> */}
         </Wrapper>
       );
     } else
