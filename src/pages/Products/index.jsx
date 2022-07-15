@@ -348,6 +348,8 @@ const Products = () => {
               <Box>
                 <MainContentHeader
                   of="sản phẩm"
+                  addOn={true}
+                  delOn={true}
                   isRefreshDisabled={isLoading}
                   isDeleteDisabled={selectedList.length > 0 ? false : true}
                   handleRefreshClicked={onHandleRefreshClicked}

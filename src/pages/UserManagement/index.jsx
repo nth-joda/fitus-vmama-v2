@@ -428,6 +428,8 @@ const UserManagement = () => {
             <Box>
               <MainContentHeader
                 of="thông tin nhân viên"
+                addOn={true}
+                delOn={true}
                 isRefreshDisabled={isLoading}
                 isDeleteDisabled={selectedList.length > 0 ? false : true}
                 handleRefreshClicked={onHandleRefreshClicked}

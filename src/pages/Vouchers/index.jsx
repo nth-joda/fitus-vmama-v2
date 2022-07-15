@@ -16,7 +16,9 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContentText from "@mui/material/DialogContentText";
 import axios from "axios";
 import TextField from "@mui/material/TextField";
-
+import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
+import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
+import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
 import Header from "../../components/Header";
 import SideBar from "../../components/Sidebar";
 import MainContent from "../../components/MainContent";
@@ -29,6 +31,7 @@ import ServerResponse from "../../objects/ServerResponse";
 import "./vouchers.css";
 import MainContentHeader from "../../components/MainContent/MainContentHeader";
 import ServerApi from "../../objects/ServerApi";
+import { Autocomplete, Typography } from "@mui/material";
 
 const NET_ERROR_MSG = "[Lỗi đường truyền]";
 
@@ -48,7 +51,15 @@ const Vouchers = () => {
   const [deletingId, setDeletingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [showItem, setShowItem] = useState(null);
-
+  const [openCheckingContent, setOpenCheckingContent] = useState(false);
+  const [testingBill, setTestingBill] = useState([]);
+  const [tempTestingProduct, setTempTestingProduct] = useState({
+    pdName: "",
+    pdPrice: "",
+  });
+  const [allProducts, setAllProducts] = useState(null);
+  const [openAddTestProductDialog, setOpenAddTestProductDialog] =
+    useState(false);
   const onHandleCheck = (item, isCheck) => {
     if (
       selectedList.filter((fitem, fid) => fitem.ID === item.ID).length > 0 &&
@@ -360,6 +371,43 @@ const Vouchers = () => {
     setCurrentPage(totalPages + 1);
   };
 
+  const onHandleCheckClicked = () => {
+    const local_token = localStorage.getItem("token");
+    if (local_token !== null || local_token !== "") {
+      const config = {
+        headers: {
+          Authorization: "Bearer " + local_token,
+          "Content-Type": "application/json",
+        },
+      };
+      axios
+        .get(SERVER_API.BASE_URL + SERVER_API.GETALLPRODUCTS, config)
+        .then((res) => {
+          console.log(res);
+          setAllProducts(res.data.data.products);
+        })
+        .catch((err) => {
+          console.log(err);
+          if (
+            err.response.data &&
+            err.response.data.status === 404 &&
+            currentPage > 1
+          ) {
+            const prevPage = currentPage - 1;
+            setCurrentPage(prevPage);
+            loadData(prevPage);
+            setSelectedList([]);
+          } else {
+            catchError(err);
+          }
+        });
+    } else {
+      localStorage.removeItem("name");
+      localStorage.removeItem("token");
+    }
+    setOpenCheckingContent(true);
+  };
+
   const onHandleAfterAddOrEditingMode = (isCont) => {
     setAddOrEditMode((prevState) => {
       if (prevState === false) {
@@ -444,16 +492,302 @@ const Vouchers = () => {
         </Grid>
         <Grid item xs={12} sm={12} md={10}>
           <MainContent of="vouchers">
-            {!addOrEditMode ? (
+            {openCheckingContent ? (
+              <div>
+                <div className="chosen-vouchers-and-bills">
+                  <Grid container columnSpacing={3}>
+                    <Grid item container xs={6} sm={6} md={6}>
+                      <Grid item xs={12} sm={12} md={12}>
+                        <Box
+                          sx={{
+                            background: "rgba(0, 85, 147, 0.78)",
+                            padding: "0rem 1.3rem",
+                            borderRadius: "0.6rem",
+                          }}
+                        >
+                          <Typography
+                            sx={{
+                              color: "white",
+                              fontWeight: 600,
+                              fontSize: "1.2rem",
+                              lineHeight: "2.2rem",
+                            }}
+                          >
+                            Voucher đã chọn
+                          </Typography>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        sx={{
+                          background: "white",
+                          marginTop: "0.3rem",
+
+                          borderRadius: "0.5rem",
+                          overflowY: "auto",
+                          height: "12rem",
+                        }}
+                      >
+                        {selectedList.map((mit, mid) => {
+                          return (
+                            <Box
+                              sx={
+                                mid % 2 === 1
+                                  ? {
+                                      background: "#DBE8F1",
+                                      padding: "0.3rem 1rem",
+                                    }
+                                  : {
+                                      padding: "0.3rem 1rem",
+                                    }
+                              }
+                            >
+                              <Typography
+                                sx={{ color: "#005593", fontWeight: 600 }}
+                              >
+                                {mit.Name}
+                              </Typography>
+                            </Box>
+                          );
+                        })}
+                      </Grid>
+                    </Grid>
+                    <Grid item container xs={6} sm={6} md={6}>
+                      <Grid item xs={12} sm={12} md={12}>
+                        <Box
+                          sx={{
+                            background: "rgba(0, 85, 147, 0.78)",
+                            padding: "0rem 1.3rem",
+                            borderRadius: "0.6rem",
+                          }}
+                        >
+                          <Grid container>
+                            <Grid item xs={7} sm={7} md={7} alignSelf="center">
+                              <Typography
+                                sx={{
+                                  color: "white",
+                                  fontWeight: 600,
+                                  fontSize: "1.2rem",
+                                  lineHeight: "2.2rem",
+                                }}
+                              >
+                                Hóa đơn
+                              </Typography>
+                            </Grid>
+                            <Grid
+                              item
+                              container
+                              xs={5}
+                              sm={5}
+                              md={5}
+                              alignSelf="center"
+                              justifyContent="flex-end"
+                            >
+                              <IconButton sx={{ color: "white" }} size="small">
+                                <FileUploadOutlinedIcon />
+                              </IconButton>
+
+                              <IconButton sx={{ color: "white" }} size="small">
+                                <FileDownloadOutlinedIcon />
+                              </IconButton>
+                            </Grid>
+                          </Grid>
+                        </Box>
+                      </Grid>
+                      <Grid
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        sx={{
+                          background: "white",
+                          marginTop: "0.3rem",
+
+                          borderRadius: "0.5rem",
+                          overflowY: "auto",
+                          height: "12rem",
+                        }}
+                      >
+                        <Box>
+                          {testingBill.map((mit, mid) => {
+                            return (
+                              <Box
+                                sx={
+                                  mid % 2 === 1
+                                    ? {
+                                        background: "#DBE8F1",
+                                        padding: "0.3rem 1rem",
+                                      }
+                                    : {
+                                        padding: "0.3rem 1rem",
+                                      }
+                                }
+                              >
+                                <Grid container>
+                                  <Grid item xs={9} sm={9} md={9}>
+                                    <Typography
+                                      sx={{ color: "#005593", fontWeight: 600 }}
+                                    >
+                                      {mit.pdName}
+                                    </Typography>
+                                  </Grid>
+
+                                  <Grid item xs={3} sm={3} md={3}>
+                                    <Typography
+                                      sx={{ color: "#005593", fontWeight: 600 }}
+                                    >
+                                      {mit.pdPrice}
+                                    </Typography>
+                                  </Grid>
+                                </Grid>
+                              </Box>
+                            );
+                          })}
+                          <Box sx={{ padding: "0.2rem 1rem" }}>
+                            <IconButton
+                              size="small"
+                              onClick={() => {
+                                setTempTestingProduct({
+                                  pdName: null,
+                                  pdPrice: null,
+                                });
+                                setOpenAddTestProductDialog(true);
+                              }}
+                            >
+                              <AddCircleOutlinedIcon />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </div>
+                <div className="checking-cta" style={{ margin: "0.5rem 1rem" }}>
+                  <Grid container justifyContent={"flex-end"}>
+                    <button className="btn btn-light-green">Kiểm tra</button>
+                  </Grid>
+                </div>
+                <div className="checking-results">
+                  <Grid
+                    container
+                    sx={{
+                      background: "rgba(0, 85, 147, 0.78)",
+                      borderRadius: "0.5rem",
+                      padding: "0rem 1.3rem",
+                    }}
+                  >
+                    <Grid item container xs={6} sm={6} md={6}>
+                      <Typography
+                        sx={{
+                          color: "white",
+                          fontWeight: 600,
+                          fontSize: "1.2rem",
+                          lineHeight: "2.2rem",
+                        }}
+                      >
+                        Tên voucher
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item
+                      container
+                      xs={6}
+                      sm={6}
+                      md={6}
+                      textAlign="center"
+                      justifyContent="center"
+                    >
+                      <Typography
+                        sx={{
+                          color: "white",
+                          fontWeight: 600,
+                          fontSize: "1.2rem",
+                          lineHeight: "2.2rem",
+                          textAlign: "center",
+                        }}
+                      >
+                        Kết quả
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    sx={{
+                      background: "white",
+                      marginTop: "0.3rem",
+
+                      borderRadius: "0.5rem",
+                      overflowY: "auto",
+                      height: "12rem",
+                    }}
+                  >
+                    {selectedList.map((mit, mid) => {
+                      return (
+                        <Box
+                          sx={
+                            mid % 2 === 1
+                              ? {
+                                  background: "#DBE8F1",
+                                  padding: "0.3rem 1rem",
+                                }
+                              : {
+                                  padding: "0.3rem 1rem",
+                                }
+                          }
+                        >
+                          <Typography
+                            sx={{ color: "#005593", fontWeight: 600 }}
+                          >
+                            {mit.Name}
+                          </Typography>
+                        </Box>
+                      );
+                    })}
+                  </Grid>
+                </div>
+                <div className="checking-footer-cta">
+                  <Grid
+                    sx={{ marginTop: "0.8rem" }}
+                    container
+                    justifyContent={"flex-end"}
+                    columnSpacing={2}
+                  >
+                    <Grid item xs={4} sm={4} md={1.5}>
+                      <button
+                        className="btn btn-orange fullWidth"
+                        onClick={() => setOpenCheckingContent(false)}
+                      >
+                        Thoát
+                      </button>
+                    </Grid>
+                    <Grid item xs={4} sm={4} md={1.5}>
+                      <button className="btn btn-light-green fullWidth">
+                        Tiếp tục
+                      </button>
+                    </Grid>
+                  </Grid>
+                </div>
+              </div>
+            ) : !addOrEditMode ? (
               <Box>
                 <MainContentHeader
                   of="vouchers"
+                  addOn={true}
+                  delOn={true}
+                  checkOn={true}
                   catchTerm={(term) => setSearchTerm(term)}
                   isRefreshDisabled={isLoading}
                   isDeleteDisabled={selectedList.length > 0 ? false : true}
                   handleRefreshClicked={onHandleRefreshClicked}
                   handleDeleteClicked={onHandleDeleteClicked}
                   handleAddClicked={onHandleAddClicked}
+                  handleCheckClicked={onHandleCheckClicked}
                 />
                 {isLoading ? (
                   <Box sx={{ textAlign: "center" }}>
@@ -975,6 +1309,151 @@ const Vouchers = () => {
                   >
                     Đóng
                   </button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </div>
+        </div>
+      </Dialog>
+      <Dialog
+        open={openAddTestProductDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        fullWidth={true}
+        maxWidth="sm"
+      >
+        <div className="dialog-content">
+          <div className="dialog-title detail">Thêm sản phẩm kiểm tra</div>
+          <div className="dialog-content">
+            <Grid container rowSpacing={4}>
+              <Grid item container xs={12} md={12} sm={12}>
+                <Grid item xs={12} sm={4} md={3} alignSelf="center">
+                  <label className="form-edit-add__label">Tên sản phẩm</label>
+                </Grid>
+                <Grid item xs={12} sm={8} md={9} alignSelf="center">
+                  <Autocomplete
+                    disablePortal
+                    fullWidth
+                    id="testing-product-name"
+                    onChange={(e, v) => {
+                      if (v.ID > 0) {
+                        setTempTestingProduct((prevState) => {
+                          const newState = {
+                            pdName: v.ProductName,
+                            pdPrice: prevState.pdPrice,
+                          };
+                          return newState;
+                        });
+                      }
+                    }}
+                    options={
+                      allProducts
+                        ? allProducts
+                        : [
+                            {
+                              ID: -1,
+                              CreatedAt: "null",
+                              UpdatedAt: "null",
+                              DeletedAt: "null",
+                              ProductName: "null",
+                            },
+                          ]
+                    }
+                    getOptionLabel={(option) => option.ProductName}
+                    size="small"
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="filled"
+                        label="Bắt buộc *"
+                      />
+                    )}
+                  />
+                  {/* <TextField
+                    label="Bắt buộc *"
+                    variant="filled"
+                    size="small"
+                    error={tempTestingProduct.pdName === "" ? true : false}
+                    fullWidth
+                  /> */}
+                </Grid>
+              </Grid>
+              <Grid item container xs={12} md={12} sm={12}>
+                <Grid item xs={12} sm={4} md={3} alignSelf="center">
+                  <label className="form-edit-add__label">Giá tiền</label>
+                </Grid>
+                <Grid item xs={12} sm={8} md={9} alignSelf="center">
+                  <TextField
+                    label="Bắt buộc *"
+                    variant="filled"
+                    type="number"
+                    // min={0}
+                    value={tempTestingProduct.pdPrice}
+                    onChange={(e) => {
+                      const { value } = e.target;
+                      if (/^[0-9]*$/.test(value)) {
+                        setTempTestingProduct((prevState) => {
+                          const newState = {
+                            pdName: prevState.pdName,
+                            pdPrice: value,
+                          };
+                          return newState;
+                        });
+                      }
+                    }}
+                    InputProps={{ inputProps: { min: 0 } }}
+                    size="small"
+                    error={tempTestingProduct.pdPrice === "" ? true : false}
+                    fullWidth
+                  />
+                </Grid>
+              </Grid>
+              <Grid item container xs={12} md={12} sm={12}>
+                <Grid item xs={12} sm={4} md={3} alignSelf="center"></Grid>
+                <Grid
+                  item
+                  xs={12}
+                  sm={8}
+                  md={9}
+                  alignSelf="center"
+                  container
+                  justifyContent="flex-end"
+                >
+                  <Grid item xs={6.5} sm={6.5} md={6.5}>
+                    <button
+                      className="btn btn-primary"
+                      type="button"
+                      onClick={() => setOpenAddTestProductDialog(false)}
+                    >
+                      Hủy bỏ thao tác
+                    </button>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={5.5}
+                    sm={5.5}
+                    md={5.5}
+                    container
+                    justifyContent="flex-end"
+                  >
+                    <button
+                      className="btn btn-safe"
+                      type="button"
+                      disabled={
+                        tempTestingProduct.pdName === "" ||
+                        tempTestingProduct.pdName == null ||
+                        tempTestingProduct.pdPrice === "" ||
+                        tempTestingProduct.pdPrice == null
+                      }
+                      onClick={() => {
+                        testingBill.push(tempTestingProduct);
+                        // console.log(testingBill, tempTestingProduct);
+                        setOpenAddTestProductDialog(false);
+                      }}
+                    >
+                      Xác nhận
+                    </button>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>

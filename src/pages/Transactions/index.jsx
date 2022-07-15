@@ -647,6 +647,8 @@ const Transactions = () => {
             <Box>
               <MainContentHeader
                 of="giao dịch"
+                addOn={true}
+                delOn={true}
                 catchTerm={(term) => setSearchTerm(term)}
                 isRefreshDisabled={isLoading}
                 isDeleteDisabled={false}
@@ -895,11 +897,67 @@ const Transactions = () => {
                   Danh sách sản phẩm:
                 </label>
               </Grid>
-              <Grid container item xs={12} sm={12} md={12} rowSpacing={1.5}>
+              <Grid container item xs={12} sm={12} md={12} rowSpacing={0}>
+                <Grid
+                  item
+                  container
+                  columnSpacing={2}
+                  sx={{
+                    borderRadius: "0.5rem",
+                    margin: "0.3rem 0",
+                    padding: "0rem 0.2rem",
+                  }}
+                >
+                  <Grid
+                    item
+                    xs={2}
+                    sm={2}
+                    md={2}
+                    alignSelf="center"
+                    textAlign={"center"}
+                  >
+                    <span className="products-title">STT</span>
+                  </Grid>
+                  <Grid item xs={6} sm={6} md={6}>
+                    <span className="products-title">Tên mặt hàng</span>
+                  </Grid>
+                  <Grid
+                    item
+                    xs={4}
+                    sm={4}
+                    md={4}
+                    alignSelf="center"
+                    textAlign={"center"}
+                  >
+                    <span className="products-title">Số lượng</span>
+                  </Grid>
+                  {/* <Grid
+                          item
+                          xs={3}
+                          sm={3}
+                          md={3}
+                          alignSelf="center"
+                          textAlign={"center"}
+                        >
+                          {item.ID + "bổ sung đơn giá"}
+                        </Grid> */}
+                </Grid>
+              </Grid>
+              <Grid container item xs={12} sm={12} md={12} rowSpacing={0}>
                 {showItem && showItem.receipts ? (
                   showItem.receipts.ReceiptItems.map((item, index) => {
                     return (
-                      <Grid item container columnSpacing={2}>
+                      <Grid
+                        item
+                        container
+                        columnSpacing={2}
+                        sx={{
+                          background: "#cccccc3e",
+                          borderRadius: "0.5rem",
+                          margin: "0.3rem 0",
+                          padding: "0.5rem 0.2rem",
+                        }}
+                      >
                         <Grid
                           item
                           xs={2}
@@ -910,20 +968,20 @@ const Transactions = () => {
                         >
                           {index + 1}
                         </Grid>
-                        <Grid item xs={5} sm={5} md={5}>
+                        <Grid item xs={6} sm={6} md={6}>
                           {item.Name}
                         </Grid>
                         <Grid
                           item
-                          xs={2}
-                          sm={2}
-                          md={2}
+                          xs={4}
+                          sm={4}
+                          md={4}
                           alignSelf="center"
                           textAlign={"center"}
                         >
                           {"(x " + item.Amount + ")"}
                         </Grid>
-                        <Grid
+                        {/* <Grid
                           item
                           xs={3}
                           sm={3}
@@ -932,7 +990,7 @@ const Transactions = () => {
                           textAlign={"center"}
                         >
                           {item.ID + "bổ sung đơn giá"}
-                        </Grid>
+                        </Grid> */}
                       </Grid>
                     );
                   })
