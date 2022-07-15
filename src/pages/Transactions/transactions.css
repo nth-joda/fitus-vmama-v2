@@ -198,3 +198,7 @@
   color: var(--green-color);
   font-style: italic;
 }
+
+.products-title {
+  font-weight: 700;
+}

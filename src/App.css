@@ -11,6 +11,7 @@ body {
   --card-bg-color: #005593;
   --blue-text-color: rgba(0, 85, 147, 0.78);
   --green-color: #2e7d32;
+  --light-green-color: #309a41;
   --red-color: #a00000;
   --secondary-color: #603e9f;
   --white-color: #fff;
@@ -59,6 +60,11 @@ li {
 
 .btn-primary {
   background-color: var(--blue-bg-color);
+  text-transform: uppercase;
+}
+
+.btn-light-green {
+  background-color: var(--light-green-color);
   text-transform: uppercase;
 }
 
