@@ -359,7 +359,7 @@ const Transactions = () => {
     if (isLoading !== true) {
       return (
         <Wrapper>
-          {transactionsOnCurrentPage
+          {transactionsOnCurrentPage != null
             ? transactionsOnCurrentPage.map((item, index) => {
                 return (
                   <Wrapper>
@@ -393,7 +393,7 @@ const Transactions = () => {
                             container
                             justifyContent="flex-end"
                           >
-                            {item.date}
+                            {item.date ? item.date : ""}
                           </Grid>
                         </Grid>
                       </Grid>
@@ -426,7 +426,7 @@ const Transactions = () => {
                                       <span className="history-table__mobile-title">
                                         Thời gian
                                       </span>
-                                      <span className="history-table__value bold-value">
+                                      <p className="history-table__value bold-value">
                                         {item && item.CreatedAt
                                           ? item.CreatedAt.substring(
                                               item.CreatedAt.indexOf("T") + 1,
@@ -439,7 +439,7 @@ const Transactions = () => {
                                                   )
                                             )
                                           : SYSTEM_ERROR_MSG}
-                                      </span>
+                                      </p>
                                     </td>
                                     <td
                                       className="td-item"
@@ -450,11 +450,11 @@ const Transactions = () => {
                                       <span className="history-table__mobile-title">
                                         Mã giao dịch
                                       </span>
-                                      <span className="history-table__value">
+                                      <p className="history-table__value">
                                         {item && item.TransactionID
                                           ? item.TransactionID
                                           : SYSTEM_ERROR_MSG}
-                                      </span>
+                                      </p>
                                     </td>
                                     <td
                                       className="td-item"
@@ -467,7 +467,7 @@ const Transactions = () => {
                                       </span>
                                       <span className="history-table__value">
                                         {item && item.Voucher
-                                          ? item.Voucher
+                                          ? item.Voucher.Name
                                           : SYSTEM_ERROR_MSG}
                                       </span>
                                     </td>
@@ -1778,12 +1778,80 @@ const Transactions = () => {
                 <Grid item>
                   <button
                     onClick={() => {
-                      alert(
-                        "TODO: Tìm giao dịch, từ ngày: " +
-                          fromDateValue +
-                          " đến ngày: " +
-                          toDateValue
-                      );
+                      const getFromMonth =
+                        fromDateValue.getMonth() + 1 < 10
+                          ? "0" + (fromDateValue.getMonth() + 1)
+                          : fromDateValue.getMonth() + 1;
+                      const getToMonth =
+                        toDateValue.getMonth() + 1 < 10
+                          ? "0" + (toDateValue.getMonth() + 1)
+                          : toDateValue.getMonth() + 1;
+                      const getFromDay =
+                        fromDateValue.getDate() < 10
+                          ? "0" + fromDateValue.getDate()
+                          : fromDateValue.getDate();
+                      const getToDay =
+                        toDateValue.getDate() < 10
+                          ? "0" + toDateValue.getDate()
+                          : toDateValue.getDate();
+
+                      const fromString =
+                        getFromDay +
+                        "-" +
+                        getFromMonth +
+                        "-" +
+                        fromDateValue.getFullYear();
+                      const toString =
+                        getToDay +
+                        "-" +
+                        getToMonth +
+                        "-" +
+                        toDateValue.getFullYear();
+                      const local_token = localStorage.getItem("token");
+                      if (local_token !== null || local_token !== "") {
+                        const config = {
+                          headers: {
+                            Authorization: "Bearer " + local_token,
+                            "Content-Type": "application/json",
+                          },
+                        };
+                        axios
+                          .get(
+                            ServerApi.BASE_URL +
+                              ServerApi.TRANSACTION_SEARCH +
+                              "from_date=" +
+                              fromString +
+                              "&to_date=" +
+                              toString,
+                            config
+                          )
+                          .then((res) => {
+                            const recs = splitTransactionsByDate(
+                              res.data.data.receipts
+                            );
+
+                            if (recs != null)
+                              setTransactionsOnCurrentPage(recs);
+                            else setTransactionsOnCurrentPage([]);
+                          })
+                          .catch((err) => {
+                            console.log(err);
+                            if (
+                              err.response.data &&
+                              err.response.data.status === 404 &&
+                              currentPage > 1
+                            ) {
+                              const prevPage = currentPage - 1;
+                              setCurrentPage(prevPage);
+                              loadData(prevPage);
+                            } else {
+                              catchError(err);
+                            }
+                          });
+                      } else {
+                        localStorage.removeItem("name");
+                        localStorage.removeItem("token");
+                      }
                       setIsPickingTime(false);
                     }}
                     className="btn btn-safe"

@@ -19,6 +19,7 @@ import TextField from "@mui/material/TextField";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
+
 import Header from "../../components/Header";
 import SideBar from "../../components/Sidebar";
 import MainContent from "../../components/MainContent";
@@ -53,6 +54,7 @@ const Vouchers = () => {
   const [showItem, setShowItem] = useState(null);
   const [openCheckingContent, setOpenCheckingContent] = useState(false);
   const [testingBill, setTestingBill] = useState([]);
+  const [loadingFile, setLoadingFile] = useState(false);
   const [tempTestingProduct, setTempTestingProduct] = useState({
     pdName: "",
     pdPrice: "",
@@ -495,8 +497,8 @@ const Vouchers = () => {
             {openCheckingContent ? (
               <div>
                 <div className="chosen-vouchers-and-bills">
-                  <Grid container columnSpacing={3}>
-                    <Grid item container xs={6} sm={6} md={6}>
+                  <Grid container columnSpacing={3} rowSpacing={2}>
+                    <Grid item container xs={12} sm={6} md={6}>
                       <Grid item xs={12} sm={12} md={12}>
                         <Box
                           sx={{
@@ -555,7 +557,7 @@ const Vouchers = () => {
                         })}
                       </Grid>
                     </Grid>
-                    <Grid item container xs={6} sm={6} md={6}>
+                    <Grid item container xs={12} sm={6} md={6}>
                       <Grid item xs={12} sm={12} md={12}>
                         <Box
                           sx={{
@@ -586,7 +588,24 @@ const Vouchers = () => {
                               alignSelf="center"
                               justifyContent="flex-end"
                             >
-                              <IconButton sx={{ color: "white" }} size="small">
+                              <IconButton
+                                sx={{ color: "white" }}
+                                size="small"
+                                aria-label="upload json file"
+                                component="label"
+                              >
+                                <input
+                                  hidden
+                                  accept="application/JSON"
+                                  multiple
+                                  type="file"
+                                  onChange={(e) => {
+                                    console.log(e.target.value);
+                                    var data = require("json!." +
+                                      e.target.value);
+                                    console.log("JSONcdat: ", data);
+                                  }}
+                                />
                                 <FileUploadOutlinedIcon />
                               </IconButton>
 
@@ -811,6 +830,7 @@ const Vouchers = () => {
                   catchTerm={(term) => setSearchTerm(term)}
                   isRefreshDisabled={isLoading}
                   isDeleteDisabled={selectedList.length > 0 ? false : true}
+                  isCheckingDisabled={selectedList.length > 0 ? false : true}
                   handleRefreshClicked={onHandleRefreshClicked}
                   handleDeleteClicked={onHandleDeleteClicked}
                   handleAddClicked={onHandleAddClicked}
