@@ -590,7 +590,34 @@ const Vouchers = () => {
                                 <FileUploadOutlinedIcon />
                               </IconButton>
 
-                              <IconButton sx={{ color: "white" }} size="small">
+                              <IconButton
+                                sx={{ color: "white" }}
+                                size="small"
+                                onClick={() => {
+                                  let today = new Date();
+                                  var fileName =
+                                    "vmama_test_bill_" +
+                                    today.getDate() +
+                                    "-" +
+                                    (today.getMonth() + 1) +
+                                    "-" +
+                                    today.getFullYear() +
+                                    ".json";
+
+                                  let dataUri =
+                                    "data:application/json;charset=utf-8," +
+                                    encodeURIComponent(
+                                      JSON.stringify(testingBill)
+                                    );
+                                  let linkElement = document.createElement("a");
+                                  linkElement.setAttribute("href", dataUri);
+                                  linkElement.setAttribute(
+                                    "download",
+                                    fileName
+                                  );
+                                  linkElement.click();
+                                }}
+                              >
                                 <FileDownloadOutlinedIcon />
                               </IconButton>
                             </Grid>
@@ -1322,7 +1349,7 @@ const Vouchers = () => {
         fullWidth={true}
         maxWidth="sm"
       >
-        <div className="dialog-content">
+        <Box className="dialog-content">
           <div className="dialog-title detail">Thêm sản phẩm kiểm tra</div>
           <div className="dialog-content">
             <Grid container rowSpacing={4}>
@@ -1332,6 +1359,9 @@ const Vouchers = () => {
                 </Grid>
                 <Grid item xs={12} sm={8} md={9} alignSelf="center">
                   <Autocomplete
+                    ListboxProps={{
+                      style: { maxHeight: 150, overflow: "auto" },
+                    }}
                     disablePortal
                     fullWidth
                     id="testing-product-name"
@@ -1458,7 +1488,7 @@ const Vouchers = () => {
               </Grid>
             </Grid>
           </div>
-        </div>
+        </Box>
       </Dialog>
     </div>
   );
