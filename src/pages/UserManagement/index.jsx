@@ -15,6 +15,7 @@ import Dialog from "@mui/material/Dialog";
 import TextField from "@mui/material/TextField";
 import { useFormik } from "formik";
 import axios from "axios";
+import FindReplaceOutlinedIcon from "@mui/icons-material/FindReplaceOutlined";
 
 import Header from "../../components/Header";
 import SideBar from "../../components/Sidebar";
@@ -25,7 +26,13 @@ import Wrapper from "../../utils/Wrapper";
 import { useEffect } from "react";
 import ServerResponse from "../../objects/ServerResponse";
 import ServerApi from "../../objects/ServerApi";
-import { DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import {
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Icon,
+  Typography,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 // const usersList = [
@@ -85,6 +92,7 @@ const UserManagement = () => {
   const [serverStatus, setServerStatus] = useState(null);
   const [serverDialog, setServerDialog] = useState(false);
   const [usersOnCurrentPage, setUsersOnCurrentPage] = useState(null);
+  const [banGiaoItem, setBanGiaoItem] = useState(null);
 
   // Load data:
   const catchData = (res) => {
@@ -330,6 +338,7 @@ const UserManagement = () => {
         <th className="table__th small">ID</th>
         <th className="table__th">Tên nhân viên</th>
         <th className="table__th">Tên đăng nhập</th>
+        <th className="table__th small">Bàn giao</th>
         <th className="table__th small">Admin</th>
         <th className="table__th">Chỉnh sửa</th>
       </Wrapper>
@@ -397,6 +406,24 @@ const UserManagement = () => {
                 <td className="table__td" onClick={() => setShowItem(item)}>
                   <span className="table__mobile-caption">Tên đăng nhập</span>
                   <span>{item.Username}</span>
+                </td>
+                <td
+                  className="table__td small"
+                  // onClick={() => setShowItem(item)}
+                >
+                  <span className="table__mobile-caption">Bàn giao</span>
+                  <span>
+                    <IconButton
+                      sx={{
+                        color: "#E76118",
+                        "&:hover": { backgroundColor: "#e7601820" },
+                      }}
+                      size="large"
+                      onClick={() => setBanGiaoItem(item)}
+                    >
+                      <FindReplaceOutlinedIcon />
+                    </IconButton>
+                  </span>
                 </td>
 
                 <td
@@ -524,7 +551,7 @@ const UserManagement = () => {
             <Grid container rowSpacing={2}>
               <Grid container item columnSpacing={2}>
                 <Grid item xs={12} sm={4} md={4} alignSelf="center">
-                  <label className="form-edit-add__label">Tên người dùng</label>
+                  <label className="form-edit-add__label">Tên nhân viên</label>
                 </Grid>
                 <Grid item xs={12} sm={8} md={8}>
                   <TextField
@@ -682,7 +709,7 @@ const UserManagement = () => {
             <Grid container rowSpacing={2}>
               <Grid container item columnSpacing={2}>
                 <Grid item xs={12} sm={4} md={4} alignSelf="center">
-                  <label className="form-edit-add__label">Tên người dùng</label>
+                  <label className="form-edit-add__label">Tên nhân viên</label>
                 </Grid>
                 <Grid item xs={12} sm={8} md={8}>
                   <TextField
@@ -794,7 +821,7 @@ const UserManagement = () => {
             <Grid container rowSpacing={2}>
               <Grid container item columnSpacing={2}>
                 <Grid item xs={12} sm={4} md={4} alignSelf="center">
-                  <label className="form-edit-add__label">Tên người dùng</label>
+                  <label className="form-edit-add__label">Tên nhân viên</label>
                 </Grid>
                 <Grid item xs={12} sm={8} md={8}>
                   <TextField
@@ -873,6 +900,152 @@ const UserManagement = () => {
                     className="btn btn-primary"
                   >
                     Đóng
+                  </button>
+                </Grid>
+              </Grid>
+            </Grid>
+          </div>
+        </div>
+      </Dialog>
+      <Dialog open={banGiaoItem != null} onClose={() => setBanGiaoItem(null)}>
+        <div className="dialog-content">
+          <div className="dialog-title edit">Thông tin bàn giao</div>
+          <form className="form-edit-add">
+            <Grid container rowSpacing={2}>
+              <Grid container item columnSpacing={2}>
+                <Grid item xs={12} sm={4} md={4} alignSelf="center">
+                  <label className="form-edit-add__label">Tên nhân viên</label>
+                </Grid>
+                <Grid item xs={12} sm={8} md={8}>
+                  <TextField
+                    fullWidth
+                    id="fullName"
+                    label="Bắt buộc *"
+                    variant="filled"
+                    name="fullName"
+                    disabled
+                    defaultValue={
+                      banGiaoItem ? banGiaoItem.Name : "[Lỗi hệ thống]"
+                    }
+                  />
+                </Grid>
+              </Grid>
+              <Grid container item columnSpacing={2}>
+                <Grid item xs={12} sm={4} md={4} alignSelf="center">
+                  <label className="form-edit-add__label">Tên đăng nhập</label>
+                </Grid>
+                <Grid item xs={12} sm={8} md={8}>
+                  <TextField
+                    fullWidth
+                    id="userName"
+                    label="Bắt buộc *"
+                    variant="filled"
+                    name="userName"
+                    disabled
+                    defaultValue={
+                      banGiaoItem ? banGiaoItem.Username : "[Lỗi hệ thống]"
+                    }
+                  />
+                </Grid>
+              </Grid>
+
+              <Grid container item columnSpacing={2}>
+                <Grid item xs={12} sm={4} md={4} alignSelf="center">
+                  <label className="form-edit-add__label">
+                    Quà tặng đang giữ
+                  </label>
+                </Grid>
+                <Grid
+                  item
+                  container
+                  xs={12}
+                  sm={8}
+                  md={8}
+                  columnSpacing={2}
+                  rowSpacing={2}
+                >
+                  <Grid item xs={12} sm={6} md={6}>
+                    <TextField
+                      fullWidth
+                      variant="standard"
+                      name="password"
+                      disabled
+                      inputProps={{ min: 0, style: { textAlign: "center" } }}
+                      defaultValue="Quà 1"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={6}>
+                    <TextField
+                      fullWidth
+                      variant="standard"
+                      name="password"
+                      disabled
+                      inputProps={{ min: 0, style: { textAlign: "center" } }}
+                      defaultValue="Quà 2"
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6} md={6}>
+                    <TextField
+                      fullWidth
+                      variant="standard"
+                      name="password"
+                      disabled
+                      inputProps={{ min: 0, style: { textAlign: "center" } }}
+                      defaultValue="Quà 3"
+                    />
+                  </Grid>
+                </Grid>
+              </Grid>
+              <Typography>
+                Nhân viên quản lý kiểm tra đủ các quà tặng được liệt kê ở mục
+                "Quà tặng đang giữ" khi nhân viên{" "}
+                <span style={{ fontWeight: 600 }}>
+                  {banGiaoItem ? banGiaoItem.Name : "Nguyễn Văn A"}
+                </span>{" "}
+                trao trả. Nhấn{" "}
+                <span style={{ color: "#2E7D32", fontWeight: 600 }}>
+                  [Xác nhận]
+                </span>{" "}
+                khi đã nhận đủ các sản phẩm cần bàn giao. TODO: Phân tích lại
+                chổ "giao thêm" và "xác nhận" bàn giao.
+              </Typography>
+            </Grid>
+          </form>
+          <div className="form-edit-add__cta edit">
+            <Grid container direction="row" alignItems="center">
+              <Grid
+                item
+                container
+                xs={6}
+                sm={6}
+                md={6}
+                direction="column"
+                alignItems="center"
+              >
+                <Grid item>
+                  <button
+                    // onClick={() => formik.handleSubmit(formik.values)}
+                    className="btn btn-safe"
+                  >
+                    Xác nhận
+                  </button>
+                </Grid>
+              </Grid>
+              <Grid
+                item
+                container
+                xs={6}
+                sm={6}
+                md={6}
+                direction="column"
+                alignItems="center"
+              >
+                <Grid item>
+                  <button
+                    onClick={() => setBanGiaoItem(null)}
+                    className="btn btn-danger"
+                  >
+                    Hủy bỏ
                   </button>
                 </Grid>
               </Grid>
