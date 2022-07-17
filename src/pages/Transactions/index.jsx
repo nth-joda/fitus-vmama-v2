@@ -88,16 +88,36 @@ const splitTransactionsByDate = (trans) => {
       if (objOfDate ? true : false) {
         ret[ret.indexOf(objOfDate)]?.trans.push(item);
       } else {
+        const tempDate = new Date(item.CreatedAt);
         const newObj = {
-          date: item.CreatedAt.substring(0, item.CreatedAt.indexOf("T")),
+          date:
+            (tempDate.getDate() > 9
+              ? tempDate.getDate()
+              : "0" + tempDate.getDate()) +
+            "-" +
+            (tempDate.getMonth() > 9
+              ? tempDate.getMonth()
+              : "0" + tempDate.getMonth()) +
+            "-" +
+            tempDate.getFullYear(),
           trans: [item],
         };
 
         ret.push(newObj);
       }
     } else {
+      const tempDate = new Date(item.CreatedAt);
       const newObj = {
-        date: item.CreatedAt.substring(0, item.CreatedAt.indexOf("T")),
+        date:
+          (tempDate.getDate() > 9
+            ? tempDate.getDate()
+            : "0" + tempDate.getDate()) +
+          "-" +
+          (tempDate.getMonth() > 9
+            ? tempDate.getMonth()
+            : "0" + tempDate.getMonth()) +
+          "-" +
+          tempDate.getFullYear(),
         trans: [item],
       };
 
@@ -369,30 +389,21 @@ const Transactions = () => {
                           item
                           sx={{ cursor: "pointer" }}
                           container
-                          xs={5.5}
-                          sm={2.5}
-                          md={1.4}
+                          xs={7}
+                          sm={3}
+                          md={1.6}
                           columnSpacing={2}
                           onClick={() => setIsPickingTime(true)}
                         >
                           <Grid
                             item
-                            xs={2}
-                            sm={2}
-                            md={2}
+                            xs={12}
+                            sm={12}
+                            md={12}
                             container
                             justifyContent="center"
                           >
-                            <TodayIcon />
-                          </Grid>
-                          <Grid
-                            item
-                            xs={10}
-                            sm={10}
-                            md={10}
-                            container
-                            justifyContent="flex-end"
-                          >
+                            <TodayIcon sx={{ marginRight: "0.8rem" }} />
                             {item.date ? item.date : ""}
                           </Grid>
                         </Grid>
@@ -411,6 +422,7 @@ const Transactions = () => {
                       <tbody className="history-table__body">
                         {item.trans
                           ? item.trans.map((item, index) => {
+                              console.log("item to show", item);
                               return (
                                 <Wrapper>
                                   <tr
@@ -426,7 +438,7 @@ const Transactions = () => {
                                       <span className="history-table__mobile-title">
                                         Thời gian
                                       </span>
-                                      <p className="history-table__value bold-value">
+                                      <span className="history-table__value bold-value">
                                         {item && item.CreatedAt
                                           ? item.CreatedAt.substring(
                                               item.CreatedAt.indexOf("T") + 1,
@@ -439,7 +451,7 @@ const Transactions = () => {
                                                   )
                                             )
                                           : SYSTEM_ERROR_MSG}
-                                      </p>
+                                      </span>
                                     </td>
                                     <td
                                       className="td-item"
@@ -450,11 +462,11 @@ const Transactions = () => {
                                       <span className="history-table__mobile-title">
                                         Mã giao dịch
                                       </span>
-                                      <p className="history-table__value">
+                                      <span className="history-table__value">
                                         {item && item.TransactionID
                                           ? item.TransactionID
                                           : SYSTEM_ERROR_MSG}
-                                      </p>
+                                      </span>
                                     </td>
                                     <td
                                       className="td-item"
@@ -465,11 +477,13 @@ const Transactions = () => {
                                       <span className="history-table__mobile-title">
                                         Voucher đã đổi
                                       </span>
-                                      <span className="history-table__value">
+                                      <div className="history-table__value">
                                         {item && item.Voucher
-                                          ? item.Voucher.Name
+                                          ? item.Voucher[0].Name != null
+                                            ? item.Voucher[0].Name
+                                            : item.Voucher
                                           : SYSTEM_ERROR_MSG}
-                                      </span>
+                                      </div>
                                     </td>
                                     <td
                                       className="td-item"
