@@ -357,6 +357,7 @@ const Vouchers = () => {
   const onHandleRefreshClicked = () => {
     setIsLoading(true);
     setSelectedList([]);
+    setSearchTerm(null);
     loadData(currentPage);
   };
 
@@ -838,6 +839,7 @@ const Vouchers = () => {
                   handleDeleteClicked={onHandleDeleteClicked}
                   handleAddClicked={onHandleAddClicked}
                   handleCheckClicked={onHandleCheckClicked}
+                  isResetSearch={searchTerm === null ? true : false}
                 />
                 {isLoading ? (
                   <Box sx={{ textAlign: "center" }}>

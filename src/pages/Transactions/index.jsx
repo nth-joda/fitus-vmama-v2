@@ -307,6 +307,7 @@ const Transactions = () => {
           "Content-Type": "application/json",
         },
       };
+
       axios
         .get(ServerApi.BASE_URL + ServerApi.GET_TRANSACTIONS + pageNum, config)
         .then((res) => {
@@ -355,6 +356,7 @@ const Transactions = () => {
 
   const onHandleRefreshClicked = () => {
     setIsLoading(true);
+
     loadData(currentPage);
     setSearchingModeMsg("");
   };

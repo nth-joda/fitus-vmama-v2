@@ -274,6 +274,7 @@ const Products = () => {
   const onHandleRefreshClicked = () => {
     setIsLoading(true);
     setSelectedList([]);
+    setSearchTerm(null);
     loadData(currentPage);
   };
 
@@ -359,6 +360,7 @@ const Products = () => {
                   handleDeleteClicked={onHandleDeleteClicked}
                   handleAddClicked={onHandleAddClicked}
                   catchTerm={(term) => setSearchTerm(term)}
+                  isResetSearch={searchTerm === null ? true : false}
                 />
                 {isLoading ? (
                   <Box sx={{ textAlign: "center" }}>
