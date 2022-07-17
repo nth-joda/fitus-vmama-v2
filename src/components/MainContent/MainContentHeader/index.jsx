@@ -132,8 +132,8 @@ const MainContentHeader = (props) => {
         {props.checkOn && (
           <Grid
             item
-            xs={3}
-            sm={3}
+            xs={12 / getNumOfBtns()}
+            sm={12 / getNumOfBtns()}
             md={12 / getNumOfBtns()}
             alignSelf="center"
             justifyContent={"center"}
@@ -156,8 +156,8 @@ const MainContentHeader = (props) => {
         {props.refOn && (
           <Grid
             item
-            xs={3}
-            sm={3}
+            xs={12 / getNumOfBtns()}
+            sm={12 / getNumOfBtns()}
             md={12 / getNumOfBtns()}
             alignSelf="center"
             justifyContent={"center"}
@@ -178,7 +178,7 @@ const MainContentHeader = (props) => {
           <Grid
             container
             item
-            xs={3}
+            xs={12 / getNumOfBtns()}
             sm={12 / getNumOfBtns()}
             md={12 / getNumOfBtns()}
           >
@@ -200,7 +200,12 @@ const MainContentHeader = (props) => {
         )}
 
         {props.delOn && (
-          <Grid item xs={3} sm={12 / getNumOfBtns()} md={12 / getNumOfBtns()}>
+          <Grid
+            item
+            xs={12 / getNumOfBtns()}
+            sm={12 / getNumOfBtns()}
+            md={12 / getNumOfBtns()}
+          >
             <button
               className={
                 props.deleteColor

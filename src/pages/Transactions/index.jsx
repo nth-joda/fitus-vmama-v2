@@ -88,16 +88,36 @@ const splitTransactionsByDate = (trans) => {
       if (objOfDate ? true : false) {
         ret[ret.indexOf(objOfDate)]?.trans.push(item);
       } else {
+        const tempDate = new Date(item.CreatedAt);
         const newObj = {
-          date: item.CreatedAt.substring(0, item.CreatedAt.indexOf("T")),
+          date:
+            (tempDate.getDate() > 9
+              ? tempDate.getDate()
+              : "0" + tempDate.getDate()) +
+            "-" +
+            (tempDate.getMonth() > 9
+              ? tempDate.getMonth()
+              : "0" + tempDate.getMonth()) +
+            "-" +
+            tempDate.getFullYear(),
           trans: [item],
         };
 
         ret.push(newObj);
       }
     } else {
+      const tempDate = new Date(item.CreatedAt);
       const newObj = {
-        date: item.CreatedAt.substring(0, item.CreatedAt.indexOf("T")),
+        date:
+          (tempDate.getDate() > 9
+            ? tempDate.getDate()
+            : "0" + tempDate.getDate()) +
+          "-" +
+          (tempDate.getMonth() > 9
+            ? tempDate.getMonth()
+            : "0" + tempDate.getMonth()) +
+          "-" +
+          tempDate.getFullYear(),
         trans: [item],
       };
 
@@ -359,7 +379,7 @@ const Transactions = () => {
     if (isLoading !== true) {
       return (
         <Wrapper>
-          {transactionsOnCurrentPage
+          {transactionsOnCurrentPage != null
             ? transactionsOnCurrentPage.map((item, index) => {
                 return (
                   <Wrapper>
@@ -369,31 +389,22 @@ const Transactions = () => {
                           item
                           sx={{ cursor: "pointer" }}
                           container
-                          xs={5.5}
-                          sm={2.5}
-                          md={1.4}
+                          xs={7}
+                          sm={3}
+                          md={1.6}
                           columnSpacing={2}
                           onClick={() => setIsPickingTime(true)}
                         >
                           <Grid
                             item
-                            xs={2}
-                            sm={2}
-                            md={2}
+                            xs={12}
+                            sm={12}
+                            md={12}
                             container
                             justifyContent="center"
                           >
-                            <TodayIcon />
-                          </Grid>
-                          <Grid
-                            item
-                            xs={10}
-                            sm={10}
-                            md={10}
-                            container
-                            justifyContent="flex-end"
-                          >
-                            {item.date}
+                            <TodayIcon sx={{ marginRight: "0.8rem" }} />
+                            {item.date ? item.date : ""}
                           </Grid>
                         </Grid>
                       </Grid>
@@ -411,6 +422,7 @@ const Transactions = () => {
                       <tbody className="history-table__body">
                         {item.trans
                           ? item.trans.map((item, index) => {
+                              console.log("item to show", item);
                               return (
                                 <Wrapper>
                                   <tr
@@ -465,11 +477,13 @@ const Transactions = () => {
                                       <span className="history-table__mobile-title">
                                         Voucher đã đổi
                                       </span>
-                                      <span className="history-table__value">
+                                      <div className="history-table__value">
                                         {item && item.Voucher
-                                          ? item.Voucher
+                                          ? item.Voucher[0].Name != null
+                                            ? item.Voucher[0].Name
+                                            : item.Voucher
                                           : SYSTEM_ERROR_MSG}
-                                      </span>
+                                      </div>
                                     </td>
                                     <td
                                       className="td-item"
@@ -1778,12 +1792,80 @@ const Transactions = () => {
                 <Grid item>
                   <button
                     onClick={() => {
-                      alert(
-                        "TODO: Tìm giao dịch, từ ngày: " +
-                          fromDateValue +
-                          " đến ngày: " +
-                          toDateValue
-                      );
+                      const getFromMonth =
+                        fromDateValue.getMonth() + 1 < 10
+                          ? "0" + (fromDateValue.getMonth() + 1)
+                          : fromDateValue.getMonth() + 1;
+                      const getToMonth =
+                        toDateValue.getMonth() + 1 < 10
+                          ? "0" + (toDateValue.getMonth() + 1)
+                          : toDateValue.getMonth() + 1;
+                      const getFromDay =
+                        fromDateValue.getDate() < 10
+                          ? "0" + fromDateValue.getDate()
+                          : fromDateValue.getDate();
+                      const getToDay =
+                        toDateValue.getDate() < 10
+                          ? "0" + toDateValue.getDate()
+                          : toDateValue.getDate();
+
+                      const fromString =
+                        getFromDay +
+                        "-" +
+                        getFromMonth +
+                        "-" +
+                        fromDateValue.getFullYear();
+                      const toString =
+                        getToDay +
+                        "-" +
+                        getToMonth +
+                        "-" +
+                        toDateValue.getFullYear();
+                      const local_token = localStorage.getItem("token");
+                      if (local_token !== null || local_token !== "") {
+                        const config = {
+                          headers: {
+                            Authorization: "Bearer " + local_token,
+                            "Content-Type": "application/json",
+                          },
+                        };
+                        axios
+                          .get(
+                            ServerApi.BASE_URL +
+                              ServerApi.TRANSACTION_SEARCH +
+                              "from_date=" +
+                              fromString +
+                              "&to_date=" +
+                              toString,
+                            config
+                          )
+                          .then((res) => {
+                            const recs = splitTransactionsByDate(
+                              res.data.data.receipts
+                            );
+
+                            if (recs != null)
+                              setTransactionsOnCurrentPage(recs);
+                            else setTransactionsOnCurrentPage([]);
+                          })
+                          .catch((err) => {
+                            console.log(err);
+                            if (
+                              err.response.data &&
+                              err.response.data.status === 404 &&
+                              currentPage > 1
+                            ) {
+                              const prevPage = currentPage - 1;
+                              setCurrentPage(prevPage);
+                              loadData(prevPage);
+                            } else {
+                              catchError(err);
+                            }
+                          });
+                      } else {
+                        localStorage.removeItem("name");
+                        localStorage.removeItem("token");
+                      }
                       setIsPickingTime(false);
                     }}
                     className="btn btn-safe"
