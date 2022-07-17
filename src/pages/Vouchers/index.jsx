@@ -19,6 +19,7 @@ import TextField from "@mui/material/TextField";
 import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
+import ClearIcon from "@mui/icons-material/Clear";
 
 import Header from "../../components/Header";
 import SideBar from "../../components/Sidebar";
@@ -54,7 +55,7 @@ const Vouchers = () => {
   const [showItem, setShowItem] = useState(null);
   const [openCheckingContent, setOpenCheckingContent] = useState(false);
   const [testingBill, setTestingBill] = useState([]);
-
+  const [isShowingTestRes, setIsShowingTestRes] = useState(false);
   const [tempTestingProduct, setTempTestingProduct] = useState({
     pdName: "",
     pdPrice: "",
@@ -68,12 +69,20 @@ const Vouchers = () => {
       isCheck === false
     ) {
       const newList = selectedList.filter((fitem) => fitem.ID !== item.ID);
-      setSelectedList(newList);
+      setSelectedList(
+        newList.map((item) => {
+          return Object.assign(item, { testing: "waiting" });
+        })
+      );
     } else if (
       !selectedList.filter((fitem, fid) => fitem.ID === item.ID).length > 0 &&
       isCheck === true
     ) {
-      setSelectedList([...selectedList, item]);
+      setSelectedList(
+        [...selectedList, item].map((item) => {
+          return Object.assign(item, { testing: "waiting" });
+        })
+      );
     }
   };
 
@@ -91,7 +100,11 @@ const Vouchers = () => {
             checked={selectedList.length > 0}
             onChange={(e) => {
               if (e.target.checked) {
-                setSelectedList(vouchers.map((item) => item));
+                setSelectedList(
+                  vouchers.map((item) => {
+                    return Object.assign(item, { testing: "waiting" });
+                  })
+                );
               } else setSelectedList([]);
             }}
           />
@@ -257,7 +270,7 @@ const Vouchers = () => {
 
   const catchError = (err) => {
     err = ServerResponse(err);
-
+    console.log(err);
     if (err.status && err.status === 405) {
       setServerStatus({
         code: err.status,
@@ -374,6 +387,75 @@ const Vouchers = () => {
     setCurrentPage(totalPages + 1);
   };
 
+  const onHandleTestingVouchers = () => {
+    const req_body = {
+      prices: testingBill.map((item) => parseInt(item.pdPrice)),
+      products: testingBill.map((item) => item.pdName),
+      ids: selectedList.map((item) => item.ID),
+    };
+
+    const local_token = localStorage.getItem("token");
+    // setIsLoading(true);
+    if (local_token !== null || local_token !== "") {
+      const config = {
+        headers: {
+          Authorization: "Bearer " + local_token,
+          "Content-Type": "application/json",
+        },
+      };
+
+      axios
+        .post(SERVER_API.BASE_URL + SERVER_API.TEST_VOUCHERS, req_body, config)
+        .then((res) => {
+          console.log("result test: ", res);
+          // catchData(res.data);
+          // setIsLoading(false);
+          const testRes = res.data.satisfied_voucher_id;
+          setSelectedList((prev) => {
+            console.log(testRes);
+            if (testRes == null) {
+              const newState = prev.map((item) => {
+                let temp = item;
+                temp.testing = "Thất bại";
+                return temp;
+              });
+              return newState;
+            } else {
+              const newState = prev.map((item) => {
+                let temp = item;
+                temp.testing = testRes.includes(item.ID)
+                  ? "Thành công"
+                  : "Thất bại";
+                return temp;
+              });
+              return newState;
+            }
+          });
+        })
+        .catch((err) => {
+          // setIsLoading(false);
+          console.log(err);
+          if (
+            err.response.data &&
+            err.response.data.status === 404 &&
+            currentPage > 1
+          ) {
+            const prevPage = currentPage - 1;
+            setCurrentPage(prevPage);
+            loadData(prevPage);
+            setSelectedList([]);
+          } else {
+            catchError(err);
+          }
+        });
+    } else {
+      localStorage.removeItem("name");
+      localStorage.removeItem("token");
+    }
+    alert("testinggg");
+    setIsShowingTestRes(true);
+  };
+
   const onHandleCheckClicked = () => {
     const local_token = localStorage.getItem("token");
     if (local_token !== null || local_token !== "") {
@@ -464,9 +546,13 @@ const Vouchers = () => {
             console.log("res: ", res);
             if (res.data.status === 200) {
               console.log("filtering: ", deletingID);
-              setSelectedList((prevState) => [
-                ...prevState.filter((fit, fid) => fit.ID !== deletingID),
-              ]);
+              setSelectedList((prevState) =>
+                [...prevState.filter((fit, fid) => fit.ID !== deletingID)].map(
+                  (item) => {
+                    return Object.assign(item, { testing: "waiting" });
+                  }
+                )
+              );
             }
           })
           .catch((err) => {
@@ -676,8 +762,8 @@ const Vouchers = () => {
                                       }
                                 }
                               >
-                                <Grid container>
-                                  <Grid item xs={9} sm={9} md={9}>
+                                <Grid container columnSpacing={2}>
+                                  <Grid item xs={8} sm={8} md={8}>
                                     <Typography
                                       sx={{ color: "#005593", fontWeight: 600 }}
                                     >
@@ -685,12 +771,39 @@ const Vouchers = () => {
                                     </Typography>
                                   </Grid>
 
-                                  <Grid item xs={3} sm={3} md={3}>
+                                  <Grid
+                                    item
+                                    xs={3}
+                                    sm={3}
+                                    md={3}
+                                    alignSelf="center"
+                                    justifyContent="flex-end"
+                                  >
                                     <Typography
-                                      sx={{ color: "#005593", fontWeight: 600 }}
+                                      sx={{
+                                        color: "#005593",
+                                        fontWeight: 600,
+                                        textAlign: "right",
+                                      }}
                                     >
                                       {mit.pdPrice}
                                     </Typography>
+                                  </Grid>
+                                  <Grid item xs={1} sm={1} md={1}>
+                                    <IconButton
+                                      size="small"
+                                      disabled={isShowingTestRes}
+                                      onClick={() => {
+                                        setTestingBill((prev) => {
+                                          const newState = prev.filter(
+                                            (item) => item.pdName !== mit.pdName
+                                          );
+                                          return newState;
+                                        });
+                                      }}
+                                    >
+                                      <ClearIcon />
+                                    </IconButton>
                                   </Grid>
                                 </Grid>
                               </Box>
@@ -699,6 +812,7 @@ const Vouchers = () => {
                           <Box sx={{ padding: "0.2rem 1rem" }}>
                             <IconButton
                               size="small"
+                              disabled={isShowingTestRes}
                               onClick={() => {
                                 setTempTestingProduct({
                                   pdName: null,
@@ -717,7 +831,19 @@ const Vouchers = () => {
                 </div>
                 <div className="checking-cta" style={{ margin: "0.5rem 1rem" }}>
                   <Grid container justifyContent={"flex-end"}>
-                    <button className="btn btn-light-green">Kiểm tra</button>
+                    <button
+                      className="btn btn-light-green"
+                      disabled={
+                        isShowingTestRes ||
+                        testingBill == null ||
+                        testingBill.length < 1
+                          ? true
+                          : false
+                      }
+                      onClick={() => onHandleTestingVouchers()}
+                    >
+                      Kiểm tra
+                    </button>
                   </Grid>
                 </div>
                 <div className="checking-results">
@@ -729,7 +855,7 @@ const Vouchers = () => {
                       padding: "0rem 1.3rem",
                     }}
                   >
-                    <Grid item container xs={6} sm={6} md={6}>
+                    <Grid item container xs={8} sm={8} md={8}>
                       <Typography
                         sx={{
                           color: "white",
@@ -744,9 +870,9 @@ const Vouchers = () => {
                     <Grid
                       item
                       container
-                      xs={6}
-                      sm={6}
-                      md={6}
+                      xs={4}
+                      sm={4}
+                      md={4}
                       textAlign="center"
                       justifyContent="center"
                     >
@@ -777,28 +903,62 @@ const Vouchers = () => {
                       height: "12rem",
                     }}
                   >
-                    {selectedList.map((mit, mid) => {
-                      return (
-                        <Box
-                          sx={
-                            mid % 2 === 1
-                              ? {
-                                  background: "#DBE8F1",
-                                  padding: "0.3rem 1rem",
-                                }
-                              : {
-                                  padding: "0.3rem 1rem",
-                                }
-                          }
-                        >
-                          <Typography
-                            sx={{ color: "#005593", fontWeight: 600 }}
+                    {isShowingTestRes &&
+                      selectedList.map((mit, mid) => {
+                        return (
+                          <Box
+                            sx={
+                              mid % 2 === 1
+                                ? {
+                                    background: "#DBE8F1",
+                                    padding: "0.3rem 1rem",
+                                  }
+                                : {
+                                    padding: "0.3rem 1rem",
+                                  }
+                            }
                           >
-                            {mit.Name}
-                          </Typography>
-                        </Box>
-                      );
-                    })}
+                            <Grid container>
+                              <Grid
+                                item
+                                xs={8}
+                                sm={8}
+                                md={8}
+                                textAlign="flex-start"
+                                justifyContent="center"
+                              >
+                                <Typography
+                                  sx={{ color: "#005593", fontWeight: 600 }}
+                                >
+                                  {mit.Name}
+                                </Typography>
+                              </Grid>
+                              <Grid
+                                item
+                                xs={4}
+                                sm={4}
+                                md={4}
+                                textAlign="center"
+                                justifyContent="center"
+                              >
+                                {mit.testing === "waiting" ? (
+                                  <CircularProgress size="1.1rem" />
+                                ) : (
+                                  <Typography
+                                    sx={
+                                      mit.testing === "Thất bại"
+                                        ? { color: "#FF6E4D", fontWeight: 600 }
+                                        : { color: "#005593", fontWeight: 600 }
+                                    }
+                                  >
+                                    {mit.testing}
+                                  </Typography>
+                                )}
+                              </Grid>
+                            </Grid>
+                          </Box>
+                        );
+                      })}
                   </Grid>
                 </div>
                 <div className="checking-footer-cta">
@@ -811,13 +971,30 @@ const Vouchers = () => {
                     <Grid item xs={4} sm={4} md={1.5}>
                       <button
                         className="btn btn-orange fullWidth"
-                        onClick={() => setOpenCheckingContent(false)}
+                        onClick={() => {
+                          setOpenCheckingContent(false);
+                          setIsShowingTestRes(false);
+                        }}
                       >
                         Thoát
                       </button>
                     </Grid>
                     <Grid item xs={4} sm={4} md={1.5}>
-                      <button className="btn btn-light-green fullWidth">
+                      <button
+                        className="btn btn-light-green fullWidth"
+                        disabled={!isShowingTestRes}
+                        onClick={() => {
+                          setIsShowingTestRes(false);
+                          setSelectedList((prev) => {
+                            const newState = prev.map((item) => {
+                              let temp = item;
+                              temp.testing = "waiting";
+                              return temp;
+                            });
+                            return newState;
+                          });
+                        }}
+                      >
                         Tiếp tục
                       </button>
                     </Grid>
