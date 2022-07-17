@@ -675,8 +675,8 @@ const Transactions = () => {
             <Box>
               <MainContentHeader
                 of="giao dịch"
-                addOn={true}
-                delOn={true}
+                addOn={false}
+                delOn={false}
                 catchTerm={(term) => setSearchTerm(term)}
                 isRefreshDisabled={isLoading}
                 isDeleteDisabled={false}
