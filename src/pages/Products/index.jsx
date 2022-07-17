@@ -274,6 +274,7 @@ const Products = () => {
   const onHandleRefreshClicked = () => {
     setIsLoading(true);
     setSelectedList([]);
+    setSearchTerm(null);
     loadData(currentPage);
   };
 
@@ -340,7 +341,10 @@ const Products = () => {
       <Header />
       <Grid container>
         <Grid item xs={12} sm={12} md={2}>
-          <SideBar location="/products" />
+          <SideBar
+            location="/products"
+            handleRefresh={() => onHandleRefreshClicked()}
+          />
         </Grid>
         <Grid item xs={12} sm={12} md={10}>
           <MainContent>
@@ -356,6 +360,7 @@ const Products = () => {
                   handleDeleteClicked={onHandleDeleteClicked}
                   handleAddClicked={onHandleAddClicked}
                   catchTerm={(term) => setSearchTerm(term)}
+                  isResetSearch={searchTerm === null ? true : false}
                 />
                 {isLoading ? (
                   <Box sx={{ textAlign: "center" }}>

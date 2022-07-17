@@ -12,6 +12,7 @@ const SideBar = (props) => {
   const navigate = useNavigate();
   const goTo = (location) => {
     navigate("/" + location);
+    props.handleRefresh();
   };
   return (
     <Grid

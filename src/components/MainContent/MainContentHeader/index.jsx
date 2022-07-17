@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Grid from "@mui/material/Grid";
 // import TextField from "@mui/material/TextField";
 // import InputAdornment from "@mui/material/InputAdornment";
@@ -73,6 +73,11 @@ const MainContentHeader = (props) => {
     return i;
   };
   const [inputSearchTerm, setInputSearchTerm] = useState(null);
+  useEffect(() => {
+    if (props.isResetSearch) {
+      setInputSearchTerm(null);
+    }
+  }, [props.isResetSearch]);
   return (
     <Grid
       container

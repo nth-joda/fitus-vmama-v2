@@ -14,6 +14,7 @@ const ServerApi = {
   DELETE_PRODUCTS: "/api/v1/admin/products/delete_products",
   SEARCH_PRODUCTS_NY_KW: "/api/v1/admin/products/search?query=",
   GET_STAFFS: "/api/v1/admin/accounts?page=",
+  SEARCH_STAFFS: "/api/v1/admin/accounts/search?query=",
   GET_TRANSACTIONS: "/api/v1/admin/transactions?page=",
   GET_TRANSACTION_DETAIL: "/api/v1/admin/transactions/",
   CHECK_TRANSACTION: "/api/v1/admin/transactions/",

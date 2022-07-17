@@ -26,7 +26,6 @@
   color: var(--white-color);
   cursor: pointer;
   transition: var(--transition);
-  cursor: default;
 }
 
 .card:hover {

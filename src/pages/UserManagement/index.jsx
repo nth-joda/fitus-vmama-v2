@@ -122,29 +122,57 @@ const UserManagement = () => {
           "Content-Type": "application/json",
         },
       };
-      axios
-        .get(ServerApi.BASE_URL + ServerApi.GET_STAFFS + pageNum, config)
-        .then((res) => {
-          console.log(res);
-          catchData(res.data);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          setIsLoading(false);
-          console.log(err);
-          if (
-            err.response.data &&
-            err.response.data.status === 404 &&
-            currentPage > 1
-          ) {
-            const prevPage = currentPage - 1;
-            setCurrentPage(prevPage);
-            loadData(prevPage);
-            setSelectedList([]);
-          } else {
-            catchError(err);
-          }
-        });
+      if (searchTerm != null || searchTerm !== "") {
+        axios
+          .get(
+            ServerApi.BASE_URL + ServerApi.SEARCH_STAFFS + searchTerm,
+            config
+          )
+          .then((res) => {
+            console.log(res);
+            catchData(res.data);
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            setIsLoading(false);
+            console.log(err);
+            if (
+              err.response.data &&
+              err.response.data.status === 404 &&
+              currentPage > 1
+            ) {
+              const prevPage = currentPage - 1;
+              setCurrentPage(prevPage);
+              loadData(prevPage);
+            } else {
+              catchError(err);
+            }
+          });
+      } else {
+        axios
+          .get(ServerApi.BASE_URL + ServerApi.GET_STAFFS + pageNum, config)
+          .then((res) => {
+            console.log(res);
+            catchData(res.data);
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            setIsLoading(false);
+            console.log(err);
+            if (
+              err.response.data &&
+              err.response.data.status === 404 &&
+              currentPage > 1
+            ) {
+              const prevPage = currentPage - 1;
+              setCurrentPage(prevPage);
+              loadData(prevPage);
+              setSelectedList([]);
+            } else {
+              catchError(err);
+            }
+          });
+      }
     } else {
       localStorage.removeItem("name");
       localStorage.removeItem("token");
@@ -153,7 +181,7 @@ const UserManagement = () => {
 
   useEffect(() => {
     loadData(currentPage);
-  }, [currentPage]);
+  }, [currentPage, searchTerm]);
 
   // Diaglog:
   const [openAddDialog, setOpenAddDialog] = React.useState(false);
@@ -271,6 +299,7 @@ const UserManagement = () => {
   const onHandleRefreshClicked = () => {
     setIsLoading(true);
     setSelectedList([]);
+    setSearchTerm(null);
     loadData(currentPage);
   };
 
@@ -325,92 +354,79 @@ const UserManagement = () => {
     return (
       <Wrapper>
         {users
-          ? users
-              .filter((val) => {
-                if (searchTerm === "") {
-                  return val;
-                } else if (
-                  val.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  val.Username.toLowerCase().includes(searchTerm.toLowerCase())
-                ) {
-                  return val;
+          ? users.map((item) => (
+              <tr
+                className={
+                  selectedList.filter((it, id) => it.ID === item.ID).length > 0
+                    ? "table__tr table__tr-selected"
+                    : "table__tr"
                 }
-                return false;
-              })
-              .map((item) => (
-                <tr
-                  className={
-                    selectedList.filter((it, id) => it.ID === item.ID).length >
-                    0
-                      ? "table__tr table__tr-selected"
-                      : "table__tr"
-                  }
-                >
-                  <td className="table__td table__mobile-title">
-                    <span className="table__mobile-value">
-                      <Checkbox
-                        sx={{
+              >
+                <td className="table__td table__mobile-title">
+                  <span className="table__mobile-value">
+                    <Checkbox
+                      sx={{
+                        color: { xs: "white", sm: "white", md: "black" },
+                        "&.Mui-checked": {
                           color: { xs: "white", sm: "white", md: "black" },
-                          "&.Mui-checked": {
-                            color: { xs: "white", sm: "white", md: "black" },
-                          },
-                        }}
-                        checked={
-                          selectedList.filter((it, id) => it.ID === item.ID)
-                            .length > 0
-                            ? true
-                            : false
-                        }
-                        onChange={(e) => onHandleCheck(item, e.target.checked)}
-                      />
-                    </span>
-                    <span className="table__mobile-name">{item.Name}</span>
-                  </td>
-                  <td
-                    className="table__td small"
-                    onClick={() => setShowItem(item)}
-                  >
-                    <span className="table__mobile-caption">ID</span>
-                    <span className="table__value">{item.ID}</span>
-                  </td>
-                  <td className="table__td" onClick={() => setShowItem(item)}>
-                    <span className="table__mobile-caption">Tên nhân viên</span>
-                    <span>{item.Name}</span>
-                  </td>
+                        },
+                      }}
+                      checked={
+                        selectedList.filter((it, id) => it.ID === item.ID)
+                          .length > 0
+                          ? true
+                          : false
+                      }
+                      onChange={(e) => onHandleCheck(item, e.target.checked)}
+                    />
+                  </span>
+                  <span className="table__mobile-name">{item.Name}</span>
+                </td>
+                <td
+                  className="table__td small"
+                  onClick={() => setShowItem(item)}
+                >
+                  <span className="table__mobile-caption">ID</span>
+                  <span className="table__value">{item.ID}</span>
+                </td>
+                <td className="table__td" onClick={() => setShowItem(item)}>
+                  <span className="table__mobile-caption">Tên nhân viên</span>
+                  <span>{item.Name}</span>
+                </td>
 
-                  <td className="table__td" onClick={() => setShowItem(item)}>
-                    <span className="table__mobile-caption">Tên đăng nhập</span>
-                    <span>{item.Username}</span>
-                  </td>
+                <td className="table__td" onClick={() => setShowItem(item)}>
+                  <span className="table__mobile-caption">Tên đăng nhập</span>
+                  <span>{item.Username}</span>
+                </td>
 
-                  <td
-                    className="table__td small"
-                    onClick={() => setShowItem(item)}
-                  >
-                    <span className="table__mobile-caption">Admin</span>
-                    <span>
-                      {item.Role.ID === 1 ? (
-                        <CheckIcon sx={{ color: "#2e7d32" }} />
-                      ) : (
-                        <ClearIcon sx={{ color: "#a00000" }} />
-                      )}
-                    </span>
-                  </td>
+                <td
+                  className="table__td small"
+                  onClick={() => setShowItem(item)}
+                >
+                  <span className="table__mobile-caption">Admin</span>
+                  <span>
+                    {item.Role.ID === 1 ? (
+                      <CheckIcon sx={{ color: "#2e7d32" }} />
+                    ) : (
+                      <ClearIcon sx={{ color: "#a00000" }} />
+                    )}
+                  </span>
+                </td>
 
-                  <td className="table__td">
-                    <span className="table__mobile-caption">Chỉnh sửa</span>
-                    <span className="table__value">
-                      <IconButton
-                        color="primary"
-                        aria-label="chinh sua"
-                        onClick={() => setEditItem(item)}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </span>
-                  </td>
-                </tr>
-              ))
+                <td className="table__td">
+                  <span className="table__mobile-caption">Chỉnh sửa</span>
+                  <span className="table__value">
+                    <IconButton
+                      color="primary"
+                      aria-label="chinh sua"
+                      onClick={() => setEditItem(item)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </span>
+                </td>
+              </tr>
+            ))
           : null}
       </Wrapper>
     );
@@ -421,7 +437,10 @@ const UserManagement = () => {
       <Header />
       <Grid container>
         <Grid item xs={12} sm={12} md={2}>
-          <SideBar location="/user-management" />
+          <SideBar
+            location="/user-management"
+            handleRefresh={() => onHandleRefreshClicked()}
+          />
         </Grid>
         <Grid item xs={12} sm={12} md={10}>
           <MainContent>
@@ -430,6 +449,7 @@ const UserManagement = () => {
                 of="thông tin nhân viên"
                 addOn={true}
                 delOn={true}
+                isResetSearch={searchTerm === null ? true : false}
                 isRefreshDisabled={isLoading}
                 isDeleteDisabled={selectedList.length > 0 ? false : true}
                 handleRefreshClicked={onHandleRefreshClicked}
