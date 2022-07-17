@@ -54,7 +54,7 @@ const Vouchers = () => {
   const [showItem, setShowItem] = useState(null);
   const [openCheckingContent, setOpenCheckingContent] = useState(false);
   const [testingBill, setTestingBill] = useState([]);
-  const [loadingFile, setLoadingFile] = useState(false);
+
   const [tempTestingProduct, setTempTestingProduct] = useState({
     pdName: "",
     pdPrice: "",
@@ -490,7 +490,10 @@ const Vouchers = () => {
       <Header />
       <Grid container>
         <Grid item xs={12} sm={12} md={2}>
-          <SideBar location="/vouchers" />
+          <SideBar
+            location="/vouchers"
+            handleRefresh={() => onHandleRefreshClicked()}
+          />
         </Grid>
         <Grid item xs={12} sm={12} md={10}>
           <MainContent of="vouchers">

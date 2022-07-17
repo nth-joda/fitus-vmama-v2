@@ -421,7 +421,10 @@ const UserManagement = () => {
       <Header />
       <Grid container>
         <Grid item xs={12} sm={12} md={2}>
-          <SideBar location="/user-management" />
+          <SideBar
+            location="/user-management"
+            handleRefresh={() => onHandleRefreshClicked()}
+          />
         </Grid>
         <Grid item xs={12} sm={12} md={10}>
           <MainContent>

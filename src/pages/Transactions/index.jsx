@@ -6,6 +6,8 @@ import {
   DialogTitle,
   Grid,
   Stack,
+  Tooltip,
+  Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useState } from "react";
@@ -26,7 +28,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 import axios from "axios";
 import { useEffect } from "react";
 import CheckBoxOutlineBlank from "@mui/icons-material/CheckBoxOutlineBlank";
-import { Formik, useFormik } from "formik";
+import { useFormik } from "formik";
 
 // Time picker
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -142,6 +144,7 @@ const Transactions = () => {
   const [serverDialog, setServerDialog] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [transactionOnFocus, setTransactionOnFocus] = useState(null);
+  const [searchingModeMsg, setSearchingModeMsg] = useState("");
 
   // Trigger dialog to pick time
   const [isPickingTime, setIsPickingTime] = useState(false);
@@ -353,6 +356,7 @@ const Transactions = () => {
   const onHandleRefreshClicked = () => {
     setIsLoading(true);
     loadData(currentPage);
+    setSearchingModeMsg("");
   };
   const onHandleDeleteClicked = () => {};
   const onHandleAddClicked = () => {};
@@ -385,28 +389,33 @@ const Transactions = () => {
                   <Wrapper>
                     <div className="history-table__date">
                       <Grid container>
-                        <Grid
-                          item
-                          sx={{ cursor: "pointer" }}
-                          container
-                          xs={7}
-                          sm={3}
-                          md={1.6}
-                          columnSpacing={2}
-                          onClick={() => setIsPickingTime(true)}
+                        <Tooltip
+                          title="Nhấn để tìm các giao dịch theo ngày"
+                          arrow
                         >
                           <Grid
                             item
-                            xs={12}
-                            sm={12}
-                            md={12}
+                            sx={{ cursor: "pointer" }}
                             container
-                            justifyContent="center"
+                            xs={7}
+                            sm={3}
+                            md={1.6}
+                            columnSpacing={2}
+                            onClick={() => setIsPickingTime(true)}
                           >
-                            <TodayIcon sx={{ marginRight: "0.8rem" }} />
-                            {item.date ? item.date : ""}
+                            <Grid
+                              item
+                              xs={12}
+                              sm={12}
+                              md={12}
+                              container
+                              justifyContent="center"
+                            >
+                              <TodayIcon sx={{ marginRight: "0.8rem" }} />
+                              {item.date ? item.date : ""}
+                            </Grid>
                           </Grid>
-                        </Grid>
+                        </Tooltip>
                       </Grid>
                     </div>
                     <table className="history-table">
@@ -654,7 +663,10 @@ const Transactions = () => {
       <Header />
       <Grid container>
         <Grid item xs={12} sm={12} md={2}>
-          <SideBar location="/transactions" />
+          <SideBar
+            location="/transactions"
+            handleRefresh={() => onHandleRefreshClicked()}
+          />
         </Grid>
         <Grid item xs={12} sm={12} md={10}>
           <MainContent of="transactions">
@@ -684,6 +696,31 @@ const Transactions = () => {
                 deleteColor={"secondary"}
               />
             </Box>
+            <span>
+              <Tooltip
+                title="Nhấn để tắt chế độ tìm kiếm"
+                placement="bottom"
+                arrow
+              >
+                <Typography
+                  sx={{
+                    cursor: "pointer",
+                    color: "white",
+                    fontStyle: "italic",
+                    fontWeight: 500,
+                    "&:hover": {
+                      color: "#ccc",
+                      transition: "300ms",
+                    },
+                    width: "wrap-content",
+                    display: "inline-block",
+                  }}
+                  onClick={() => onHandleRefreshClicked()}
+                >
+                  {searchingModeMsg}
+                </Typography>
+              </Tooltip>
+            </span>
             <Box>{historyTable()}</Box>
           </MainContent>
         </Grid>
@@ -1821,6 +1858,14 @@ const Transactions = () => {
                         getToMonth +
                         "-" +
                         toDateValue.getFullYear();
+                      setSearchingModeMsg(
+                        fromString === toString
+                          ? "Các giao dịch trong ngày: " + fromString
+                          : "Các giao dịch từ ngày: " +
+                              fromString +
+                              " đến ngày: " +
+                              toString
+                      );
                       const local_token = localStorage.getItem("token");
                       if (local_token !== null || local_token !== "") {
                         const config = {
