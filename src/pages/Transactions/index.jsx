@@ -224,6 +224,7 @@ const Transactions = () => {
 
   useEffect(() => {
     if (transactionOnFocus != null) {
+      setShowItem(transactionOnFocus);
       const local_token = localStorage.getItem("token");
       if (local_token !== null || local_token !== "") {
         const config = {
@@ -762,7 +763,7 @@ const Transactions = () => {
                     disabled
                     inputProps={{ min: 0, style: { textAlign: "center" } }}
                     variant="standard"
-                    defaultValue={
+                    value={
                       showItem && showItem.receipts
                         ? showItem.receipts.CreatedAt.replace("Z", "").replace(
                             "T",
@@ -784,7 +785,7 @@ const Transactions = () => {
                     disabled
                     inputProps={{ min: 0, style: { textAlign: "center" } }}
                     variant="standard"
-                    defaultValue={
+                    value={
                       showItem && showItem.receipts
                         ? showItem.receipts.TransactionID
                         : SYSTEM_ERROR_MSG
@@ -813,7 +814,9 @@ const Transactions = () => {
                   <label className="form-edit-add__label">Tên voucher</label>
                 </Grid>
                 <Grid item xs={8} sm={6} md={8} alignSelf="center">
-                  {showItem && showItem.receipts.Customer ? (
+                  {showItem &&
+                  showItem.receipts &&
+                  showItem.receipts.Voucher ? (
                     <TextField
                       fullWidth
                       disabled
@@ -838,7 +841,9 @@ const Transactions = () => {
                   <label className="form-edit-add__label">Tên khách hàng</label>
                 </Grid>
                 <Grid item xs={8} sm={6} md={8}>
-                  {showItem && showItem.receipts.Customer ? (
+                  {showItem &&
+                  showItem.receipts &&
+                  showItem.receipts.Customer ? (
                     <TextField
                       fullWidth
                       disabled
@@ -867,7 +872,7 @@ const Transactions = () => {
                       disabled
                       inputProps={{ min: 0, style: { textAlign: "center" } }}
                       variant="standard"
-                      defaultValue={showItem.receipts.Customer.Phone}
+                      value={showItem.receipts.Customer.Phone}
                     />
                   ) : (
                     <Grid item xs={12} sm={12} md={12}>
@@ -893,7 +898,7 @@ const Transactions = () => {
                     maxRows={5}
                     inputProps={{ min: 0, style: { textAlign: "left" } }}
                     variant="outlined"
-                    defaultValue={
+                    value={
                       showItem && showItem.account
                         ? "(" +
                           showItem.account.Role.Description +
@@ -1409,7 +1414,7 @@ const Transactions = () => {
                   inputProps={{ min: 0, style: { textAlign: "center" } }}
                   variant="standard"
                   defaultValue={
-                    showItem && showItem && showItem.receipts.Customer
+                    showItem && showItem.receipts && showItem.receipts.Customer
                       ? showItem.receipts.Customer.Name
                       : ""
                   }
@@ -1425,7 +1430,7 @@ const Transactions = () => {
                   inputProps={{ min: 0, style: { textAlign: "center" } }}
                   variant="standard"
                   defaultValue={
-                    showItem && showItem && showItem.receipts.Customer
+                    showItem && showItem.receipts && showItem.receipts.Customer
                       ? showItem.receipts.Customer.Phone
                       : ""
                   }
@@ -1887,13 +1892,15 @@ const Transactions = () => {
                             config
                           )
                           .then((res) => {
-                            const recs = splitTransactionsByDate(
-                              res.data.data.receipts
-                            );
+                            if (res.data.data.receipts) {
+                              const recs = splitTransactionsByDate(
+                                res.data.data.receipts
+                              );
 
-                            if (recs != null)
-                              setTransactionsOnCurrentPage(recs);
-                            else setTransactionsOnCurrentPage([]);
+                              if (recs != null)
+                                setTransactionsOnCurrentPage(recs);
+                              else setTransactionsOnCurrentPage([]);
+                            } else setTransactionsOnCurrentPage([]);
                           })
                           .catch((err) => {
                             console.log(err);

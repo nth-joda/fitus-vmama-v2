@@ -1000,7 +1000,9 @@ const UserManagement = () => {
                 Nhân viên quản lý kiểm tra đủ các quà tặng được liệt kê ở mục
                 "Quà tặng đang giữ" khi nhân viên{" "}
                 <span style={{ fontWeight: 600 }}>
-                  {banGiaoItem ? banGiaoItem.Name : "Nguyễn Văn A"}
+                  {banGiaoItem
+                    ? banGiaoItem.Name
+                    : "[Hệ thống: Tên Nhân viên đang bàn giao]"}
                 </span>{" "}
                 trao trả. Nhấn{" "}
                 <span style={{ color: "#2E7D32", fontWeight: 600 }}>
