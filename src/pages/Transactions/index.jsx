@@ -82,11 +82,23 @@ const splitTransactionsByDate = (trans) => {
   trans.map((item) => {
     if (ret.length > 0) {
       let objOfDate = ret.find((fitem) => {
-        return (
-          fitem.date ===
-          item.CreatedAt.substring(0, item.CreatedAt.indexOf("T"))
-        );
+        const tempDate = new Date(item.CreatedAt);
+        const newObj = {
+          date:
+            (tempDate.getDate() > 9
+              ? tempDate.getDate()
+              : "0" + tempDate.getDate()) +
+            "-" +
+            (tempDate.getMonth() + 1 > 9
+              ? tempDate.getMonth() + 1
+              : "0" + (tempDate.getMonth() + 1)) +
+            "-" +
+            tempDate.getFullYear(),
+          trans: [item],
+        };
+        return fitem.date === newObj.date;
       });
+
       if (objOfDate ? true : false) {
         ret[ret.indexOf(objOfDate)]?.trans.push(item);
       } else {
@@ -97,9 +109,9 @@ const splitTransactionsByDate = (trans) => {
               ? tempDate.getDate()
               : "0" + tempDate.getDate()) +
             "-" +
-            (tempDate.getMonth() > 9
-              ? tempDate.getMonth()
-              : "0" + tempDate.getMonth()) +
+            (tempDate.getMonth() + 1 > 9
+              ? tempDate.getMonth() + 1
+              : "0" + (tempDate.getMonth() + 1)) +
             "-" +
             tempDate.getFullYear(),
           trans: [item],
@@ -115,9 +127,9 @@ const splitTransactionsByDate = (trans) => {
             ? tempDate.getDate()
             : "0" + tempDate.getDate()) +
           "-" +
-          (tempDate.getMonth() > 9
-            ? tempDate.getMonth()
-            : "0" + tempDate.getMonth()) +
+          (tempDate.getMonth() + 1 > 9
+            ? tempDate.getMonth() + 1
+            : "0" + (tempDate.getMonth() + 1)) +
           "-" +
           tempDate.getFullYear(),
         trans: [item],
