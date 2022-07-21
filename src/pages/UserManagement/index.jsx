@@ -30,8 +30,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Icon,
-  Snackbar,
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";

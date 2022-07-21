@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import Vouchers from "./pages/Vouchers/index";
 import Products from "./pages/Products/index";
 import Vmachines from "./pages/Vmachines/index";
+import Gifts from "./pages/Gifts/index";
 import NotFound from "./pages/NotFound";
 
 import { Navigate, useNavigate, Route, Routes } from "react-router-dom";
@@ -34,6 +35,18 @@ const AppRouter = () => {
               <Vouchers />
             ) : (
               <Navigate to="/login" />
+            )
+          }
+        ></Route>
+        <Route
+          path="/gifts"
+          element={
+            localStorage.getItem("token") ? (
+              <Gifts />
+            ) : (
+              <Navigate
+                to={{ pathname: "/login", state: { from: "/gifts" } }}
+              />
             )
           }
         ></Route>

@@ -4,7 +4,8 @@ import Card from "./Card";
 import "./sideBar.css";
 
 import DiscountIcon from "@mui/icons-material/Discount";
-import CategoryIcon from "@mui/icons-material/Category";
+import RedeemIcon from "@mui/icons-material/Redeem";
+import WidgetsIcon from "@mui/icons-material/Widgets";
 import Grid from "@mui/material/Grid";
 import GroupIcon from "@mui/icons-material/Group";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
@@ -33,9 +34,19 @@ const SideBar = (props) => {
       </Grid>
       <Grid item xs={6} sm={2.5} md={12}>
         <Card
+          isActive={props.location === "/gifts" ? true : false}
+          icon={<RedeemIcon />}
+          endpoint="gifts"
+          onNavigate={(where) => goTo(where)}
+        >
+          Quà tặng
+        </Card>
+      </Grid>
+      <Grid item xs={6} sm={2.5} md={12}>
+        <Card
           isActive={props.location === "/products" ? true : false}
           endpoint="products"
-          icon={<CategoryIcon />}
+          icon={<WidgetsIcon />}
           onNavigate={(where) => goTo(where)}
         >
           Sản phẩm
