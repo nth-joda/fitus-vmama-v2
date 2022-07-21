@@ -20,6 +20,8 @@ import FileUploadOutlinedIcon from "@mui/icons-material/FileUploadOutlined";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import AddCircleOutlinedIcon from "@mui/icons-material/AddCircleOutlined";
 import ClearIcon from "@mui/icons-material/Clear";
+import ToggleOffOutlinedIcon from "@mui/icons-material/ToggleOffOutlined";
+import ToggleOnIcon from "@mui/icons-material/ToggleOn";
 
 import Header from "../../components/Header";
 import SideBar from "../../components/Sidebar";
@@ -33,7 +35,13 @@ import ServerResponse from "../../objects/ServerResponse";
 import "./vouchers.css";
 import MainContentHeader from "../../components/MainContent/MainContentHeader";
 import ServerApi from "../../objects/ServerApi";
-import { Autocomplete, Typography } from "@mui/material";
+import {
+  Alert,
+  Autocomplete,
+  Snackbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 
 const NET_ERROR_MSG = "[Lỗi đường truyền]";
 
@@ -56,6 +64,7 @@ const Vouchers = () => {
   const [openCheckingContent, setOpenCheckingContent] = useState(false);
   const [testingBill, setTestingBill] = useState([]);
   const [isShowingTestRes, setIsShowingTestRes] = useState(false);
+  const [publishMsg, setPublishMsg] = useState(null);
   const [tempTestingProduct, setTempTestingProduct] = useState({
     pdName: "",
     pdPrice: "",
@@ -113,8 +122,7 @@ const Vouchers = () => {
         <th className="table__th small">ID</th>
         <th className="table__th simi-small">Tên voucher</th>
         <th className="table__th">Miêu tả</th>
-        <th className="table__th small">Còn lại</th>
-        <th className="table__th small">Số lượng</th>
+        <th className="table__th small">Đang áp dụng</th>
         <th className="table__th">Chỉnh sửa</th>
       </Wrapper>
     );
@@ -220,7 +228,7 @@ const Vouchers = () => {
                 </span>
               </td>
 
-              <td className="table__td small">
+              {/* <td className="table__td small">
                 <span className="table__mobile-caption">Còn lại</span>
                 <span
                   className="table__value"
@@ -228,15 +236,44 @@ const Vouchers = () => {
                 >
                   {item.Remaining}
                 </span>
-              </td>
+              </td> */}
 
               <td className="table__td small">
-                <span className="table__mobile-caption">Số lượng</span>
+                <span className="table__mobile-caption">Đang áp dụng</span>
                 <span
                   className="table__value"
-                  onClick={() => handleShowItem(item)}
+                  // onClick={() => handleShowItem(item)}
                 >
-                  {item.Total}
+                  <Tooltip
+                    title={
+                      item.Published
+                        ? "Nhấn để dừng áp dụng khuyến mãi"
+                        : "Nhấn để triển khai chương trình khuyến mãi này"
+                    }
+                    arrow
+                  >
+                    <Checkbox
+                      size="large"
+                      sx={{
+                        "&.Mui-checked": {
+                          color: {
+                            xs: "#2e7d32",
+                            sm: "#2e7d32",
+                            md: "#2e7d32",
+                          },
+                        },
+                      }}
+                      checked={item.Published}
+                      inputProps={{ "aria-label": "Checkbox demo" }}
+                      icon={<ToggleOffOutlinedIcon />}
+                      checkedIcon={<ToggleOnIcon />}
+                      onChange={(e) => {
+                        // alert("clicked");
+                        setPublishMsg({ code: "softLoading", msg: "..." });
+                        publishVoucher(item.ID, item.Name, e.target.checked);
+                      }}
+                    />
+                  </Tooltip>
                 </span>
               </td>
 
@@ -352,6 +389,82 @@ const Vouchers = () => {
             }
           });
       }
+    } else {
+      localStorage.removeItem("name");
+      localStorage.removeItem("token");
+    }
+  };
+
+  const publishVoucher = (id, name, isChecked) => {
+    const local_token = localStorage.getItem("token");
+    setVouchers((prevState) => {
+      const newState = prevState.map((item) => {
+        if (item.ID === id) {
+          let tempItem = item;
+          tempItem.Published = isChecked;
+          return tempItem;
+        } else return item;
+      });
+      return newState;
+    });
+    if (local_token !== null || local_token !== "") {
+      const config = {
+        headers: {
+          Authorization: "Bearer " + local_token,
+          "Content-Type": "application/json",
+        },
+      };
+      const body_req = {
+        voucher_id: id,
+        published: isChecked,
+      };
+      axios
+        .post(
+          SERVER_API.BASE_URL + SERVER_API.PUBLISH_VOUCHER,
+          body_req,
+          config
+        )
+        .then((res) => {
+          console.log(res);
+          if (res.data.status === 200) {
+            setPublishMsg(
+              isChecked
+                ? {
+                    code: 200,
+                    msg: "Thành công: Đưa vào áp dụng voucher [ " + name + " ]",
+                  }
+                : {
+                    code: 200,
+                    msg: "Thành công: Dừng áp dụng voucher [ " + name + " ]",
+                  }
+            );
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setVouchers((prevState) => {
+            const newState = prevState.map((item) => {
+              if (item.ID === id) {
+                let tempItem = item;
+                tempItem.Published = !isChecked;
+                return tempItem;
+              } else return item;
+            });
+            return newState;
+          });
+          if (
+            err.response.data &&
+            err.response.data.status === 404 &&
+            currentPage > 1
+          ) {
+            const prevPage = currentPage - 1;
+            setCurrentPage(prevPage);
+            loadData(prevPage);
+            setSelectedList([]);
+          } else {
+            catchError(err);
+          }
+        });
     } else {
       localStorage.removeItem("name");
       localStorage.removeItem("token");
@@ -1692,6 +1805,58 @@ const Vouchers = () => {
           </div>
         </Box>
       </Dialog>
+      <Snackbar
+        open={publishMsg != null}
+        autoHideDuration={
+          publishMsg != null && publishMsg.code === "softLoading" ? null : 6000
+        }
+        anchorOrigin={
+          publishMsg != null && publishMsg.code === "softLoading"
+            ? { vertical: "bottom", horizontal: "center" }
+            : { vertical: "top", horizontal: "right" }
+        }
+        sx={
+          publishMsg != null && publishMsg.code === "softLoading"
+            ? { color: "#2e7d32" }
+            : {
+                color: "#2e7d32",
+              }
+        }
+        onClose={() => setPublishMsg(null)}
+      >
+        {publishMsg != null && publishMsg.code === "softLoading" ? (
+          <Box
+            sx={{
+              background: "#302c2c7e",
+              padding: "0.5rem",
+              borderRadius: "0.3rem",
+            }}
+          >
+            <Grid container>
+              <CircularProgress
+                size="1.5rem"
+                sx={{ margin: "auto", color: "white" }}
+              />
+            </Grid>
+          </Box>
+        ) : (
+          <Alert
+            sx={{
+              fontWeight: 600,
+
+              fontSize: "1.1rem",
+              background: "#a6ebb2",
+              "& .MuiAlert-icon": {
+                color: "#2e7d32",
+              },
+            }}
+            severity="success"
+            color="success"
+          >
+            {publishMsg != null ? publishMsg.msg : ""}
+          </Alert>
+        )}
+      </Snackbar>
     </div>
   );
 };
