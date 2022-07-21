@@ -31,6 +31,7 @@ import {
   DialogContent,
   DialogTitle,
   Icon,
+  Snackbar,
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -85,6 +86,7 @@ const UserManagement = () => {
   const [selectedList, setSelectedList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [totalPages, setTotalPages] = useState(1);
+  const [metaD, setMetaD] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [editItem, setEditItem] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -96,9 +98,12 @@ const UserManagement = () => {
 
   // Load data:
   const catchData = (res) => {
+    console.log("ress:", res);
     const meta = res.data.metadata;
     const prods = res.data.accounts;
     if (meta != null) setTotalPages(meta.total_pages);
+    if (meta != null) setMetaD(meta);
+    console.log("meta:", meta);
     if (prods != null) setUsersOnCurrentPage(prods);
   };
 
@@ -137,7 +142,7 @@ const UserManagement = () => {
             config
           )
           .then((res) => {
-            console.log(res);
+            console.log("users:", res);
             catchData(res.data);
             setIsLoading(false);
           })
@@ -160,7 +165,7 @@ const UserManagement = () => {
         axios
           .get(ServerApi.BASE_URL + ServerApi.GET_STAFFS + pageNum, config)
           .then((res) => {
-            console.log(res);
+            console.log("users:", res);
             catchData(res.data);
             setIsLoading(false);
           })
@@ -495,8 +500,16 @@ const UserManagement = () => {
                     body={renderBody(usersOnCurrentPage)}
                   />
                   <div className="mainContent__footer">
-                    <Stack spacing={2}>
-                      <Pagination
+                    <Stack spacing={2} direction="row">
+                      <span>
+                        Tổng số nhân viên:{" "}
+                        {metaD != null
+                          ? metaD.total_records
+                          : usersOnCurrentPage
+                          ? usersOnCurrentPage.length
+                          : "[Lỗi hệ thống]"}
+                      </span>
+                      {/* <Pagination
                         count={totalPages}
                         defaultPage={currentPage}
                         variant="outlined"
@@ -506,7 +519,7 @@ const UserManagement = () => {
                           setCurrentPage(pageNumber);
                           console.log(pageNumber);
                         }}
-                      />
+                      /> */}
                     </Stack>
                   </div>
                 </div>

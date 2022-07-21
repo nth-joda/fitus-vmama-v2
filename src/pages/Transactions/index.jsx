@@ -311,8 +311,74 @@ const Transactions = () => {
   };
 
   const loadData = (pageNum) => {
+    // const local_token = localStorage.getItem("token");
+    // setIsLoading(true);
+    // if (local_token !== null || local_token !== "") {
+    //   const config = {
+    //     headers: {
+    //       Authorization: "Bearer " + local_token,
+    //       "Content-Type": "application/json",
+    //     },
+    //   };
+
+    //   axios
+    //     .get(ServerApi.BASE_URL + ServerApi.GET_TRANSACTIONS + pageNum, config)
+    //     .then((res) => {
+    //       console.log(res);
+    //       catchData(res.data);
+    //       setIsLoading(false);
+    //     })
+    //     .catch((err) => {
+    //       setIsLoading(false);
+    //       console.log(err);
+    //       if (
+    //         err.response.data &&
+    //         err.response.data.status === 404 &&
+    //         currentPage > 1
+    //       ) {
+    //         const prevPage = currentPage - 1;
+    //         setCurrentPage(prevPage);
+    //         loadData(prevPage);
+    //       } else {
+    //         catchError(err);
+    //       }
+    //     });
+    // } else {
+    //   localStorage.removeItem("name");
+    //   localStorage.removeItem("token");
+    // }
+    const today = new Date();
+    const pastMonth = new Date(new Date().setDate(new Date().getDate() - 30));
+    setFromDateValue(pastMonth);
+    const getFromMonth =
+      pastMonth.getMonth() < 10
+        ? "0" + (pastMonth.getMonth() + 1)
+        : pastMonth.getMonth() + 1;
+    const getToMonth =
+      today.getMonth() + 1 < 10
+        ? "0" + (today.getMonth() + 1)
+        : today.getMonth() + 1;
+    const getFromDay =
+      pastMonth.getDate() < 10
+        ? "0" + pastMonth.getDate()
+        : pastMonth.getDate();
+    const getToDay =
+      today.getDate() < 10 ? "0" + today.getDate() : today.getDate();
+
+    const fromString =
+      getFromDay + "-" + getFromMonth + "-" + fromDateValue.getFullYear();
+    const toString =
+      getToDay + "-" + getToMonth + "-" + toDateValue.getFullYear();
+    setSearchingModeMsg(
+      fromString === toString
+        ? "Các giao dịch trong ngày: " + fromString
+        : "Các giao dịch từ ngày: " +
+            fromString +
+            " đến ngày: " +
+            toString +
+            " (Hôm nay)"
+    );
     const local_token = localStorage.getItem("token");
-    setIsLoading(true);
     if (local_token !== null || local_token !== "") {
       const config = {
         headers: {
@@ -320,16 +386,25 @@ const Transactions = () => {
           "Content-Type": "application/json",
         },
       };
-
       axios
-        .get(ServerApi.BASE_URL + ServerApi.GET_TRANSACTIONS + pageNum, config)
+        .get(
+          ServerApi.BASE_URL +
+            ServerApi.TRANSACTION_SEARCH +
+            "from_date=" +
+            fromString +
+            "&to_date=" +
+            toString,
+          config
+        )
         .then((res) => {
-          console.log(res);
-          catchData(res.data);
-          setIsLoading(false);
+          if (res.data.data.receipts) {
+            const recs = splitTransactionsByDate(res.data.data.receipts);
+
+            if (recs != null) setTransactionsOnCurrentPage(recs);
+            else setTransactionsOnCurrentPage([]);
+          } else setTransactionsOnCurrentPage([]);
         })
         .catch((err) => {
-          setIsLoading(false);
           console.log(err);
           if (
             err.response.data &&
@@ -347,6 +422,7 @@ const Transactions = () => {
       localStorage.removeItem("name");
       localStorage.removeItem("token");
     }
+    setIsPickingTime(false);
   };
 
   useEffect(() => {
@@ -398,157 +474,151 @@ const Transactions = () => {
     if (isLoading !== true) {
       return (
         <Wrapper>
-          {transactionsOnCurrentPage != null
-            ? transactionsOnCurrentPage.map((item, index) => {
-                return (
-                  <Wrapper>
-                    <div className="history-table__date">
-                      <Grid container>
-                        <Tooltip
-                          title="Nhấn để tìm các giao dịch theo ngày"
-                          arrow
+          {transactionsOnCurrentPage != null ? (
+            transactionsOnCurrentPage.map((item, index) => {
+              return (
+                <Wrapper>
+                  <div className="history-table__date">
+                    <Grid container>
+                      <Tooltip
+                        title="Nhấn để tìm các giao dịch theo ngày"
+                        arrow
+                      >
+                        <Grid
+                          item
+                          sx={{ cursor: "pointer" }}
+                          container
+                          xs={7}
+                          sm={3}
+                          md={1.6}
+                          columnSpacing={2}
+                          onClick={() => setIsPickingTime(true)}
                         >
                           <Grid
                             item
-                            sx={{ cursor: "pointer" }}
+                            xs={12}
+                            sm={12}
+                            md={12}
                             container
-                            xs={7}
-                            sm={3}
-                            md={1.6}
-                            columnSpacing={2}
-                            onClick={() => setIsPickingTime(true)}
+                            justifyContent="center"
                           >
-                            <Grid
-                              item
-                              xs={12}
-                              sm={12}
-                              md={12}
-                              container
-                              justifyContent="center"
-                            >
-                              <TodayIcon sx={{ marginRight: "0.8rem" }} />
-                              {item.date ? item.date : ""}
-                            </Grid>
+                            <TodayIcon sx={{ marginRight: "0.8rem" }} />
+                            {item.date ? item.date : ""}
                           </Grid>
-                        </Tooltip>
-                      </Grid>
-                    </div>
-                    <table className="history-table">
-                      <thead>
-                        <tr className="history-table__title">
-                          <td>Thời gian</td>
-                          <td>Mã giao dịch</td>
-                          <td>Voucher đã đổi</td>
-                          <td>Nh.viên thực hiện</td>
-                          <td>Trạng thái</td>
-                        </tr>
-                      </thead>
-                      <tbody className="history-table__body">
-                        {item.trans
-                          ? item.trans.map((item, index) => {
-                              console.log("item to show", item);
-                              return (
-                                <Wrapper>
-                                  <tr
-                                    className="history-table__row"
-                                    key={item.ID}
+                        </Grid>
+                      </Tooltip>
+                    </Grid>
+                  </div>
+                  <table className="history-table">
+                    <thead>
+                      <tr className="history-table__title">
+                        <td>Thời gian</td>
+                        <td>Mã giao dịch</td>
+                        <td>Voucher đã đổi</td>
+                        <td>Nh.viên thực hiện</td>
+                        <td>Trạng thái</td>
+                      </tr>
+                    </thead>
+                    <tbody className="history-table__body">
+                      {item.trans
+                        ? item.trans.map((item, index) => {
+                            console.log("item to show", item);
+                            return (
+                              <Wrapper>
+                                <tr
+                                  className="history-table__row"
+                                  key={item.ID}
+                                >
+                                  <td
+                                    className="td-key"
+                                    onClick={() => {
+                                      setTransactionOnFocus(item);
+                                    }}
                                   >
-                                    <td
-                                      className="td-key"
-                                      onClick={() => {
-                                        setTransactionOnFocus(item);
+                                    <span className="history-table__mobile-title">
+                                      Thời gian
+                                    </span>
+                                    <span className="history-table__value bold-value">
+                                      {item && item.CreatedAt
+                                        ? item.CreatedAt.substring(
+                                            item.CreatedAt.indexOf("T") + 1,
+                                            item.CreatedAt.lastIndexOf(".")
+                                              ? item.CreatedAt.lastIndexOf(".")
+                                              : item.CreatedAt.lastIndexOf("Z")
+                                          )
+                                        : SYSTEM_ERROR_MSG}
+                                    </span>
+                                  </td>
+                                  <td
+                                    className="td-item"
+                                    onClick={() => setTransactionOnFocus(item)}
+                                  >
+                                    <span className="history-table__mobile-title">
+                                      Mã giao dịch
+                                    </span>
+                                    <span className="history-table__value">
+                                      {item && item.TransactionID
+                                        ? item.TransactionID
+                                        : SYSTEM_ERROR_MSG}
+                                    </span>
+                                  </td>
+                                  <td
+                                    className="td-item"
+                                    onClick={() => setTransactionOnFocus(item)}
+                                  >
+                                    <span className="history-table__mobile-title">
+                                      Voucher đã đổi
+                                    </span>
+                                    <div className="history-table__value">
+                                      {item && item.Voucher
+                                        ? item.Voucher[0].Name != null
+                                          ? item.Voucher[0].Name
+                                          : item.Voucher
+                                        : SYSTEM_ERROR_MSG}
+                                    </div>
+                                  </td>
+                                  <td
+                                    className="td-item"
+                                    onClick={() => setTransactionOnFocus(item)}
+                                  >
+                                    <span className="history-table__mobile-title">
+                                      Nh.viên thực hiện
+                                    </span>
+                                    <span className="history-table__value bold-value">
+                                      {item && item.Account
+                                        ? item.Account
+                                        : SYSTEM_ERROR_MSG}
+                                    </span>
+                                  </td>
+                                  <td className="td-item">
+                                    <span className="history-table__mobile-title">
+                                      Trạng thái
+                                    </span>
+                                    <RenderStatus
+                                      checkingItem={item}
+                                      handleDoCheckClicked={(checkedItem) => {
+                                        if (showItem === null)
+                                          setTransactionOnFocus(checkedItem);
+                                        else
+                                          setCheckingTransaction(checkedItem);
                                       }}
-                                    >
-                                      <span className="history-table__mobile-title">
-                                        Thời gian
-                                      </span>
-                                      <span className="history-table__value bold-value">
-                                        {item && item.CreatedAt
-                                          ? item.CreatedAt.substring(
-                                              item.CreatedAt.indexOf("T") + 1,
-                                              item.CreatedAt.lastIndexOf(".")
-                                                ? item.CreatedAt.lastIndexOf(
-                                                    "."
-                                                  )
-                                                : item.CreatedAt.lastIndexOf(
-                                                    "Z"
-                                                  )
-                                            )
-                                          : SYSTEM_ERROR_MSG}
-                                      </span>
-                                    </td>
-                                    <td
-                                      className="td-item"
-                                      onClick={() =>
-                                        setTransactionOnFocus(item)
-                                      }
-                                    >
-                                      <span className="history-table__mobile-title">
-                                        Mã giao dịch
-                                      </span>
-                                      <span className="history-table__value">
-                                        {item && item.TransactionID
-                                          ? item.TransactionID
-                                          : SYSTEM_ERROR_MSG}
-                                      </span>
-                                    </td>
-                                    <td
-                                      className="td-item"
-                                      onClick={() =>
-                                        setTransactionOnFocus(item)
-                                      }
-                                    >
-                                      <span className="history-table__mobile-title">
-                                        Voucher đã đổi
-                                      </span>
-                                      <div className="history-table__value">
-                                        {item && item.Voucher
-                                          ? item.Voucher[0].Name != null
-                                            ? item.Voucher[0].Name
-                                            : item.Voucher
-                                          : SYSTEM_ERROR_MSG}
-                                      </div>
-                                    </td>
-                                    <td
-                                      className="td-item"
-                                      onClick={() =>
-                                        setTransactionOnFocus(item)
-                                      }
-                                    >
-                                      <span className="history-table__mobile-title">
-                                        Nh.viên thực hiện
-                                      </span>
-                                      <span className="history-table__value bold-value">
-                                        {item && item.Account
-                                          ? item.Account
-                                          : SYSTEM_ERROR_MSG}
-                                      </span>
-                                    </td>
-                                    <td className="td-item">
-                                      <span className="history-table__mobile-title">
-                                        Trạng thái
-                                      </span>
-                                      <RenderStatus
-                                        checkingItem={item}
-                                        handleDoCheckClicked={(checkedItem) => {
-                                          if (showItem === null)
-                                            setTransactionOnFocus(checkedItem);
-                                          else
-                                            setCheckingTransaction(checkedItem);
-                                        }}
-                                      />
-                                    </td>
-                                  </tr>
-                                </Wrapper>
-                              );
-                            })
-                          : null}
-                      </tbody>
-                    </table>
-                  </Wrapper>
-                );
-              })
-            : "Kho cóa"}
+                                    />
+                                  </td>
+                                </tr>
+                              </Wrapper>
+                            );
+                          })
+                        : null}
+                    </tbody>
+                  </table>
+                </Wrapper>
+              );
+            })
+          ) : (
+            <Box sx={{ textAlign: "center" }}>
+              <CircularProgress sx={{ color: "white", margin: "1rem" }} />
+            </Box>
+          )}
           {/* <div className="history-table__date">
             <Grid container>
               <Grid item xs={2} sm={0.7} md={0.5}>
@@ -730,7 +800,7 @@ const Transactions = () => {
                     width: "wrap-content",
                     display: "inline-block",
                   }}
-                  onClick={() => onHandleRefreshClicked()}
+                  onClick={() => setIsPickingTime(true)}
                 >
                   {searchingModeMsg}
                 </Typography>
@@ -1701,7 +1771,15 @@ const Transactions = () => {
               columnSpacing={3}
               alignContent={"center"}
             >
-              <Grid item sx={12} sm={6} md={6} alignSelf="center">
+              <Grid
+                item
+                container
+                sx={12}
+                sm={6}
+                md={6}
+                alignSelf="center"
+                justifyContent="center"
+              >
                 <DesktopDatePicker
                   label="Từ ngày"
                   inputFormat="dd/MM/yyyy"
@@ -1734,7 +1812,7 @@ const Transactions = () => {
                     <TextField
                       {...params}
                       helperText={
-                        fromDateValue.getDate() === new Date().getDate()
+                        fromDateValue === new Date()
                           ? "Hôm nay"
                           : "ngày/tháng/năm"
                       }
@@ -1743,7 +1821,15 @@ const Transactions = () => {
                   )}
                 />
               </Grid>
-              <Grid item xs={12} sm={6} md={6} alignSelf="center">
+              <Grid
+                item
+                xs={12}
+                sm={6}
+                md={6}
+                alignSelf="center"
+                container
+                justifyContent="center"
+              >
                 <DesktopDatePicker
                   label="Đến ngày"
                   inputFormat="dd/MM/yyyy"
@@ -1776,7 +1862,9 @@ const Transactions = () => {
                     <TextField
                       {...params}
                       helperText={
-                        toDateValue.getDate() === new Date().getDate()
+                        toDateValue.getDate() === new Date().getDate() &&
+                        toDateValue.getMonth() === new Date().getMonth() + 1 &&
+                        toDateValue.getFullYear() === new Date().getFullYear()
                           ? "Hôm nay"
                           : "ngày/tháng/năm"
                       }
