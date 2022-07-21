@@ -22,6 +22,8 @@ const ServerApi = {
   CHECK_TRANSACTION: "/api/v1/admin/transactions/",
   REGISTER_STAFF: "/api/v1/admin/auth/register_sales",
   TRANSACTION_SEARCH: "/api/v1/admin/transactions/search?",
+  GET_ALL_GIFTS: "/api/v1/admin/gifts?page=",
+  SEARCH_GIFTS_BY_KW: "/api/v1/admin/gifts/search?query=",
 };
 
 export default ServerApi;
