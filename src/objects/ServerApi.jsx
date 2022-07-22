@@ -24,6 +24,9 @@ const ServerApi = {
   TRANSACTION_SEARCH: "/api/v1/admin/transactions/search?",
   GET_ALL_GIFTS: "/api/v1/admin/gifts?page=",
   SEARCH_GIFTS_BY_KW: "/api/v1/admin/gifts/search?query=",
+  UPDATE_GIFT: "/api/v1/admin/gifts/",
+  CREATE_GIFT: "/api/v1/admin/gifts",
+  DELETE_GIFTS: "/api/v1/admin/gifts/delete_gifts",
 };
 
 export default ServerApi;
