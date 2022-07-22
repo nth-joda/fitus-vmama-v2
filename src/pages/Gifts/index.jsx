@@ -2,10 +2,12 @@ import React, { useState } from "react";
 import {
   Checkbox,
   CircularProgress,
+  Dialog,
   Grid,
   IconButton,
   Pagination,
   Stack,
+  TextField,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import EditIcon from "@mui/icons-material/Edit";
@@ -18,6 +20,8 @@ import Wrapper from "../../utils/Wrapper";
 import Table from "../../utils/Table";
 import { useEffect } from "react";
 import axios from "axios";
+import * as yup from "yup";
+import { useFormik } from "formik";
 import ServerApi from "../../objects/ServerApi";
 import ServerResponse from "../../objects/ServerResponse";
 
@@ -137,6 +141,59 @@ const Gifts = () => {
     loadData(currentPage);
   }, [currentPage]);
 
+  const editFormik = useFormik({
+    initialValues: {
+      ID: -1,
+      giftName: "",
+      amount: 999999,
+    },
+    onSubmit: (values) => {
+      alert(JSON.stringify(values, null, 2));
+    },
+  });
+
+  const editFormHandleSubmit = () => {
+    if (giftOnFocus == null) {
+      const local_token = localStorage.getItem("token");
+      const config = {
+        headers: {
+          Authorization: "Bearer " + local_token,
+          "Content-Type": "application/json",
+        },
+      };
+      const body_req = {
+        gift_name: editFormik.values.giftName,
+        total: parseInt(editFormik.values.amount),
+        remaining: parseInt(editFormik.values.amount),
+      };
+      axios
+        .post(ServerApi.BASE_URL + ServerApi.CREATE_GIFT, body_req, config)
+        .then((res) => {
+          console.log("after adding:", res);
+        })
+        .catch((err) => {
+          console.log(err);
+          catchError(err);
+        });
+    } else {
+      //edit gift
+    }
+    setGiftOnFocus(null);
+    setAddingOrEditingMode(false);
+  };
+
+  useEffect(() => {
+    if (giftOnFocus != null) {
+      editFormik.setFieldValue("ID", giftOnFocus.ID);
+      editFormik.setFieldValue("giftName", giftOnFocus.GiftName);
+      editFormik.setFieldValue("amount", giftOnFocus.Remaining);
+    } else {
+      editFormik.setFieldValue("ID", -1);
+      editFormik.setFieldValue("giftName", "");
+      editFormik.setFieldValue("amount", "");
+    }
+  }, [giftOnFocus]);
+
   // TABLE DATA:
   const renderHeaders = () => {
     return (
@@ -210,7 +267,7 @@ const Gifts = () => {
                 <span
                   className="table__mobile-name"
                   onClick={() => {
-                    // handleShowItem(item);
+                    setGiftOnFocus(item);
                   }}
                 >
                   {item.GiftName}
@@ -218,7 +275,7 @@ const Gifts = () => {
               </td>
               <td
                 className="table__td small"
-                // onClick={() => handleShowItem(item)}
+                onClick={() => setGiftOnFocus(item)}
               >
                 <span className="table__mobile-caption">ID</span>
                 <span className="table__value">{item.ID}</span>
@@ -226,7 +283,7 @@ const Gifts = () => {
 
               <td
                 className="table__td simi-small"
-                // onClick={() => handleShowItem(item)}
+                onClick={() => setGiftOnFocus(item)}
               >
                 <span className="table__mobile-caption">Tên Quà tặng</span>
                 <span className="table__value">{item.GiftName}</span>
@@ -245,8 +302,8 @@ const Gifts = () => {
                     color="primary"
                     aria-label="chinh sua"
                     onClick={() => {
-                      // setEditItem(item.ID);
-                      // setAddOrEditMode(true);
+                      setGiftOnFocus(item);
+                      setAddingOrEditingMode(true);
                     }}
                   >
                     <EditIcon />
@@ -279,7 +336,10 @@ const Gifts = () => {
                 isDeleteDisabled={selectedList.length > 0 ? false : true}
                 // handleRefreshClicked={onHandleRefreshClicked}
                 // handleDeleteClicked={onHandleDeleteClicked}
-                // handleAddClicked={onHandleAddClicked}
+                handleAddClicked={() => {
+                  setGiftOnFocus(null);
+                  setAddingOrEditingMode(true);
+                }}
                 // catchTerm={(term) => setSearchTerm(term)}
                 // isResetSearch={searchTerm === null ? true : false}
               />
@@ -335,6 +395,126 @@ const Gifts = () => {
           </MainContent>
         </Grid>
       </Grid>
+      <Dialog
+        open={addingOrEditingMode === true ? true : false}
+        fullWidth
+        maxWidth="md"
+        onClose={() => {
+          if (giftOnFocus == null) setAddingOrEditingMode(false);
+        }}
+      >
+        <Box className="dialog-content">
+          <div className="dialog-title detail">
+            {giftOnFocus != null ? "Chỉnh sửa quà tặng" : "Thêm loại quà tặng"}
+          </div>
+          <div className="dialog-content">
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                editFormHandleSubmit();
+              }}
+            >
+              <Grid container rowSpacing={4}>
+                <Grid item container xs={12} sm={12} md={12}>
+                  <Grid item xs={12} sm={4} md={3} alignSelf="center">
+                    <label className="form-edit-add__label">Tên quà tặng</label>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={9} alignSelf="center">
+                    <TextField
+                      label="Bắt buộc *"
+                      variant="filled"
+                      type="text"
+                      error={
+                        editFormik.values.giftName === "" ||
+                        editFormik.values.giftName == null
+                      }
+                      name="giftName"
+                      onChange={editFormik.handleChange}
+                      InputProps={{ inputProps: { min: 0 } }}
+                      value={editFormik.values.giftName}
+                      size="small"
+                      fullWidth
+                    />
+                  </Grid>
+                </Grid>
+                <Grid item container xs={12} sm={12} md={12}>
+                  <Grid item xs={12} sm={4} md={3} alignSelf="center">
+                    <label className="form-edit-add__label">
+                      Số lượng còn lại
+                    </label>
+                  </Grid>
+                  <Grid item xs={12} sm={8} md={9} alignSelf="center">
+                    <TextField
+                      // disabled={giftOnFocus != null ? true : false}
+                      label="Bắt buộc *"
+                      variant="filled"
+                      type="number"
+                      name="amount"
+                      error={
+                        editFormik.values.amount <= 0 ||
+                        editFormik.values.amount == null
+                      }
+                      InputProps={{ inputProps: { min: 0 } }}
+                      onChange={(e) =>
+                        editFormik.setFieldValue("amount", e.target.value)
+                      }
+                      value={editFormik.values.amount}
+                      size="small"
+                      fullWidth
+                    />
+                  </Grid>
+                </Grid>
+                <Grid item container xs={12} md={12} sm={12}>
+                  <Grid item xs={12} sm={4} md={3} alignSelf="center"></Grid>
+                  <Grid
+                    item
+                    xs={12}
+                    sm={8}
+                    md={9}
+                    alignSelf="center"
+                    container
+                    justifyContent="flex-end"
+                  >
+                    <Grid item xs={6.5} sm={6.5} md={6.5}>
+                      <button
+                        className="btn btn-primary"
+                        type="button"
+                        onClick={() => {
+                          setGiftOnFocus(null);
+                          setAddingOrEditingMode(false);
+                        }}
+                      >
+                        Hủy bỏ thao tác
+                      </button>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={5.5}
+                      sm={5.5}
+                      md={5.5}
+                      container
+                      justifyContent="flex-end"
+                    >
+                      <button
+                        className="btn btn-safe"
+                        type="submit"
+                        disabled={
+                          editFormik.values.giftName === "" ||
+                          editFormik.values.giftName == null ||
+                          editFormik.values.amount <= 0 ||
+                          editFormik.values.amount == null
+                        }
+                      >
+                        Xác nhận
+                      </button>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </form>
+          </div>
+        </Box>
+      </Dialog>
     </div>
   );
 };
