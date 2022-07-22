@@ -3,9 +3,13 @@ import {
   Checkbox,
   CircularProgress,
   Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Grid,
   IconButton,
   Pagination,
+  Snackbar,
   Stack,
   TextField,
 } from "@mui/material";
@@ -24,8 +28,10 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import ServerApi from "../../objects/ServerApi";
 import ServerResponse from "../../objects/ServerResponse";
+import { useNavigate } from "react-router-dom";
 
 const Gifts = () => {
+  let navigate = useNavigate();
   const [hardLoading, setHardLoading] = useState(false);
   const [softLoading, setSoftLoading] = useState(false);
   const [giftsOnCurrentPage, setGiftsOnCurrentPage] = useState(null);
@@ -151,8 +157,16 @@ const Gifts = () => {
       alert(JSON.stringify(values, null, 2));
     },
   });
+  const handleAgree = () => {
+    if (serverStatus.code === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("name");
+      navigate("/login");
+    } else setOpenServerDialog(false);
+  };
 
   const editFormHandleSubmit = () => {
+    setSoftLoading(true);
     if (giftOnFocus == null) {
       const local_token = localStorage.getItem("token");
       const config = {
@@ -170,9 +184,22 @@ const Gifts = () => {
         .post(ServerApi.BASE_URL + ServerApi.CREATE_GIFT, body_req, config)
         .then((res) => {
           console.log("after adding:", res);
+          res = ServerResponse(res);
+          console.log("asdsa", res);
+          setServerStatus({
+            msg: "Thao tác thành công",
+            hint: "",
+          });
+          editFormik.setFieldValue("giftName", "");
+          editFormik.setFieldValue("amount", "");
+          editFormik.setFieldValue("ID", -1);
+
+          setSoftLoading(false);
+          setOpenServerDialog(true);
         })
         .catch((err) => {
           console.log(err);
+          setSoftLoading(true);
           catchError(err);
         });
     } else {
@@ -515,6 +542,51 @@ const Gifts = () => {
           </div>
         </Box>
       </Dialog>
+      {serverStatus && (
+        <Dialog
+          open={openServerDialog === true ? true : false}
+          fullWidth
+          maxWidth="sm"
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle>{serverStatus.msg}</DialogTitle>
+          <DialogContent>
+            <p>{serverStatus.hint}</p>
+          </DialogContent>
+          <DialogActions>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={handleAgree}
+            >
+              Đồng ý
+            </button>
+          </DialogActions>
+        </Dialog>
+      )}
+      <Snackbar
+        open={softLoading === true ? true : false}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        sx={{
+          color: "#2e7d32",
+        }}
+      >
+        <Box
+          sx={{
+            background: "#302c2c7e",
+            padding: "0.5rem",
+            borderRadius: "0.3rem",
+          }}
+        >
+          <Grid container>
+            <CircularProgress
+              size="1.5rem"
+              sx={{ margin: "auto", color: "white" }}
+            />
+          </Grid>
+        </Box>
+      </Snackbar>
     </div>
   );
 };
