@@ -26,6 +26,7 @@ const ServerApi = {
   SEARCH_GIFTS_BY_KW: "/api/v1/admin/gifts/search?query=",
   UPDATE_GIFT: "/api/v1/admin/gifts/",
   CREATE_GIFT: "/api/v1/admin/gifts",
+  DELETE_GIFTS: "/api/v1/admin/gifts/delete_gifts",
 };
 
 export default ServerApi;

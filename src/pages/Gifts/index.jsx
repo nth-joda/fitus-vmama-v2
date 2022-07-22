@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import {
+  Button,
   Checkbox,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
+  DialogContentText,
   DialogTitle,
   Grid,
   IconButton,
@@ -43,6 +45,7 @@ const Gifts = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [serverStatus, setServerStatus] = useState(null);
   const [openServerDialog, setOpenServerDialog] = useState(null);
+  const [openConfirmDelDialog, setOpenConfirmDelDialog] = useState(false);
 
   const catchData = (res) => {
     const meta = res.data.metadata;
@@ -165,21 +168,59 @@ const Gifts = () => {
     } else setOpenServerDialog(false);
   };
 
+  const onHandleDeleteClicked = () => {
+    setOpenConfirmDelDialog(true);
+  };
+
+  const confirmedDelete = () => {
+    setSoftLoading(true);
+    const local_token = localStorage.getItem("token");
+    const config = {
+      headers: {
+        Authorization: "Bearer " + local_token,
+        "Content-Type": "application/json",
+      },
+    };
+    const body_req = {
+      ids: selectedList.map((item) => item.ID),
+    };
+    axios
+      .post(ServerApi.BASE_URL + ServerApi.DELETE_GIFTS, body_req, config)
+      .then((res) => {
+        console.log("after deling:", res);
+        res = ServerResponse(res);
+        setServerStatus({
+          msg: "Thao tác thành công",
+          hint: "",
+        });
+        loadData(metaD.total_pages - 1);
+        setSelectedList([]);
+        setOpenConfirmDelDialog(false);
+        setSoftLoading(false);
+        setOpenServerDialog(true);
+      })
+      .catch((err) => {
+        console.log(err);
+        setSoftLoading(true);
+        catchError(err);
+      });
+  };
+
   const editFormHandleSubmit = () => {
     setSoftLoading(true);
+    const local_token = localStorage.getItem("token");
+    const config = {
+      headers: {
+        Authorization: "Bearer " + local_token,
+        "Content-Type": "application/json",
+      },
+    };
+    const body_req = {
+      gift_name: editFormik.values.giftName,
+      total: parseInt(editFormik.values.amount),
+      remaining: parseInt(editFormik.values.amount),
+    };
     if (giftOnFocus == null) {
-      const local_token = localStorage.getItem("token");
-      const config = {
-        headers: {
-          Authorization: "Bearer " + local_token,
-          "Content-Type": "application/json",
-        },
-      };
-      const body_req = {
-        gift_name: editFormik.values.giftName,
-        total: parseInt(editFormik.values.amount),
-        remaining: parseInt(editFormik.values.amount),
-      };
       axios
         .post(ServerApi.BASE_URL + ServerApi.CREATE_GIFT, body_req, config)
         .then((res) => {
@@ -193,7 +234,7 @@ const Gifts = () => {
           editFormik.setFieldValue("giftName", "");
           editFormik.setFieldValue("amount", "");
           editFormik.setFieldValue("ID", -1);
-
+          loadData(currentPage);
           setSoftLoading(false);
           setOpenServerDialog(true);
         })
@@ -204,6 +245,32 @@ const Gifts = () => {
         });
     } else {
       //edit gift
+      axios
+        .put(
+          ServerApi.BASE_URL + ServerApi.UPDATE_GIFT + giftOnFocus.ID,
+          body_req,
+          config
+        )
+        .then((res) => {
+          console.log("after adding:", res);
+          res = ServerResponse(res);
+          setServerStatus({
+            msg: "Thao tác thành công",
+            hint: "",
+          });
+          editFormik.setFieldValue("giftName", "");
+          editFormik.setFieldValue("amount", "");
+          editFormik.setFieldValue("ID", -1);
+          loadData(currentPage);
+
+          setSoftLoading(false);
+          setOpenServerDialog(true);
+        })
+        .catch((err) => {
+          console.log(err);
+          setSoftLoading(true);
+          catchError(err);
+        });
     }
     setGiftOnFocus(null);
     setAddingOrEditingMode(false);
@@ -362,7 +429,7 @@ const Gifts = () => {
                 delOn={true}
                 isDeleteDisabled={selectedList.length > 0 ? false : true}
                 // handleRefreshClicked={onHandleRefreshClicked}
-                // handleDeleteClicked={onHandleDeleteClicked}
+                handleDeleteClicked={onHandleDeleteClicked}
                 handleAddClicked={() => {
                   setGiftOnFocus(null);
                   setAddingOrEditingMode(true);
@@ -542,6 +609,79 @@ const Gifts = () => {
           </div>
         </Box>
       </Dialog>
+      <Dialog
+        open={openConfirmDelDialog === true ? true : false}
+        fullWidth
+        maxWidth="md"
+        onClose={() => {
+          if (giftOnFocus == null) setAddingOrEditingMode(false);
+        }}
+      >
+        <DialogTitle id="alert-dialog-title">
+          Xóa {selectedList.length} sản phẩm sau khỏi hệ thống?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <Grid container sx={{ background: "#3084d7", padding: "0.5rem" }}>
+              <Grid item xs={2} sm={2} md={1.5}>
+                <span className="table__title">No </span>
+              </Grid>
+              <Grid item xs={2} sm={2} md={1.5}>
+                <span className="table__title">Id </span>
+              </Grid>
+              <Grid item xs={6} sm={6} md={7}>
+                <span className="table__title">Tên quà tặng</span>
+              </Grid>
+              <Grid item xs={2} sm={2} md={2}>
+                <span className="table__title">Số lượng</span>
+              </Grid>
+            </Grid>
+            {selectedList.map((item, index) => {
+              console.log(item);
+              return (
+                <Grid container sx={{ padding: "0.5rem" }}>
+                  <Grid item xs={2} sm={2} md={1.5}>
+                    <span>{index + 1} </span>
+                  </Grid>
+                  <Grid item xs={2} sm={2} md={1.5}>
+                    <span>{item.ID} </span>
+                  </Grid>
+                  <Grid item xs={6} sm={6} md={7}>
+                    <span>{item.GiftName}</span>
+                  </Grid>
+                  <Grid item xs={2} sm={2} md={2}>
+                    <span>{item.Remaining}</span>
+                  </Grid>
+                </Grid>
+              );
+            })}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          {softLoading === true ? (
+            <Grid
+              container
+              sx={{
+                justifyContent: "center",
+                alignItems: "center",
+                textAlign: "center",
+                padding: "0.5rem",
+              }}
+            >
+              <CircularProgress />
+            </Grid>
+          ) : (
+            <Wrapper>
+              <Button onClick={() => setOpenConfirmDelDialog(false)}>
+                Hủy bỏ
+              </Button>
+              <Button color="error" onClick={confirmedDelete}>
+                Xác nhận xóa
+              </Button>
+            </Wrapper>
+          )}
+        </DialogActions>
+      </Dialog>
       {serverStatus && (
         <Dialog
           open={openServerDialog === true ? true : false}
@@ -565,6 +705,7 @@ const Gifts = () => {
           </DialogActions>
         </Dialog>
       )}
+
       <Snackbar
         open={softLoading === true ? true : false}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
